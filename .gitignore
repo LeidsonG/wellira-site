@@ -1,0 +1,28 @@
+# Credenciais de deploy (SFTP HostGator)
+.env
+.env.*
+deploy.conf
+*.pem
+*.key
+
+# Conteúdo criado pela cliente no painel — vive no servidor, nunca no repo
+dados/ofertas/
+assets/videos/
+assets/img/uploads/
+
+# Documentos internos de trabalho — o repositório é público
+CLAUDE.md
+PROJETO.md
+
+# Sistema / editor
+.DS_Store
+Thumbs.db
+*.log
+*.tmp
+*.swp
+.vscode/
+.idea/
+
+# Artefatos locais
+node_modules/
+/tmp/
