@@ -276,6 +276,46 @@ p  { margin: 0 0 1.1rem; }
 .review-name { font-size: .85rem; color: var(--ink-faint); margin-top: .5rem; }
 */
 
+/* ---------- Página de erro ----------
+   Links de ofertas antigas continuam circulando depois de a página sair do ar.
+   Esta tela é o que essas pessoas veem, então ela precisa parecer parte de um
+   site cuidado — e oferecer para onde ir em seguida. */
+
+.error {
+  min-height: 68vh;
+  display: grid; place-items: center;
+  padding: 3rem 0;
+  text-align: center;
+}
+.error-code {
+  font-size: clamp(6rem, 26vw, 12rem);
+  font-weight: 800; line-height: 0.85; letter-spacing: -0.06em;
+  background: linear-gradient(155deg, var(--brand) 15%, #7cc0b7 85%);
+  -webkit-background-clip: text; background-clip: text;
+  color: transparent;
+  margin-bottom: 1.25rem;
+  user-select: none;
+}
+.error h1 { font-size: clamp(1.5rem, 5vw, 2.1rem); }
+.error .lede { max-width: 30rem; margin-inline: auto; }
+
+.error-links {
+  display: grid; gap: 0.6rem; grid-template-columns: 1fr;
+  max-width: 28rem; margin: 2rem auto 0; padding: 0; list-style: none;
+  text-align: left;
+}
+.error-links a {
+  display: flex; align-items: center; gap: 0.75rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--line); border-radius: 11px;
+  background: var(--bg); color: var(--ink);
+  text-decoration: none; font-weight: 600; font-size: 0.97rem;
+  transition: border-color .15s ease, background .15s ease;
+}
+.error-links a:hover { border-color: var(--brand); background: #f2f9f8; }
+.error-links svg { color: var(--brand); flex: 0 0 auto; }
+.error-links .arrow { margin-left: auto; color: var(--ink-faint); }
+
 /* ---------- Rodapé ---------- */
 
 .legal {

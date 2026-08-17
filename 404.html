@@ -4,7 +4,18 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Page Not Found — Wellira</title>
-<meta name="robots" content="noindex">
+
+<!-- ==========================================================================
+     ⚠️  ATENÇÃO — BLOQUEIO DE INDEXAÇÃO ATIVO  ⚠️
+     A meta "robots" abaixo, somada ao robots.txt na raiz, impede que esta
+     página apareça no Google enquanto está hospedada no GitHub Pages.
+
+     >>> REMOVER esta meta E o robots.txt ANTES de publicar na HostGator. <<<
+     Se forem esquecidos, o site real jamais será encontrado no Google.
+     Checklist completo no README.md.
+     ========================================================================== -->
+<meta name="robots" content="noindex, nofollow">
+
 <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
@@ -17,17 +28,39 @@
 </header>
 
 <main>
-  <section class="hero center">
+  <section class="error">
     <div class="wrap">
-      <span class="eyebrow">Error 404</span>
-      <h1>That page isn't here.</h1>
+      <div class="error-code" aria-hidden="true">404</div>
+
+      <h1>This page has moved on.</h1>
       <p class="lede">
-        The link may be out of date, or the review you're looking for has been taken
-        down. Either way, nothing's broken on your end.
+        The review you're after may have been taken down, or the link is simply out
+        of date. Nothing went wrong on your end.
       </p>
-      <p>
-        <a class="btn-ghost" href="index.html">Go to the homepage</a>
-      </p>
+
+      <ul class="error-links">
+        <li>
+          <a href="index.html">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M5 21V10l7-6 7 6v11z"/><path d="M9.5 21v-6h5v6"/></svg>
+            Back to the homepage
+            <span class="arrow" aria-hidden="true">&rarr;</span>
+          </a>
+        </li>
+        <li>
+          <a href="index.html#how">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 4 6.5v5c0 4.6 3.3 8.4 8 9.5 4.7-1.1 8-4.9 8-9.5v-5L12 3Z"/></svg>
+            How I review products
+            <span class="arrow" aria-hidden="true">&rarr;</span>
+          </a>
+        </li>
+        <li>
+          <a href="/contact/">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16v11H8l-4 4V5Z"/></svg>
+            Ask me directly
+            <span class="arrow" aria-hidden="true">&rarr;</span>
+          </a>
+        </li>
+      </ul>
     </div>
   </section>
 </main>
@@ -37,7 +70,6 @@
     <nav class="legal-links">
       <a href="/privacy-policy/">Privacy Policy</a>
       <a href="/terms-of-service/">Terms of Service</a>
-      <a href="/affiliate-disclosure/">Affiliate Disclosure</a>
       <a href="/contact/">Contact</a>
     </nav>
     <p>&copy; 2026 Wellira. All rights reserved.</p>

@@ -1,0 +1,17 @@
+# ============================================================================
+# ⚠️  ARQUIVO TEMPORÁRIO DE PREVIEW — APAGAR ANTES DE PUBLICAR NA HOSTGATOR
+# ============================================================================
+#
+# Enquanto o site está no GitHub Pages, ele contém produtos FICTÍCIOS criados
+# apenas para aprovação do layout. Este arquivo impede que buscadores indexem
+# esse conteúdo e o confundam com uma oferta real.
+#
+# >>> APAGAR este robots.txt e remover as tags <meta name="robots"> das
+# >>> páginas HTML antes de subir o site definitivo. Se ficarem, o site real
+# >>> nunca aparecerá no Google.
+#
+# Checklist completo no README.md.
+# ============================================================================
+
+User-agent: *
+Disallow: /
