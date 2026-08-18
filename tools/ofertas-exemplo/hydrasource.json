@@ -1,25 +1,20 @@
 {
   "_comentario": "Mesma estrutura de vitalane.json, com os blocos 'beneficios' e 'autor' AUSENTES de propósito — é a demonstração da regra 'campo vazio = bloco some'. Categoria eletronico: o rodapé não recebe FDA/DSHEA nem 'results vary'.",
-
   "status": "publicado",
   "avisos_legais": "",
   "eyebrow": "Home tech · Reviewed",
   "titulo": "A machine that pulls drinking water out of the air.",
   "titulo_aba": "HydraSource Review — Water From Air, Tested",
-  "subtitulo": "It sounds like a gimmick. I ran one for a week to find out how much water it really makes — and where it disappoints.",
+  "subtitulo": "It sounds like a gimmick. I ran one for a week to find out how much water it really makes, and where it disappoints.",
   "meta_descricao": "An atmospheric water generator tested for a week: how much water it really makes, and where it falls short.",
-
   "video": "https://www.youtube.com/watch?v=aqz-KE-bpKQ",
   "video_legenda": "Watch: 7 days with the HydraSource · 5:40",
-
   "link": "https://exemplo-fornecedor.com/hydrasource",
   "botao_texto": "Check Price on the Official Site",
   "botao_sub": "You'll be taken to the manufacturer's website to complete your order.",
   "botao_sub2": "Secure checkout on the manufacturer's website.",
-
   "texto_titulo": "The honest version",
-  "texto": "The physics here isn't magic: the unit chills a surface until moisture in the air condenses on it, then filters what it collects. Dehumidifiers have done the first half for decades. What you're paying for is the filtration and the convenience of having it come out drinkable.\n\nIn a normally humid room, mine produced a bit under two gallons a day — enough for a household's drinking water, not enough to cook and clean with. It also runs constantly, and you will hear it. It's about as loud as a window air conditioner.\n\nWhere it genuinely earned its place: no more hauling cases of bottled water, and no plastic piling up by the door. Whether that's worth the price depends entirely on where you live — which is what the next section is about.",
-
+  "texto": "The physics here isn't magic: the unit chills a surface until moisture in the air condenses on it, then filters what it collects. Dehumidifiers have done the first half for decades. What you're paying for is the filtration and the convenience of having it come out drinkable.\n\nIn a normally humid room, mine produced a bit under two gallons a day, enough for a household's drinking water, not enough to cook and clean with. It also runs constantly, and you will hear it. It's about as loud as a window air conditioner.\n\nWhere it genuinely earned its place: no more hauling cases of bottled water, and no plastic piling up by the door. Whether that's worth the price depends entirely on where you live, which is what the next section is about.",
   "como_funciona_titulo": "How it works",
   "como_funciona": [
     {
@@ -35,27 +30,36 @@
       "texto": "Multi-stage filtration before it reaches the dispenser. Filters are replaceable."
     }
   ],
-
   "nao_e_para_voce_titulo": "This isn't for you if…",
   "nao_e_para_voce": [
-    "You live somewhere dry — below about 40% humidity, output drops sharply",
+    "You live somewhere dry, below about 40% humidity, output drops sharply",
     "You need water for cooking and cleaning, not just drinking",
-    "Electricity costs are a major concern — it runs continuously",
+    "Electricity costs are a major concern: it runs continuously",
     "You need it silent. It isn't."
   ],
   "nao_e_para_voce_nota": "If none of those are dealbreakers for you, it's a genuinely useful machine.",
-
   "selos": [
-    { "icone": "retorno", "titulo": "30-day returns", "texto": "Handled by the manufacturer" },
-    { "icone": "envio",   "titulo": "Ships from the USA", "texto": "No overseas wait times" },
-    { "icone": "escudo",  "titulo": "2-year warranty", "texto": "Parts and labor" }
+    {
+      "icone": "retorno",
+      "titulo": "30-day returns",
+      "texto": "Handled by the manufacturer"
+    },
+    {
+      "icone": "envio",
+      "titulo": "Ships from the USA",
+      "texto": "No overseas wait times"
+    },
+    {
+      "icone": "escudo",
+      "titulo": "2-year warranty",
+      "texto": "Parts and labor"
+    }
   ],
-
   "faq_titulo": "Common questions",
   "faq": [
     {
       "pergunta": "What happens when I click?",
-      "resposta": "You'll be taken to the official HydraSource website, where the order is processed. I don't handle payment, shipping or returns — the manufacturer does."
+      "resposta": "You'll be taken to the official HydraSource website, where the order is processed. I don't handle payment, shipping or returns. The manufacturer does."
     },
     {
       "pergunta": "How much water does it actually make?",
@@ -67,7 +71,7 @@
     },
     {
       "pergunta": "How often do filters need replacing?",
-      "resposta": "Roughly every six months under normal use. Factor the replacement cost into your decision — it's an ongoing expense, not a one-time purchase."
+      "resposta": "Roughly every six months under normal use. Factor the replacement cost into your decision: it's an ongoing expense, not a one-time purchase."
     },
     {
       "pergunta": "Is my payment secure?",
