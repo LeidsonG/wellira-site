@@ -20,6 +20,8 @@ Hospedagem: HostGator (plano compartilhado, cPanel). Deploy por SFTP.
 - [ ] **Remover a tag `<meta name="robots" content="noindex, nofollow">`** de:
       `index.html`, `vitalane.html`, `hydrasource.html`, `404.html`
 - [ ] Remover os comentários de aviso que acompanham essas tags
+- [ ] **Remover a nota `.video-nota`** sob o vídeo (texto em português, só para a
+      fase de aprovação) e a regra correspondente no CSS
 - [ ] Substituir os produtos fictícios (Vitalane, HydraSource) pelos reais
 - [ ] Substituir foto, nome e história na seção "Why I'm sharing this"
 - [ ] Preencher as páginas legais com os dados reais da empresa
