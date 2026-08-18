@@ -83,7 +83,7 @@ function cta(string $link, string $texto, ?string $sub = null): string
 
 <header class="site-head">
   <div class="wrap">
-    <a class="logo" href="/"><img class="logo-mark" src="/assets/img/favicon.png" alt="" width="26" height="26">Well<span>ira</span></a>
+    <span class="logo"><img class="logo-mark" src="/assets/img/favicon.png" alt="" width="26" height="26">Well<span>ira</span></span>
   </div>
 </header>
 
