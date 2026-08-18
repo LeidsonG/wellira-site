@@ -44,7 +44,7 @@ define('URL_UPLOADS', '/assets/img/uploads');
 const CATEGORIAS = [
     'saude' => [
         'rotulo'      => 'Saúde / suplemento',
-        'disclaimers' => ['resultados', 'fda'],
+        'disclaimers' => ['resultados'],
     ],
     'beleza' => [
         'rotulo'      => 'Beleza / cuidado pessoal',
@@ -65,10 +65,6 @@ const DISCLAIMERS = [
     'resultados' => '<strong>Results vary.</strong> Individual results are not typical '
                   . 'and depend on diet, activity and other personal factors. Nothing here '
                   . 'is a substitute for medical advice, diagnosis or treatment.',
-
-    'fda'        => '<strong>These statements have not been evaluated by the Food and Drug '
-                  . 'Administration. This product is not intended to diagnose, treat, cure, '
-                  . 'or prevent any disease.</strong>',
 ];
 
 /** Aviso presente em toda oferta, independente da categoria. */
