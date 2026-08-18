@@ -74,13 +74,16 @@ function cta(string $link, string $texto, ?string $sub = null): string
 <?php endif; ?>
 <meta name="twitter:card" content="summary_large_image">
 
+<link rel="icon" type="image/png" href="/assets/img/favicon.png">
+<link rel="apple-touch-icon" href="/assets/img/favicon.png">
+
 <link rel="stylesheet" href="/assets/css/style.css">
 </head>
 <body>
 
 <header class="site-head">
   <div class="wrap">
-    <a class="logo" href="/">Well<span>ira</span></a>
+    <a class="logo" href="/"><img class="logo-mark" src="/assets/img/favicon.png" alt="" width="26" height="26">Well<span>ira</span></a>
   </div>
 </header>
 

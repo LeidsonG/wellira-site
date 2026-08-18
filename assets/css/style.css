@@ -12,7 +12,7 @@
   --ink-soft:  #5f5e57;
   --ink-faint: #8b897f;
   --line:      #e6e4dd;
-  --brand:     #0d7d72;
+  --brand:     #0d7d71;
   --brand-dk:  #0a5c54;
   --cta:       #d9552b;
   --cta-dk:    #b8431f;
@@ -64,10 +64,15 @@ p  { margin: 0 0 1.1rem; }
   display: flex; align-items: center; justify-content: space-between; gap: 1rem;
 }
 .logo {
+  display: inline-flex; align-items: center; gap: 0.55rem;
   font-weight: 800; font-size: 1.2rem; letter-spacing: -0.03em;
   color: var(--ink); text-decoration: none;
 }
 .logo span { color: var(--brand); }
+
+/* A marca já vem com os cantos arredondados no PNG, então não leva
+   border-radius aqui — arredondar de novo cortaria a arte. */
+.logo-mark { width: 26px; height: 26px; flex: 0 0 auto; }
 
 /* ---------- Hero ---------- */
 

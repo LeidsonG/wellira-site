@@ -53,6 +53,7 @@ oferta.php              Template das ofertas — recebe /<slug> do .htaccess
 .htaccess               Roteamento, HTTPS, Options -Indexes, bloqueios
 robots.txt              ⚠️ temporário, ver checklist acima
 assets/css/             Folha de estilo única
+assets/img/favicon.png  Marca — favicon e ícone do cabeçalho
 assets/videos/          Vídeos enviados pela cliente (fora do repositório)
 assets/img/uploads/     Imagens enviadas pela cliente (fora do repositório)
 privacy-policy/  ┐
