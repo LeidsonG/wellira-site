@@ -1,0 +1,87 @@
+# =============================================================================
+# Wellira — configuração do Apache (HostGator, plano compartilhado)
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# Segurança básica
+# -----------------------------------------------------------------------------
+
+# Sem isso, quem acessar /assets/ vê a lista completa dos arquivos do site.
+# É a proteção mais barata e a mais esquecida.
+Options -Indexes
+
+# Não anunciar versão do Apache nas páginas de erro.
+ServerSignature Off
+
+<IfModule mod_headers.c>
+    # Impede o navegador de "adivinhar" o tipo de um arquivo servido.
+    Header set X-Content-Type-Options "nosniff"
+    # Bloqueia a página de ser embutida em iframe de terceiro (clickjacking).
+    Header set X-Frame-Options "SAMEORIGIN"
+    # Não vaza a URL completa da oferta ao redirecionar para o fornecedor.
+    Header set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
+
+# Arquivos internos nunca devem ser servidos: os JSON contêm as ofertas e o
+# .md contém documentação de trabalho.
+<FilesMatch "\.(json|md|log|bak|sql)$">
+    Require all denied
+</FilesMatch>
+
+# Arquivos ocultos (.env, .git, .htaccess) fora do alcance.
+<FilesMatch "^\.">
+    Require all denied
+</FilesMatch>
+
+# -----------------------------------------------------------------------------
+# Reescrita de URL
+# -----------------------------------------------------------------------------
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Força HTTPS. A segunda condição cobre a hospedagem compartilhada, onde o
+    # PHP recebe a requisição já em HTTP atrás do proxy — sem ela, o site entra
+    # em laço infinito de redirecionamento.
+    RewriteCond %{HTTPS} off
+    RewriteCond %{HTTP:X-Forwarded-Proto} !https
+    RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
+
+    # Roteamento das ofertas: /nome-da-oferta → oferta.php?slug=nome-da-oferta
+    #
+    # As duas condições garantem que arquivos e pastas reais continuem sendo
+    # servidos normalmente — a reescrita só age sobre caminhos que não existem
+    # no disco, que é exatamente o caso dos slugs.
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^([a-z0-9-]+)/?$ oferta.php?slug=$1 [L,QSA]
+</IfModule>
+
+# -----------------------------------------------------------------------------
+# Página de erro
+# -----------------------------------------------------------------------------
+
+# Links de ofertas já retiradas do ar continuam circulando. Sem esta linha,
+# quem clica num link antigo cai na tela padrão do Apache.
+ErrorDocument 404 /404.html
+
+# -----------------------------------------------------------------------------
+# Desempenho
+# -----------------------------------------------------------------------------
+
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/css text/plain application/javascript image/svg+xml
+</IfModule>
+
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresByType text/css        "access plus 1 month"
+    ExpiresByType image/jpeg      "access plus 1 month"
+    ExpiresByType image/png       "access plus 1 month"
+    ExpiresByType image/webp      "access plus 1 month"
+    ExpiresByType image/svg+xml   "access plus 1 month"
+    ExpiresByType video/mp4       "access plus 1 month"
+    # O HTML não entra no cache longo: as ofertas mudam com frequência e a
+    # cliente precisa ver a alteração no ar imediatamente após publicar.
+    ExpiresByType text/html       "access plus 0 seconds"
+</IfModule>

@@ -1,0 +1,7 @@
+# Nenhum arquivo desta pasta deve ser acessível pela web.
+#
+# As ofertas ficam aqui em JSON e são lidas pelo PHP a partir do disco — o
+# navegador nunca precisa alcançá-las. Esta é a segunda barreira: a primeira é
+# o bloqueio de .json no .htaccess da raiz. Se um dia alguém afrouxar aquele,
+# este continua de pé.
+Require all denied

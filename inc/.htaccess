@@ -1,0 +1,5 @@
+# Estes arquivos são incluídos pelo PHP, nunca requisitados pelo navegador.
+# Sem este bloqueio, /inc/config.php responde 200 — não vaza conteúdo (o
+# arquivo só define constantes), mas expõe a estrutura interna e qualquer
+# mensagem de erro que o PHP venha a imprimir.
+Require all denied

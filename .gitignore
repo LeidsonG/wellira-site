@@ -5,10 +5,15 @@ deploy.conf
 *.pem
 *.key
 
-# Conteúdo criado pela cliente no painel — vive no servidor, nunca no repo
-dados/ofertas/
-assets/videos/
-assets/img/uploads/
+# Conteúdo criado pela cliente no painel — vive no servidor, nunca no repo.
+# Os .htaccess destas pastas são exceção: são proteção, não conteúdo, e
+# precisam ser versionados e enviados no deploy.
+dados/ofertas/*
+!dados/ofertas/.gitkeep
+assets/videos/*
+!assets/videos/.htaccess
+assets/img/uploads/*
+!assets/img/uploads/.htaccess
 
 # Documentos internos de trabalho — o repositório é público
 CLAUDE.md

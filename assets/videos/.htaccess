@@ -1,0 +1,7 @@
+# A cliente envia arquivos por aqui pelo painel. Se um .php conseguir passar
+# pela validação de upload, ele NÃO pode ser executado — esta pasta serve
+# arquivo, nunca código.
+<FilesMatch "\.(php|phtml|php[0-9]|pl|py|cgi|sh|htaccess)$">
+    Require all denied
+</FilesMatch>
+php_flag engine off

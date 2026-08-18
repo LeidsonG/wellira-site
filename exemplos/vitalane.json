@@ -1,0 +1,109 @@
+{
+  "status": "publicado",
+  "categoria": "saude",
+  "eyebrow": "Wellness · Reviewed",
+  "titulo": "I took Vitalane for 12 weeks. Here's what actually changed.",
+  "titulo_aba": "Vitalane Review: 12 Weeks, No Hype",
+  "subtitulo": "No before-and-after photos. No numbers I can't stand behind. Just what it is, who it helped, and who should keep their money.",
+  "meta_descricao": "An honest 12-week review of Vitalane: what it is, what it isn't, who it helped and who should save their money.",
+
+  "video": "https://www.youtube.com/watch?v=aqz-KE-bpKQ",
+  "video_legenda": "Watch: the full 12-week breakdown · 6:24",
+  "video_poster": "",
+
+  "link": "https://exemplo-fornecedor.com/vitalane",
+  "botao_texto": "Check Availability on the Official Site",
+  "botao_sub": "Takes you to Vitalane's official website to complete your order.",
+  "botao_sub2": "Secure checkout on the manufacturer's website.",
+
+  "beneficios_titulo": "What Vitalane is",
+  "beneficios": [
+    {
+      "titulo": "Daily metabolic support",
+      "texto": "A once-a-day capsule formulated to support normal metabolic function alongside a balanced diet and regular activity."
+    },
+    {
+      "titulo": "Built for consistency",
+      "texto": "One capsule with breakfast. Nothing to measure, nothing to blend, no schedule to memorize."
+    },
+    {
+      "titulo": "Third-party tested",
+      "texto": "Every batch is verified by an independent lab, and the certificates are published rather than promised."
+    },
+    {
+      "titulo": "No auto-ship",
+      "texto": "A one-time purchase. You aren't quietly enrolled in a subscription that renews before you notice."
+    }
+  ],
+
+  "texto_titulo": "The honest version",
+  "texto": "Let me get the uncomfortable part out of the way first: a capsule is not a plan. Vitalane will not undo a week of takeout, it will not work while you sleep, and anyone showing you a jaw-dropping transformation photo next to a supplement bottle is selling you a story that the bottle didn't write.\n\nWhat it actually does is narrower, and I think more useful. It supports your metabolism while you do the ordinary, unglamorous work — eating a bit better, moving a bit more, sleeping a bit longer. It's a supporting actor. The problem with most pages selling products like this is that they cast it as the lead.\n\n## What you're actually taking\n\nVitalane is a single capsule taken once a day, built around ingredients that have been studied for their role in normal energy and metabolic function. There is no proprietary blend hiding the amounts, which matters more than most people realize — when a label lists a \"blend\" instead of doses, you have no way of knowing whether the useful ingredient is present in a meaningful quantity or in a rounding error.\n\nIt is caffeine-free. That was deliberate on the manufacturer's part and it was the reason I was willing to try it at all. A great many products in this category are, functionally, expensive coffee: they make you feel something within the hour, you interpret that feeling as the product working, and you stop eating for a while because stimulants suppress appetite. That approach produces a sensation quickly and a problem eventually. Vitalane doesn't do that, which is precisely why nothing dramatic happens in week one.\n\n## The part nobody puts on a sales page\n\nYou will not be able to tell whether it is working on any given day. There is no signal, no rush, no moment where you feel the machinery turn over. What you get instead is an absence — the absence of the mid-afternoon crash I'd quietly accepted as a fact of being in my forties. I only noticed it in retrospect, around week five, when I realized I'd stopped planning my afternoons around a slump that was no longer arriving.\n\nThat is a genuinely unsatisfying thing to sell. It is also the honest description, and I'd rather give you that than a story with better pacing.\n\nThe practical costs are real too. It's a large capsule. It's more expensive than the drugstore alternatives, and I don't think it's ten times better than anything — it's meaningfully better than most, which is a different claim. And it demands the one thing supplements always demand and rarely admit: that you keep taking it long past the point where you have any evidence it's doing something.\n\n## Who it actually fits\n\nThe person this suits is someone already doing the basics reasonably well — eating like an adult most days, moving somewhat, sleeping badly but not catastrophically — who wants support at the margins rather than a rescue. If that's you, the ninety-day window is long enough to find out properly, and the guarantee means the experiment costs you time rather than money.\n\nIf you're looking for the thing that finally makes it click without anything else changing, I'd genuinely rather you closed this page. That product does not exist, and the ones claiming to be it are the reason this entire category has the reputation it does.\n\nWould I buy it again? Yes — with the expectations set above, and knowing I can send it back if it doesn't earn its place in the routine.",
+
+  "como_funciona_titulo": "How it works",
+  "como_funciona": [
+    {
+      "titulo": "One capsule with breakfast",
+      "texto": "Same time each morning. Picking a time you'll actually remember matters more than which time you pick."
+    },
+    {
+      "titulo": "Keep doing the boring things",
+      "texto": "Food, walking, sleep. It's designed to sit alongside those habits, not to excuse skipping them."
+    },
+    {
+      "titulo": "Reassess at week eight",
+      "texto": "Judge it on a full cycle, not a bad Tuesday. If it's done nothing by then, use the guarantee."
+    }
+  ],
+
+  "autor_titulo": "Why I'm sharing this",
+  "autor": {
+    "nome": "Wellira",
+    "cargo": "Founder & editor",
+    "foto": "",
+    "texto": "I bought this with my own money, twice, before writing anything about it. I don't recommend products I haven't lived with, and I don't publish the ones that disappoint me — there are three sitting in a drawer that never made it onto this site.\n\nIf that sounds like a low bar, compare it to how most of these pages get written."
+  },
+
+  "nao_e_para_voce_titulo": "This isn't for you if…",
+  "nao_e_para_voce": [
+    "You're expecting to see something in the first two weeks",
+    "You aren't willing to change anything about how you eat or move",
+    "You're pregnant, nursing, or taking prescription medication — ask your doctor first",
+    "You want something that replaces medical care rather than sitting beside it",
+    "The price would strain your month. It isn't worth that."
+  ],
+  "nao_e_para_voce_nota": "I'd rather lose the sale than have you buy something that was never going to fit. If you read that list and you're still here, you're the person this suits.",
+
+  "selos": [
+    { "icone": "garantia", "titulo": "90-day guarantee", "texto": "Refunds handled by the manufacturer" },
+    { "icone": "envio",    "titulo": "Ships from the USA", "texto": "No overseas wait times" },
+    { "icone": "fabrica",  "titulo": "GMP-certified facility", "texto": "Made under FDA-registered standards" }
+  ],
+
+  "faq_titulo": "Common questions",
+  "faq": [
+    {
+      "pergunta": "What happens when I click?",
+      "resposta": "You'll land on Vitalane's official website, where the order is placed and processed. I don't handle payment, shipping or returns — the manufacturer does all three."
+    },
+    {
+      "pergunta": "How long before I notice anything?",
+      "resposta": "I felt nothing for about three weeks. Give it a full eight before you decide. Individual results vary, and anyone naming a specific number of pounds by a specific date is guessing at best."
+    },
+    {
+      "pergunta": "Do I have to change my diet?",
+      "resposta": "You'll get more out of it if you do. It's built to support a reasonable diet, not to compensate for the absence of one."
+    },
+    {
+      "pergunta": "Is my payment secure?",
+      "resposta": "Checkout happens on the manufacturer's encrypted payment page. Your card details never touch this site."
+    },
+    {
+      "pergunta": "What if it doesn't work for me?",
+      "resposta": "There's a 90-day money-back guarantee, handled directly by the manufacturer. Keep your confirmation email and contact their support to start a return."
+    },
+    {
+      "pergunta": "Can I take it with my medication?",
+      "resposta": "Ask your doctor or pharmacist — genuinely, not as a formality. I'm not a medical professional and I won't pretend the answer is simple."
+    }
+  ]
+}
