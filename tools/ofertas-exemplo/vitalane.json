@@ -65,11 +65,9 @@
 
   "nao_e_para_voce_titulo": "This isn't for you if…",
   "nao_e_para_voce": [
-    "You're expecting to see something in the first two weeks",
+    "You're not looking for fast weight loss",
     "You aren't willing to change anything about how you eat or move",
-    "You're pregnant, nursing, or taking prescription medication — ask your doctor first",
-    "You want something that replaces medical care rather than sitting beside it",
-    "The price would strain your month. It isn't worth that."
+    "You're pregnant, nursing, or taking prescription medication — ask your doctor first"
   ],
   "nao_e_para_voce_nota": "I'd rather lose the sale than have you buy something that was never going to fit. If you read that list and you're still here, you're the person this suits.",
 
@@ -100,10 +98,6 @@
     {
       "pergunta": "What if it doesn't work for me?",
       "resposta": "There's a 90-day money-back guarantee, handled directly by the manufacturer. Keep your confirmation email and contact their support to start a return."
-    },
-    {
-      "pergunta": "Can I take it with my medication?",
-      "resposta": "Ask your doctor or pharmacist — genuinely, not as a formality. I'm not a medical professional and I won't pretend the answer is simple."
     }
   ]
 }
