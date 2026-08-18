@@ -68,7 +68,6 @@ p  { margin: 0 0 1.1rem; }
   color: var(--ink); text-decoration: none;
 }
 .logo span { color: var(--brand); }
-.head-note { font-size: 0.8rem; color: var(--ink-faint); }
 
 /* ---------- Hero ---------- */
 

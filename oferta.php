@@ -82,7 +82,6 @@ function cta(string $link, string $texto, ?string $sub = null): string
 <header class="site-head">
   <div class="wrap">
     <a class="logo" href="/">Well<span>ira</span></a>
-    <span class="head-note">Independent reviews</span>
   </div>
 </header>
 
