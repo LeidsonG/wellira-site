@@ -30,46 +30,29 @@ define('DIR_UPLOADS', dirname(__DIR__) . '/assets/img/uploads');
 define('URL_UPLOADS', '/assets/img/uploads');
 
 // ---------------------------------------------------------------------------
-// Categorias e disclaimers
+// Avisos legais
 // ---------------------------------------------------------------------------
 
 /**
- * Cada categoria injeta automaticamente os avisos que lhe cabem.
+ * Aviso presente em toda oferta, sem exceção.
  *
- * O objetivo é que a cliente nunca precise decidir qual texto legal usar:
- * ela escolhe a categoria no painel e o rodapé se monta sozinho. Colar o
- * aviso da FDA num eletrodoméstico deixa de ser possível, e esquecê-lo num
- * suplemento também.
+ * Não é compliance, é proteção direta: é o que deixa registrado que quem
+ * responde por pagamento, entrega, devolução e garantia é o fornecedor. Sem
+ * isso, o comprador insatisfeito com a entrega cobra da Wellira.
  */
-const CATEGORIAS = [
-    'saude' => [
-        'rotulo'      => 'Saúde / suplemento',
-        'disclaimers' => ['resultados'],
-    ],
-    'beleza' => [
-        'rotulo'      => 'Beleza / cuidado pessoal',
-        'disclaimers' => ['resultados'],
-    ],
-    'eletronico' => [
-        'rotulo'      => 'Eletrônico / casa',
-        'disclaimers' => [],
-    ],
-    'outro' => [
-        'rotulo'      => 'Outro',
-        'disclaimers' => [],
-    ],
-];
-
-/** Textos dos disclaimers, em inglês (o site público é para os EUA). */
-const DISCLAIMERS = [
-    'resultados' => '<strong>Results vary.</strong> Individual results are not typical '
-                  . 'and depend on diet, activity and other personal factors. Nothing here '
-                  . 'is a substitute for medical advice, diagnosis or treatment.',
-];
-
-/** Aviso presente em toda oferta, independente da categoria. */
 const AVISO_BASE = 'Orders are completed on the manufacturer\'s website, which is solely '
                  . 'responsible for payment, shipping, returns and warranty.';
+
+/**
+ * Avisos adicionais são campo livre por oferta (chave "avisos_legais" no JSON),
+ * escritos pela cliente no painel.
+ *
+ * A alternativa descartada era um mapa de categoria → texto fixo. Ela existiu
+ * até 18/08/2026 e foi removida: com os avisos de FDA/DSHEA e "Results vary"
+ * dispensados pelo cliente, o mapa não injetava mais nada — virou configuração
+ * que não fazia efeito. O campo livre cobre qualquer produto futuro sem exigir
+ * que alguém preveja a categoria dele.
+ */
 
 // ---------------------------------------------------------------------------
 // Ícones disponíveis para os selos de confiança

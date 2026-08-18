@@ -35,7 +35,6 @@ if ($link === null) {
 
 $titulo      = (string) ($oferta['titulo'] ?? '');
 $botao       = (string) ($oferta['botao_texto'] ?? 'See the Official Site');
-$categoria   = (string) ($oferta['categoria'] ?? 'outro');
 $meta        = (string) ($oferta['meta_descricao'] ?? ($oferta['subtitulo'] ?? ''));
 $titulo_aba  = trim((string) ($oferta['titulo_aba'] ?? $titulo));
 
@@ -238,8 +237,8 @@ function cta(string $link, string $texto, ?string $sub = null): string
       <a href="/terms-of-service/">Terms of Service</a>
       <a href="/contact/">Contact</a>
     </nav>
-    <?php foreach (disclaimers($categoria) as $aviso): ?>
-      <p><?= $aviso /* constante confiável de config.php, com HTML proposital */ ?></p>
+    <?php foreach (avisos($oferta) as $aviso): ?>
+      <?= $aviso /* bloco pronto: base é constante, extra já passou por paragrafos() */ ?>
     <?php endforeach; ?>
     <p>&copy; <?= date('Y') ?> Wellira. All rights reserved.</p>
   </div>

@@ -2,7 +2,7 @@
   "_comentario": "Mesma estrutura de vitalane.json, com os blocos 'beneficios' e 'autor' AUSENTES de propósito — é a demonstração da regra 'campo vazio = bloco some'. Categoria eletronico: o rodapé não recebe FDA/DSHEA nem 'results vary'.",
 
   "status": "publicado",
-  "categoria": "eletronico",
+  "avisos_legais": "",
   "eyebrow": "Home tech · Reviewed",
   "titulo": "A machine that pulls drinking water out of the air.",
   "titulo_aba": "HydraSource Review — Water From Air, Tested",

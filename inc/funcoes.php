@@ -186,20 +186,22 @@ function paragrafos(string $texto): string
 }
 
 /**
- * Devolve os avisos legais que a categoria exige.
+ * Devolve os avisos legais que vão ao rodapé da oferta.
  *
- * São constantes definidas em config.php (portanto confiáveis e com HTML
- * proposital), nunca conteúdo digitado pela cliente.
+ * O primeiro é constante confiável de config.php, com HTML proposital. Os
+ * demais vêm do campo livre preenchido pela cliente, então passam por
+ * paragrafos(), que escapa antes de virar HTML.
  */
-function disclaimers(string $categoria): array
+function avisos(array $oferta): array
 {
-    $config = CATEGORIAS[$categoria] ?? CATEGORIAS['outro'];
-    $saida  = [AVISO_BASE];
+    // Cada item já sai como bloco HTML pronto. O aviso base é constante e ganha
+    // o <p> aqui; o campo livre volta de paragrafos() já com os próprios <p>.
+    // Embrulhar os dois no template geraria <p> dentro de <p>, que é inválido.
+    $saida = ['<p>' . AVISO_BASE . '</p>'];
 
-    foreach ($config['disclaimers'] as $chave) {
-        if (isset(DISCLAIMERS[$chave])) {
-            $saida[] = DISCLAIMERS[$chave];
-        }
+    $extra = trim((string) ($oferta['avisos_legais'] ?? ''));
+    if ($extra !== '') {
+        $saida[] = paragrafos($extra);
     }
     return $saida;
 }

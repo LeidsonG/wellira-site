@@ -60,7 +60,7 @@ terms-of-service/├─ páginas legais, cada uma como pasta com index.html
 contact/         ┘
 
 ─ No servidor, mas bloqueado para a web ───────────────────────
-inc/config.php          Categorias, disclaimers por categoria, caminhos
+inc/config.php          Aviso base, ícones dos selos, caminhos
 inc/funcoes.php         Carregamento, escape, vídeo, validações
 dados/ofertas/          Uma oferta por arquivo JSON (fora do repositório)
 
