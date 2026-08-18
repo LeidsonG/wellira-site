@@ -26,7 +26,7 @@ Hospedagem: HostGator (plano compartilhado, cPanel). Deploy por SFTP.
       fase de aprovação) e a regra correspondente no CSS
 - [ ] Substituir os produtos fictícios (Vitalane, HydraSource) pelos reais
 - [ ] Substituir foto, nome e história na seção "Why I'm sharing this"
-- [ ] Preencher as páginas legais com os dados reais da empresa
+- [ ] Preencher o estado/país da lei aplicável nos Termos (último marcador)
 - [ ] Voltar os caminhos de assets para absolutos (`/assets/...`) quando o
       roteamento por PHP entrar e as ofertas passarem a viver em `/<slug>/`
 
