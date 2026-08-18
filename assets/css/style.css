@@ -380,3 +380,35 @@ p  { margin: 0 0 1.1rem; }
   background: #c9a227; color: #fff; font-size: 0.62rem; font-weight: 700;
   letter-spacing: .06em; padding: 0.1rem 0.45rem; border-radius: 3px;
 }
+
+/* ---------- Páginas de documento (privacidade, termos, contato) ---------- */
+
+.documento { padding-top: 0.5rem; }
+.documento h2 { font-size: 1.28rem; margin-top: 2.4rem; }
+.documento ul { padding-left: 1.15rem; margin: 0 0 1.1rem; }
+.documento li { margin-bottom: 0.5rem; color: var(--ink-soft); }
+.documento li strong { color: var(--ink); }
+
+/* Dado que a cliente ainda precisa fornecer. Fica visualmente gritante de
+   propósito: é impossível publicar sem perceber que faltou preencher. */
+.dado-pendente {
+  background: #fff3cd; color: #7a5b00;
+  border: 1px dashed #d6bd6b; border-radius: 5px;
+  padding: 0.05rem 0.42rem;
+  font-weight: 600; font-size: 0.95em;
+}
+
+/* Bloco de e-mail em destaque na página de contato. */
+.contato-destaque {
+  display: grid; gap: 0.3rem;
+  background: var(--bg-soft);
+  border: 1px solid var(--line); border-left: 4px solid var(--brand);
+  border-radius: 11px; padding: 1.25rem 1.4rem;
+  margin-bottom: 2.2rem;
+}
+.contato-rotulo {
+  font-size: 0.72rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.09em; color: var(--brand);
+}
+.contato-valor { font-size: 1.15rem; font-weight: 700; justify-self: start; }
+.contato-nota { font-size: 0.85rem; color: var(--ink-faint); }

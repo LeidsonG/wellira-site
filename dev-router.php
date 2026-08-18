@@ -28,6 +28,18 @@ if (preg_match('~/\.~', $caminho)) {
     return true;
 }
 
+// Normaliza a barra final, como faz o .htaccess (exceto em pastas reais).
+if (strlen($caminho) > 1 && substr($caminho, -1) === '/' && !is_dir(__DIR__ . $caminho)) {
+    header('Location: ' . rtrim($caminho, '/'), true, 301);
+    return true;
+}
+
+// Pasta real com index.html (páginas legais).
+if (substr($caminho, -1) === '/' && is_file(__DIR__ . $caminho . 'index.html')) {
+    require __DIR__ . $caminho . 'index.html';
+    return true;
+}
+
 // Arquivo real no disco: deixa o servidor embutido entregar.
 if ($caminho !== '/' && is_file(__DIR__ . $caminho)) {
     return false;

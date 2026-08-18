@@ -47,6 +47,16 @@ ServerSignature Off
     RewriteCond %{HTTP:X-Forwarded-Proto} !https
     RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
 
+    # Normaliza a barra final: /oferta/ → /oferta
+    #
+    # Não é preciosismo. A página de erro é servida pelo PHP com readfile, e os
+    # caminhos dela são relativos — em /oferta/ o navegador resolveria o CSS a
+    # partir de /oferta/, quebrando o visual justamente na página que existe
+    # para não parecer quebrada. A condição !-d preserva as pastas reais, como
+    # /privacy-policy/.
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^(.+)/$ /$1 [R=301,L]
+
     # Roteamento das ofertas: /nome-da-oferta → oferta.php?slug=nome-da-oferta
     #
     # As duas condições garantem que arquivos e pastas reais continuem sendo
