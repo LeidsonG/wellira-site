@@ -43,11 +43,16 @@ a { color: var(--brand); }
 
 section { padding: 3rem 0; }
 
-h1, h2, h3 { line-height: 1.2; letter-spacing: -0.02em; margin: 0 0 0.75rem; }
+h1, h2, h3 {
+  line-height: 1.2; letter-spacing: -0.02em; margin: 0 0 0.75rem;
+  /* Distribui as palavras entre as linhas em vez de deixar uma sozinha na
+     última — títulos curtos param de quebrar em lugar esquisito. */
+  text-wrap: balance;
+}
 h1 { font-size: clamp(1.9rem, 6vw, 2.9rem); font-weight: 800; }
 h2 { font-size: clamp(1.4rem, 4vw, 1.9rem); font-weight: 750; }
 h3 { font-size: 1.0625rem; font-weight: 700; }
-p  { margin: 0 0 1.1rem; }
+p  { margin: 0 0 1.1rem; text-wrap: pretty; /* evita palavra órfã no fim do parágrafo */ }
 
 .lede { font-size: 1.15rem; color: var(--ink-soft); }
 .center { text-align: center; }
@@ -140,6 +145,11 @@ p  { margin: 0 0 1.1rem; }
   display: grid; place-items: center; color: var(--brand-dk);
   font-weight: 800; font-size: 1.7rem; border: 3px solid #fff;
   box-shadow: 0 2px 12px rgba(0,0,0,.1);
+  /* Quando o bloco for <img>, estas duas linhas enquadram o recorte circular.
+     Alinhar ao topo mantém o rosto dentro do círculo: em retrato, a cabeça fica
+     no terço superior, e um corte centralizado pegaria o ombro.
+     Para ajustar o enquadramento, mexa só no segundo valor de object-position. */
+  object-fit: cover; object-position: center top;
 }
 .author-name { font-weight: 700; margin-bottom: 0.1rem; }
 .author-role { font-size: 0.85rem; color: var(--ink-faint); margin-bottom: 0.7rem; }
