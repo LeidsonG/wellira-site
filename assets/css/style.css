@@ -64,15 +64,22 @@ p  { margin: 0 0 1.1rem; }
   display: flex; align-items: center; justify-content: space-between; gap: 1rem;
 }
 .logo {
-  display: inline-flex; align-items: center; gap: 0.55rem;
+  display: inline-flex; align-items: center;
   font-weight: 800; font-size: 1.2rem; letter-spacing: -0.03em;
   color: var(--ink); text-decoration: none;
 }
 .logo span { color: var(--brand); }
 
-/* A marca já vem com os cantos arredondados no PNG, então não leva
-   border-radius aqui — arredondar de novo cortaria a arte. */
-.logo-mark { width: 26px; height: 26px; flex: 0 0 auto; }
+/* O espaçamento vem da margem do ícone, não de gap no .logo.
+   Com gap, o flex separaria também "Well" do <span>ira</span> — são dois itens
+   distintos para o flex, e o nome apareceria partido no meio.
+
+   Sem border-radius: o PNG já traz os cantos arredondados, e arredondar de novo
+   cortaria a arte. */
+.logo-mark {
+  width: 26px; height: 26px; flex: 0 0 auto;
+  margin-right: 0.5rem;
+}
 
 /* ---------- Hero ---------- */
 
