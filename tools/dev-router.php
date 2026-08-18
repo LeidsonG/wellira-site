@@ -7,10 +7,13 @@
  * /<slug> para oferta.php e os bloqueios de acesso a arquivos internos.
  *
  * Uso:
- *   php -S localhost:8000 dev-router.php
+ *   php -S localhost:8000 tools/dev-router.php
  *
  * O script de deploy exclui este arquivo do envio.
  */
+
+/** Raiz do site — este arquivo vive um nível abaixo dela. */
+define('RAIZ', dirname(__DIR__));
 
 $caminho = (string) parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH);
 
@@ -29,35 +32,35 @@ if (preg_match('~/\.~', $caminho)) {
 }
 
 // Normaliza a barra final, como faz o .htaccess (exceto em pastas reais).
-if (strlen($caminho) > 1 && substr($caminho, -1) === '/' && !is_dir(__DIR__ . $caminho)) {
+if (strlen($caminho) > 1 && substr($caminho, -1) === '/' && !is_dir(RAIZ . $caminho)) {
     header('Location: ' . rtrim($caminho, '/'), true, 301);
     return true;
 }
 
 // Pasta real com index.html (páginas legais).
-if (substr($caminho, -1) === '/' && is_file(__DIR__ . $caminho . 'index.html')) {
-    require __DIR__ . $caminho . 'index.html';
+if (substr($caminho, -1) === '/' && is_file(RAIZ . $caminho . 'index.html')) {
+    require RAIZ . $caminho . 'index.html';
     return true;
 }
 
 // Arquivo real no disco: deixa o servidor embutido entregar.
-if ($caminho !== '/' && is_file(__DIR__ . $caminho)) {
+if ($caminho !== '/' && is_file(RAIZ . $caminho)) {
     return false;
 }
 
 // Raiz.
 if ($caminho === '' || $caminho === '/') {
-    require __DIR__ . '/index.html';
+    require RAIZ . '/index.html';
     return true;
 }
 
 // Oferta: /<slug>
 if (preg_match('~^/([a-z0-9-]+)/?$~', $caminho, $m)) {
     $_GET['slug'] = $m[1];
-    require __DIR__ . '/oferta.php';
+    require RAIZ . '/oferta.php';
     return true;
 }
 
 http_response_code(404);
-require __DIR__ . '/404.html';
+require RAIZ . '/404.html';
 return true;
