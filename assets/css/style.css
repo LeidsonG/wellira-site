@@ -417,15 +417,6 @@ p  { margin: 0 0 1.1rem; text-wrap: pretty; /* evita palavra órfã no fim do pa
 .documento li { margin-bottom: 0.5rem; color: var(--ink-soft); }
 .documento li strong { color: var(--ink); }
 
-/* Dado que a cliente ainda precisa fornecer. Fica visualmente gritante de
-   propósito: é impossível publicar sem perceber que faltou preencher. */
-.dado-pendente {
-  background: #fff3cd; color: #7a5b00;
-  border: 1px dashed #d6bd6b; border-radius: 5px;
-  padding: 0.05rem 0.42rem;
-  font-weight: 600; font-size: 0.95em;
-}
-
 /* Bloco de e-mail em destaque na página de contato. */
 .contato-destaque {
   display: grid; gap: 0.3rem;

@@ -23,7 +23,6 @@ Hospedagem: HostGator (plano compartilhado, cPanel). Deploy por SFTP.
 - [ ] Apagar os gêmeos estáticos `vitalane.html` e `hydrasource.html`, que só
       existem para a prévia do GitHub Pages
 - [ ] Substituir foto, nome e história na seção "Why I'm sharing this"
-- [ ] Preencher o estado/país da lei aplicável nos Termos (último marcador)
 - [ ] Conferir que `SITE_URL` em `inc/config.php` bate com o domínio real
 - [ ] Voltar os caminhos de assets para absolutos (`/assets/...`) quando o
       roteamento por PHP entrar e as ofertas passarem a viver em `/<slug>/`
