@@ -59,6 +59,10 @@ ServerSignature Off
     # O sitemap é gerado pelo PHP, mas os buscadores procuram por /sitemap.xml.
     RewriteRule ^sitemap\.xml$ sitemap.php [L]
 
+    # Saída para o fornecedor: /go/<slug> conta o clique e redireciona.
+    # Precisa vir antes da regra de oferta, que casa um segmento só.
+    RewriteRule ^go/([a-z0-9-]+)/?$ go.php?slug=$1 [L,QSA]
+
     # Normaliza a barra final: /oferta/ → /oferta
     #
     # Não é preciosismo. A página de erro é servida pelo PHP com readfile, e os

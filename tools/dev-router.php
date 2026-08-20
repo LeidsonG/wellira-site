@@ -37,10 +37,14 @@ if (strlen($caminho) > 1 && substr($caminho, -1) === '/' && !is_dir(RAIZ . $cami
     return true;
 }
 
-// Pasta real com index.html (páginas legais).
-if (substr($caminho, -1) === '/' && is_file(RAIZ . $caminho . 'index.html')) {
-    require RAIZ . $caminho . 'index.html';
-    return true;
+// Pasta real com index.html (páginas legais) ou index.php (painel).
+if (substr($caminho, -1) === '/') {
+    foreach (['index.php', 'index.html'] as $indice) {
+        if (is_file(RAIZ . $caminho . $indice)) {
+            require RAIZ . $caminho . $indice;
+            return true;
+        }
+    }
 }
 
 // Arquivo real no disco: deixa o servidor embutido entregar.
@@ -51,6 +55,20 @@ if ($caminho !== '/' && is_file(RAIZ . $caminho)) {
 // Raiz.
 if ($caminho === '' || $caminho === '/') {
     require RAIZ . '/index.html';
+    return true;
+}
+
+// Sitemap gerado pelo PHP.
+if ($caminho === '/sitemap.xml') {
+    require RAIZ . '/sitemap.php';
+    return true;
+}
+
+// Saída para o fornecedor: /go/<slug>. Antes da regra de oferta, que casa um
+// segmento só — a mesma ordem do .htaccess.
+if (preg_match('~^/go/([a-z0-9-]+)/?$~', $caminho, $m)) {
+    $_GET['slug'] = $m[1];
+    require RAIZ . '/go.php';
     return true;
 }
 

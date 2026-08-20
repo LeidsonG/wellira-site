@@ -26,12 +26,17 @@ if (($oferta['status'] ?? 'rascunho') !== 'publicado') {
     nao_encontrado();
 }
 
-$link = link_seguro((string) ($oferta['link'] ?? ''));
-if ($link === null) {
+$destino = link_seguro((string) ($oferta['link'] ?? ''));
+if ($destino === null) {
     // Sem destino válido não há oferta — melhor um 404 do que uma página com
     // botão que não leva a lugar nenhum.
     nao_encontrado();
 }
+
+// Os botões apontam para a saída própria, que conta o clique e só então manda
+// ao fornecedor. O link de afiliado deixa de aparecer no HTML: trocar de
+// fornecedor passa a ser edição do JSON, sem mexer na página.
+$link = '/go/' . $slug;
 
 $titulo      = (string) ($oferta['titulo'] ?? '');
 $botao       = (string) ($oferta['botao_texto'] ?? 'See the Official Site');
