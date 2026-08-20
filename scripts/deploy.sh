@@ -65,6 +65,16 @@ fi
 # Conteúdo da cliente e segredos primeiro, porque são os que doem.
 
 EXCLUIR=(
+  # --- Os .htaccess destas pastas SÃO proteção e precisam subir ---
+  #
+  # Vem antes das exclusões porque o lftp decide pela primeira regra que casa.
+  # O glob 'dados/*' também casa com arquivo oculto, então sem estas três linhas
+  # o .htaccess que fecha a pasta para a web nunca chegaria ao servidor — e a
+  # pasta de dados nasceria desprotegida no primeiro deploy.
+  --include-glob 'dados/.htaccess'
+  --include-glob 'assets/videos/.htaccess'
+  --include-glob 'assets/img/uploads/.htaccess'
+
   # --- Conteúdo da cliente e senha: existem só no servidor ---
   --exclude-glob 'dados/*'
   --exclude-glob 'assets/videos/*'
