@@ -6,9 +6,14 @@
    por oferta.php — se cada uma trouxesse o próprio trecho, trocar um ID
    exigiria editar tudo e alguma página ficaria para trás.
 
-   Os IDs ficam aqui, visíveis, e isso não é descuido: qualquer pessoa vê o
-   Pixel e o GA de qualquer site pelo inspetor do navegador. Eles identificam a
-   conta, não dão acesso a ela.
+   Os IDs NÃO ficam neste arquivo: vêm de assets/js/ids.js, que está no
+   .gitignore. O repositório é público, e embora o Pixel apareça no inspetor de
+   qualquer visitante — ele identifica a conta, não dá acesso a ela — deixá-lo
+   num repositório aberto o entrega a quem varre o GitHub em massa. Pixel
+   conhecido recebe evento falso, e evento falso ensina a Meta a mostrar o
+   anúncio para o público errado.
+
+   Sem ids.js o rastreamento simplesmente não roda, que é o padrão seguro.
    ========================================================================== */
 
 (function () {
@@ -18,11 +23,13 @@
   // Configuração
   // ---------------------------------------------------------------------------
 
-  /** ID do Meta Pixel (Gerenciador de Eventos → Fontes de dados). Ex: '123456789012345' */
-  var META_PIXEL_ID = '';
+  var IDS = window.WELLIRA_IDS || {};
 
-  /** ID de métrica do GA4 (Admin → Fluxos de dados). Ex: 'G-XXXXXXXXXX' */
-  var GA4_ID = '';
+  /** ID do Meta Pixel (Gerenciador de Eventos → Fontes de dados). */
+  var META_PIXEL_ID = IDS.pixel || '';
+
+  /** ID de métrica do GA4 (Admin → Fluxos de dados). */
+  var GA4_ID = IDS.ga4 || '';
 
   /**
    * Só rastreia no domínio de produção.

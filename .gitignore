@@ -39,3 +39,6 @@ Thumbs.db
 # Artefatos locais
 node_modules/
 /tmp/
+
+# IDs de Pixel/Analytics — fora do repositório público
+assets/js/ids.js
