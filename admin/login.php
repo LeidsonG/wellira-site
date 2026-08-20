@@ -21,7 +21,10 @@ $erro = null;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     csrf_validar();
-    $erro = tentar_login((string) ($_POST['senha'] ?? ''));
+    $erro = tentar_login(
+        (string) ($_POST['usuario'] ?? ''),
+        (string) ($_POST['senha'] ?? '')
+    );
 
     if ($erro === null) {
         // Volta para onde a pessoa tentou ir antes de ser barrada. O destino é
@@ -53,16 +56,20 @@ painel_topo('Entrar', false);
   }
   painel_aviso('erro', $erro);
 
-  if (hash_senha() === null) {
-      painel_aviso('erro', 'O painel ainda não tem senha configurada no servidor. '
-                         . 'Gere o hash com tools/gerar-hash.php e grave em inc/senha.php.');
+  if (credenciais() === null) {
+      painel_aviso('erro', 'O painel ainda não tem acesso configurado no servidor. '
+                         . 'Gere as credenciais com tools/gerar-hash.php e grave em dados/senha.php.');
   }
   ?>
 
   <form method="post" autocomplete="off">
     <?= csrf_campo() ?>
+    <label for="usuario">Usuário</label>
+    <input type="text" id="usuario" name="usuario" required autofocus
+           autocomplete="username" autocapitalize="none" spellcheck="false">
+
     <label for="senha">Senha</label>
-    <input type="password" id="senha" name="senha" required autofocus
+    <input type="password" id="senha" name="senha" required
            autocomplete="current-password">
     <button type="submit">Entrar</button>
   </form>

@@ -20,22 +20,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $erro = trocar_senha(
         (string) ($_POST['atual'] ?? ''),
         (string) ($_POST['nova'] ?? ''),
-        (string) ($_POST['confirmacao'] ?? '')
+        (string) ($_POST['confirmacao'] ?? ''),
+        (string) ($_POST['usuario'] ?? '')
     );
     $ok = ($erro === null);
 }
 
-painel_topo('Trocar senha');
+$cred = credenciais();
+
+painel_topo('Trocar acesso');
 ?>
 
 <div class="cabeca">
-  <h1>Trocar senha</h1>
+  <h1>Trocar acesso</h1>
 </div>
 
 <?php
 painel_aviso('erro', $erro);
 if ($ok) {
-    painel_aviso('ok', 'Senha alterada. Use a nova na próxima vez que entrar.');
+    painel_aviso('ok', 'Acesso alterado. Use os dados novos na próxima vez que entrar.');
 }
 ?>
 
@@ -43,7 +46,16 @@ if ($ok) {
   <?= csrf_campo() ?>
 
   <fieldset>
-    <legend>Nova senha</legend>
+    <legend>Novo acesso</legend>
+
+    <div class="campo">
+      <label for="usuario">Usuário</label>
+      <input type="text" id="usuario" name="usuario"
+             value="<?= e((string) ($cred['usuario'] ?? '')) ?>"
+             autocomplete="username" autocapitalize="none" spellcheck="false"
+             pattern="[A-Za-z0-9._-]{3,32}">
+      <p class="ajuda">De 3 a 32 caracteres: letras, números, ponto, hífen ou sublinhado.</p>
+    </div>
 
     <div class="campo">
       <label for="atual">Senha atual</label>
@@ -66,7 +78,7 @@ if ($ok) {
              autocomplete="new-password">
     </div>
 
-    <button type="submit">Trocar senha</button>
+    <button type="submit">Salvar acesso</button>
   </fieldset>
 </form>
 

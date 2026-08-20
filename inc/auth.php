@@ -31,6 +31,14 @@ function sessao_iniciar(): void
         return;
     }
 
+    // A pasta de sessões do cPanel nesta conta aponta para um caminho que não
+    // existe, e o PHP falha calado: a sessão nunca grava, o token de CSRF some
+    // entre uma requisição e outra, e o login responde 400 sem explicar nada.
+    // Gravar dentro da conta resolve e sobrevive a troca de versão do PHP.
+    if (is_dir(DIR_SESSOES) || @mkdir(DIR_SESSOES, 0700, true)) {
+        session_save_path(DIR_SESSOES);
+    }
+
     // Atrás do proxy da hospedagem compartilhada, $_SERVER['HTTPS'] costuma vir
     // vazio mesmo com o site em HTTPS. Sem checar o cabeçalho do proxy, o
     // cookie nunca receberia o atributo Secure em produção.
@@ -82,22 +90,33 @@ function exigir_login(): void
     $_SESSION['visto_em'] = time();
 }
 
-/** Lê o hash da senha. Devolve null quando o painel ainda não foi configurado. */
-function hash_senha(): ?string
+/**
+ * Lê usuário e hash do arquivo de credenciais.
+ *
+ * Devolve null quando o painel ainda não foi configurado.
+ */
+function credenciais(): ?array
 {
     if (!is_file(ARQUIVO_SENHA)) {
         return null;
     }
-    $hash = require ARQUIVO_SENHA;
-    return (is_string($hash) && $hash !== '') ? $hash : null;
+    $dados = require ARQUIVO_SENHA;
+
+    if (!is_array($dados)) {
+        return null;
+    }
+    $usuario = (string) ($dados['usuario'] ?? '');
+    $hash    = (string) ($dados['hash'] ?? '');
+
+    return ($usuario !== '' && $hash !== '') ? ['usuario' => $usuario, 'hash' => $hash] : null;
 }
 
 /**
- * Confere a senha e abre a sessão.
+ * Confere usuário e senha e abre a sessão.
  *
  * Devolve string de erro quando falha, ou null em caso de sucesso.
  */
-function tentar_login(string $senha): ?string
+function tentar_login(string $usuario, string $senha): ?string
 {
     sessao_iniciar();
 
@@ -105,14 +124,20 @@ function tentar_login(string $senha): ?string
         return 'Muitas tentativas. Tente de novo em ' . ceil($espera / 60) . ' minuto(s).';
     }
 
-    $hash = hash_senha();
-    if ($hash === null) {
-        return 'O painel ainda não tem senha configurada. Ver README.';
+    $cred = credenciais();
+    if ($cred === null) {
+        return 'O painel ainda não tem acesso configurado. Ver README.';
     }
 
-    if (!password_verify($senha, $hash)) {
+    // As duas conferências acontecem sempre, mesmo com o usuário errado, e a
+    // mensagem de erro é a mesma nos dois casos. Responder "usuário não existe"
+    // entregaria metade da credencial a quem está testando nomes.
+    $usuario_ok = hash_equals($cred['usuario'], $usuario);
+    $senha_ok   = password_verify($senha, $cred['hash']);
+
+    if (!$usuario_ok || !$senha_ok) {
         registrar_tentativa();
-        return 'Senha incorreta.';
+        return 'Usuário ou senha incorretos.';
     }
 
     limpar_tentativas();
@@ -138,18 +163,26 @@ const SENHA_MINIMA = 10;
  *
  * Devolve string de erro, ou null em caso de sucesso.
  */
-function trocar_senha(string $atual, string $nova, string $confirmacao): ?string
+function trocar_senha(string $atual, string $nova, string $confirmacao, ?string $novo_usuario = null): ?string
 {
-    $hash = hash_senha();
-    if ($hash === null) {
-        return 'O painel ainda não tem senha configurada.';
+    $cred = credenciais();
+    if ($cred === null) {
+        return 'O painel ainda não tem acesso configurado.';
     }
 
     // Exigir a senha atual é o que impede que uma sessão esquecida aberta num
     // computador emprestado vire troca de dono da conta.
-    if (!password_verify($atual, $hash)) {
+    if (!password_verify($atual, $cred['hash'])) {
         registrar_tentativa();
         return 'A senha atual está incorreta.';
+    }
+
+    $usuario = $cred['usuario'];
+    if ($novo_usuario !== null && trim($novo_usuario) !== '') {
+        $usuario = trim($novo_usuario);
+        if (!preg_match('/^[A-Za-z0-9._-]{3,32}$/', $usuario)) {
+            return 'O usuário deve ter de 3 a 32 caracteres, só letras, números, ponto, hífen ou sublinhado.';
+        }
     }
     if ($nova !== $confirmacao) {
         return 'A nova senha e a confirmação não são iguais.';
@@ -161,10 +194,17 @@ function trocar_senha(string $atual, string $nova, string $confirmacao): ?string
         return 'A nova senha precisa ser diferente da atual.';
     }
 
+    // Sem espaço nem quebra antes do <?php: qualquer byte fora das tags vira
+    // saída no momento em que o arquivo é lido, os cabeçalhos são enviados
+    // junto, e todo header() posterior deixa de funcionar. Foi assim que o
+    // redirecionamento pós-login parou de funcionar em produção.
     $conteudo = "<?php\n"
-              . "// Hash da senha do painel. Alterado pelo próprio painel.\n"
+              . "// Credenciais do painel. Alteradas pelo próprio painel.\n"
               . "// NUNCA versionar este arquivo — o repositório é público.\n"
-              . 'return ' . var_export(password_hash($nova, PASSWORD_DEFAULT), true) . ";\n";
+              . "return [\n"
+              . "    'usuario' => " . var_export($usuario, true) . ",\n"
+              . "    'hash'    => " . var_export(password_hash($nova, PASSWORD_DEFAULT), true) . ",\n"
+              . "];\n";
 
     // Escrita atômica: uma gravação interrompida no meio deixaria o arquivo de
     // senha truncado, e ninguém mais conseguiria entrar no painel.

@@ -44,6 +44,20 @@ const BACKUPS_POR_OFERTA = 10;
 define('DIR_CLIQUES', DIR_DADOS . '/cliques');
 
 /**
+ * Onde o PHP grava as sessões do painel.
+ *
+ * Não usamos o padrão da hospedagem de propósito. Nesta conta ele aponta para
+ * /var/cpanel/php/sessions/ea-php83, que não existe nem é gravável — e sem
+ * gravar sessão o login nunca completa: o token de CSRF é gerado, some, e o
+ * envio seguinte é recusado. O sintoma é um 400 que não explica nada.
+ *
+ * Apontar para dentro da conta resolve sem depender de chamado no suporte, e
+ * sobrevive a uma troca de versão do PHP pelo cPanel, que reescreve o padrão.
+ * A pasta fica sob dados/, que o .htaccess de lá já fecha para a web.
+ */
+define('DIR_SESSOES', DIR_DADOS . '/sessoes');
+
+/**
  * Hash da senha do painel.
  *
  * Mora em dados/, e não em inc/, porque a cliente troca a própria senha pelo

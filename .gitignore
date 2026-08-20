@@ -16,6 +16,7 @@ dados/ofertas/*
 !dados/ofertas/.gitkeep
 dados/backups/
 dados/cliques/
+dados/sessoes/
 dados/tentativas-*.json
 assets/videos/*
 !assets/videos/.htaccess
