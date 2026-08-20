@@ -1,0 +1,16 @@
+# Credenciais do deploy — copie para deploy.conf na RAIZ do projeto.
+#
+# deploy.conf está no .gitignore. Nunca versione o arquivo preenchido:
+# o repositório é público.
+
+# Usuário do cPanel / SSH
+SSH_USUARIO="usuario"
+
+# Host da HostGator. Aceita o domínio ou o servidor direto.
+SSH_HOST="wellira.online"
+
+# A HostGator costuma usar 2222 no plano compartilhado, não 22.
+SSH_PORTA="2222"
+
+# Raiz pública no servidor, sem barra no fim.
+DESTINO="/home/usuario/public_html"
