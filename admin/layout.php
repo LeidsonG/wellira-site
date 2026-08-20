@@ -28,6 +28,7 @@ function painel_topo(string $titulo, bool $logado = true, bool $largo = false): 
       <nav>
         <a href="/admin/">Ofertas</a>
         <a href="/admin/editar.php">Nova oferta</a>
+        <a href="/admin/senha.php">Trocar senha</a>
         <a class="sair" href="/admin/sair.php">Sair</a>
       </nav>
     <?php endif; ?>

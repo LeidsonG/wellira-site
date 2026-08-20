@@ -46,11 +46,16 @@ define('DIR_CLIQUES', DIR_DADOS . '/cliques');
 /**
  * Hash da senha do painel.
  *
- * Fica em arquivo separado e fora do git de propósito: o repositório é público.
- * Gere o seu com `php tools/gerar-hash.php` e grave o resultado em
- * inc/senha.php. Ver README.
+ * Mora em dados/, e não em inc/, porque a cliente troca a própria senha pelo
+ * painel — o arquivo precisa ser gravável pelo PHP. Deixar código executável
+ * gravável pelo servidor web é o que transforma qualquer falha de escrita em
+ * execução remota; dados/ já é gravável e já está fechado para a web pelo
+ * .htaccess de lá.
+ *
+ * Fora do git de propósito: o repositório é público. A primeira senha vem de
+ * `php tools/gerar-hash.php`. Ver README.
  */
-define('ARQUIVO_SENHA', __DIR__ . '/senha.php');
+define('ARQUIVO_SENHA', DIR_DADOS . '/senha.php');
 
 // ---------------------------------------------------------------------------
 // Limites de upload

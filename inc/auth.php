@@ -127,6 +127,66 @@ function tentar_login(string $senha): ?string
     return null;
 }
 
+/** Tamanho mínimo aceito. O painel fica exposto: senha curta cai em varredura. */
+const SENHA_MINIMA = 10;
+
+/**
+ * Troca a senha do painel.
+ *
+ * Existe para que a cliente não dependa de ninguém: a primeira senha é entregue
+ * provisória e ela troca sozinha no primeiro acesso.
+ *
+ * Devolve string de erro, ou null em caso de sucesso.
+ */
+function trocar_senha(string $atual, string $nova, string $confirmacao): ?string
+{
+    $hash = hash_senha();
+    if ($hash === null) {
+        return 'O painel ainda não tem senha configurada.';
+    }
+
+    // Exigir a senha atual é o que impede que uma sessão esquecida aberta num
+    // computador emprestado vire troca de dono da conta.
+    if (!password_verify($atual, $hash)) {
+        registrar_tentativa();
+        return 'A senha atual está incorreta.';
+    }
+    if ($nova !== $confirmacao) {
+        return 'A nova senha e a confirmação não são iguais.';
+    }
+    if (strlen($nova) < SENHA_MINIMA) {
+        return 'A nova senha precisa ter pelo menos ' . SENHA_MINIMA . ' caracteres.';
+    }
+    if ($nova === $atual) {
+        return 'A nova senha precisa ser diferente da atual.';
+    }
+
+    $conteudo = "<?php\n"
+              . "// Hash da senha do painel. Alterado pelo próprio painel.\n"
+              . "// NUNCA versionar este arquivo — o repositório é público.\n"
+              . 'return ' . var_export(password_hash($nova, PASSWORD_DEFAULT), true) . ";\n";
+
+    // Escrita atômica: uma gravação interrompida no meio deixaria o arquivo de
+    // senha truncado, e ninguém mais conseguiria entrar no painel.
+    $temporario = ARQUIVO_SENHA . '.tmp' . bin2hex(random_bytes(4));
+    if (@file_put_contents($temporario, $conteudo, LOCK_EX) === false) {
+        return 'Não consegui gravar a nova senha. Verifique a permissão da pasta dados/ no servidor.';
+    }
+    if (!@rename($temporario, ARQUIVO_SENHA)) {
+        @unlink($temporario);
+        return 'Não consegui gravar a nova senha. Verifique a permissão da pasta dados/ no servidor.';
+    }
+    @chmod(ARQUIVO_SENHA, 0600);
+
+    limpar_tentativas();
+
+    // Identificador novo depois da troca: se alguém tinha a sessão antiga, ela
+    // deixa de valer.
+    session_regenerate_id(true);
+
+    return null;
+}
+
 /** Derruba a sessão por completo, inclusive o cookie. */
 function encerrar_sessao(): void
 {

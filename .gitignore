@@ -6,7 +6,8 @@ deploy.conf
 *.key
 
 # Senha do painel. O repositório é público — este arquivo NUNCA entra.
-inc/senha.php
+# Fica em dados/ porque a cliente troca a senha pelo painel e o PHP grava nele.
+dados/senha.php
 
 # Conteúdo criado pela cliente no painel — vive no servidor, nunca no repo.
 # Os .htaccess destas pastas são exceção: são proteção, não conteúdo, e
