@@ -15,7 +15,11 @@ Hospedagem: HostGator (plano compartilhado, cPanel). Deploy por SFTP.
 > buscadores; o que fica de fora é decidido caso a caso (ver *Indexação* abaixo).
 > Não há mais bloqueio geral para desligar.
 
-- [ ] **Não enviar a pasta `tools/`** no deploy
+- [ ] **Gerar a senha do painel** e gravar em `inc/senha.php` no servidor
+      (`php tools/gerar-hash.php "senha"`)
+- [ ] Conferir permissão de escrita em `dados/`, `assets/videos/` e
+      `assets/img/uploads/`
+- [ ] Rodar `./scripts/deploy.sh` (simulação) e conferir a lista antes do `--real`
 - [ ] **Remover a nota `.video-nota`** sob o vídeo (texto em português, só para a
       fase de aprovação) e a regra correspondente no CSS
 - [ ] Substituir os produtos fictícios (Vitalane, HydraSource) pelos reais —
@@ -63,6 +67,8 @@ exige para a prévia. O que não é público fica separado por pasta:
 index.html              Página institucional (a "raiz segura")
 oferta.php              Template das ofertas — recebe /<slug> do .htaccess
 sitemap.php             Gera /sitemap.xml a partir das ofertas publicadas
+go.php                  Saída /go/<slug>: conta o clique e redireciona
+admin/                  Painel administrativo (PT-BR, protegido por senha)
 404.html                Página de erro
 .htaccess               Roteamento, HTTPS, Options -Indexes, bloqueios
 robots.txt              Aberto aos buscadores; aponta o sitemap
@@ -75,14 +81,21 @@ terms-of-service/├─ páginas legais, cada uma como pasta com index.html
 contact/         ┘
 
 ─ No servidor, mas bloqueado para a web ───────────────────────
-inc/config.php          Aviso base, ícones dos selos, caminhos
+inc/config.php          Aviso base, ícones dos selos, caminhos, limites
 inc/funcoes.php         Carregamento, escape, vídeo, validações
+inc/auth.php            Sessão, login, CSRF, limite de tentativas
+inc/admin-funcoes.php   Normalização, gravação atômica, backup, upload
+inc/senha.php           Hash da senha — FORA do repositório, criado no servidor
 dados/ofertas/          Uma oferta por arquivo JSON (fora do repositório)
+dados/backups/          Versões anteriores de cada oferta (fora do repositório)
+dados/cliques/          Contador por oferta (fora do repositório)
 
 ─ Só no repositório, NÃO enviar no deploy ─────────────────────
 tools/dev-router.php    Reproduz o .htaccess no servidor embutido do PHP
 tools/ofertas-exemplo/  Ofertas de exemplo, para popular um ambiente novo
-README.md
+tools/gerar-hash.php    Gera o hash da senha do painel
+scripts/deploy.sh       Deploy por rsync, com o conteúdo da cliente protegido
+README.md · GUIA-PAINEL.md
 
 ─ Temporário, sai depois da aprovação ─────────────────────────
 vitalane.html           Protótipo estático da oferta
@@ -100,9 +113,67 @@ da página**. Assim um único layout atende todo o catálogo, de suplemento a
 eletrodoméstico, sem que nenhuma página nasça com seção vazia.
 
 
+## Painel administrativo
+
+Fica em `/admin`, é em português e protegido por senha. A cliente cria, edita,
+duplica e publica ofertas por ele, sem SFTP. Guia de uso dela: `GUIA-PAINEL.md`.
+
+### Instalar a senha
+
+Não há página de instalação de propósito — página de setup é porta que alguém
+esquece aberta. O hash é gerado na linha de comando e copiado para o servidor:
+
+```bash
+php tools/gerar-hash.php "uma-senha-longa-de-verdade"
+```
+
+Grave a saída em **`inc/senha.php`**. O arquivo está no `.gitignore` e é
+excluído do deploy: ele nasce e vive no servidor.
+
+### Permissões de escrita no servidor
+
+O painel grava em quatro lugares. Sem permissão neles, o login funciona mas
+salvar falha:
+
+```
+dados/ofertas/        dados/backups/        dados/cliques/
+assets/videos/        assets/img/uploads/
+```
+
+As pastas de `dados/` são criadas sozinhas na primeira gravação, desde que
+`dados/` seja gravável.
+
+### O que protege o painel
+
+| Camada | Contra |
+|---|---|
+| `password_hash()` + limite de 5 tentativas/15 min por IP | força bruta |
+| Cookie `HttpOnly` + `SameSite` + `Secure`, path `/admin` | roubo de sessão |
+| `session_regenerate_id()` no login | session fixation |
+| Token CSRF em todo POST, via `hash_equals` | ação forjada por outra aba |
+| Excluir e duplicar só por POST | robô seguindo link |
+| Upload validado por **magic bytes**, extensão vinda da assinatura | PHP disfarçado de imagem |
+| `.htaccess` sem execução de PHP nas pastas de upload | o mesmo, em profundidade |
+| Escrita atômica (temporário + `rename`) | arquivo corrompido por timeout |
+| Backup das 10 versões anteriores | erro de edição da cliente |
+
+## Deploy
+
+```bash
+./scripts/deploy.sh              # simulação — mostra o que iria, sem enviar
+./scripts/deploy.sh --real       # envia
+```
+
+Credenciais em `deploy.conf` na raiz (modelo em `scripts/deploy.conf.exemplo`).
+
+> ⚠️ O script **nunca** envia `dados/ofertas/`, `dados/backups/`,
+> `dados/cliques/`, `assets/videos/` nem `assets/img/uploads/`. Esse conteúdo
+> existe só no servidor e não tem outra cópia. As exclusões valem inclusive com
+> `--delete`.
+
 ## Rodando local
 
-Com PHP, para testar o roteamento das ofertas:
+Com PHP, para testar o roteamento das ofertas e o painel:
 
 ```bash
 php -S localhost:8000 tools/dev-router.php
