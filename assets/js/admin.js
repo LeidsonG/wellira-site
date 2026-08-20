@@ -45,9 +45,11 @@
           b.classList.toggle('ativa', i === indice);
           b.setAttribute('aria-selected', i === indice ? 'true' : 'false');
         });
-        // Guardar a aba faz diferença no uso real: ela salva, volta e quer
-        // continuar de onde estava, não recomeçar do topo.
-        try { sessionStorage.setItem('wellira_aba', String(indice)); } catch (e) {}
+        // A aba viaja no formulário: o servidor a devolve na URL depois de
+        // salvar. Guardá-la no navegador fazia a cliente abrir uma oferta e
+        // cair na aba que estava aberta em outra.
+        var campo = document.getElementById('aba-atual');
+        if (campo) campo.value = String(indice);
         marcarPreenchidas();
       }
 
@@ -68,9 +70,12 @@
         });
       }
 
-      var salva = 0;
-      try { salva = parseInt(sessionStorage.getItem('wellira_aba'), 10) || 0; } catch (e) {}
-      abrir(salva < secoes.length ? salva : 0);
+      var inicial = 0;
+      var campoAba = document.getElementById('aba-atual');
+      if (campoAba) {
+        inicial = parseInt(campoAba.value, 10) || 0;
+      }
+      abrir(inicial >= 0 && inicial < secoes.length ? inicial : 0);
 
       form.addEventListener('input', marcarPreenchidas);
 

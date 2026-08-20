@@ -184,8 +184,12 @@ Volte, recarregue e tente de novo.
 corrompido. Não tente consertar pelo painel; avise o suporte técnico, que existe
 backup.
 
-**O upload falha sempre** — o arquivo pode passar do limite (64 MB para vídeo,
-4 MB para imagem). Comprima o vídeo antes de enviar.
+**O upload falha sempre** — veja o limite escrito na própria tela de envio, que
+mostra o número real do servidor. Se passar, comprima o arquivo antes.
+
+**"Formato não reconhecido"** — o arquivo não é de verdade do tipo que o nome
+diz. Trocar o final do nome (de `.avi` para `.mp4`, por exemplo) não converte
+nada: é preciso salvar no formato certo pelo programa que criou o arquivo.
 
 **Publiquei e a página não mudou** — confira se salvou como *Publicada* e não
 como *Rascunho*. Se estiver certo, atualize a página com `Ctrl + F5`.

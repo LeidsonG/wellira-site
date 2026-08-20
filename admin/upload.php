@@ -74,7 +74,11 @@ if ($enviado !== null) {
             ? 'Somente MP4.'
             : 'JPG, PNG ou WebP.' ?>
         Limite de <?= round($limite / 1048576, 1) ?> MB.
-        O arquivo é conferido pelo conteúdo, não pelo nome — renomear a extensão não funciona.
+      </p>
+      <p class="ajuda">
+        Se aparecer <em>"formato não reconhecido"</em>, o arquivo não é de
+        verdade do tipo que o nome diz. Trocar o final do nome não converte o
+        arquivo — é preciso salvá-lo no formato certo pelo programa que o criou.
       </p>
       <?php if ($destino === 'video' && $limite < MAX_UPLOAD_VIDEO): ?>
         <p class="ajuda">

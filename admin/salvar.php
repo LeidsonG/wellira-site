@@ -73,13 +73,12 @@ if ($acao === 'salvar_ver' && ($oferta['status'] ?? '') === 'publicado') {
     exit;
 }
 
-// "Salvar e continuar" devolve ao formulário, na mesma oferta. É o botão de
-// quem está escrevendo: salvar a cada parágrafo sem perder o lugar.
-if ($acao === 'salvar_continuar') {
-    header('Location: /admin/editar.php?slug=' . rawurlencode($slug)
-         . '&ok=' . rawurlencode('Salvo.'));
-    exit;
-}
+// Salvar mantém a cliente no formulário, na mesma aba. Voltar para a lista a
+// cada gravação obrigava a reabrir a oferta e reencontrar o lugar — e o texto
+// de venda é escrito em várias sessões, salvando pelo caminho.
+$aba = (int) ($_POST['aba'] ?? 0);
 
-header('Location: /admin/?ok=' . rawurlencode($mensagem));
+header('Location: /admin/editar.php?slug=' . rawurlencode($slug)
+     . '&aba=' . $aba
+     . '&ok=' . rawurlencode($mensagem));
 exit;

@@ -168,6 +168,10 @@ if (!empty($_GET['ok'])) {
   <?= csrf_campo() ?>
   <input type="hidden" name="slug_original" value="<?= e($novo ? '' : $slug) ?>">
 
+  <?php /* A aba aberta viaja no formulário e volta na URL. Guardá-la só no
+           navegador fazia a cliente cair numa aba de outra oferta. */ ?>
+  <input type="hidden" name="aba" id="aba-atual" value="<?= (int) ($_GET['aba'] ?? 0) ?>">
+
   <!-- ==================== 1. Publicação ==================== -->
   <section id="sec-publicacao" data-secao="Publicação">
     <div class="campo">
@@ -534,13 +538,16 @@ if (!empty($_GET['ok'])) {
     </div>
   </section>
 
+  <?php /* Um botão principal só. Antes eram "Salvar" e "Salvar e continuar",
+           que faziam quase a mesma coisa com nomes parecidos — e o primeiro
+           jogava de volta para a lista no meio da escrita. Agora salvar
+           mantém a cliente onde ela está, que é o que um editor deve fazer. */ ?>
   <div class="barra-salvar">
     <button type="submit" name="acao" value="salvar">Salvar</button>
-    <button type="submit" name="acao" value="salvar_continuar" class="botao-fraco">Salvar e continuar</button>
     <?php if (!$novo): ?>
-      <button type="submit" name="acao" value="salvar_ver" class="botao-fraco">Salvar e ver ↗</button>
+      <button type="submit" name="acao" value="salvar_ver" class="botao-fraco">Salvar e abrir a página ↗</button>
     <?php endif; ?>
-    <a class="cancelar" href="/admin/">Cancelar</a>
+    <a class="cancelar" href="/admin/">← Voltar para as ofertas</a>
   </div>
 </form>
 
