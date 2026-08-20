@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Deploy para a HostGator por FTPS explícito (porta 21), usando lftp.
+# Deploy para a HostGator por SFTP com chave SSH, usando lftp.
 #
 # ⚠️  A REGRA MAIS IMPORTANTE DESTE ARQUIVO
 #
@@ -10,12 +10,15 @@
 # sempre.
 #
 # Por isso este script:
-#   1. nunca envia dados/, assets/videos nem assets/img/uploads
-#   2. roda em modo simulação por padrão — só envia de verdade com --real
+#   1. nunca envia o conteúdo de dados/, assets/videos nem assets/img/uploads
+#   2. roda em simulação por padrão — só envia de verdade com --real
 #   3. só remove arquivo remoto com --limpar, e mesmo assim respeitando (1)
 #
-# ⚠️  FTP puro manda usuário e senha em texto claro pela rede. Este script usa
-# FTPS explícito (AUTH TLS) e recusa cair para FTP sem criptografia.
+# POR QUE SFTP E NÃO rsync: a conta é de plano compartilhado e não tem shell
+# ("Shell access is not enabled on your account"). O rsync precisa executar um
+# processo do outro lado; o SFTP não. A mesma chave SSH autentica os dois, então
+# não se perde nada além da velocidade do algoritmo delta — e o mirror do lftp
+# já compara tamanho e data, enviando só o que mudou.
 #
 set -euo pipefail
 
@@ -23,19 +26,12 @@ RAIZ="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$RAIZ"
 
 if ! command -v lftp >/dev/null 2>&1; then
-  cat >&2 <<'FIM'
-ERRO: o lftp não está instalado.
-
-  Ubuntu/Debian/WSL:  sudo apt install lftp
-  macOS (Homebrew):   brew install lftp
-
-O rsync não serve aqui: a hospedagem oferece FTP, não SSH.
-FIM
+  echo "ERRO: o lftp não está instalado.  sudo apt install lftp" >&2
   exit 1
 fi
 
 # ---------------------------------------------------------------------------
-# Credenciais
+# Configuração
 # ---------------------------------------------------------------------------
 
 CONF="$RAIZ/deploy.conf"
@@ -47,33 +43,44 @@ fi
 # shellcheck source=/dev/null
 source "$CONF"
 
-: "${FTP_USUARIO:?defina FTP_USUARIO em deploy.conf}"
-: "${FTP_HOST:?defina FTP_HOST em deploy.conf}"
-: "${FTP_PORTA:=21}"
-: "${DESTINO:=/}"
+: "${SSH_USUARIO:?defina SSH_USUARIO em deploy.conf}"
+: "${SSH_HOST:?defina SSH_HOST em deploy.conf}"
+: "${SSH_PORTA:=2222}"
+: "${SSH_CHAVE:?defina SSH_CHAVE em deploy.conf}"
+: "${DESTINO:?defina DESTINO em deploy.conf}"
 
-# A senha não fica no deploy.conf: é perguntada na hora, para não acabar salva
-# em disco nem no histórico do shell.
-if [[ -z "${FTP_SENHA:-}" ]]; then
-  read -rsp "Senha FTP de ${FTP_USUARIO}: " FTP_SENHA
-  echo
+CHAVE="${SSH_CHAVE/#\~/$HOME}"
+if [[ ! -f "$CHAVE" ]]; then
+  echo "ERRO: chave não encontrada em $CHAVE" >&2
+  exit 1
 fi
 
 # ---------------------------------------------------------------------------
 # O que NÃO vai
 # ---------------------------------------------------------------------------
-# Conteúdo da cliente e segredos primeiro, porque são os que doem.
 
 EXCLUIR=(
   # --- Os .htaccess destas pastas SÃO proteção e precisam subir ---
   #
-  # Vem antes das exclusões porque o lftp decide pela primeira regra que casa.
+  # Vêm antes das exclusões porque o lftp decide pela primeira regra que casa.
   # O glob 'dados/*' também casa com arquivo oculto, então sem estas três linhas
   # o .htaccess que fecha a pasta para a web nunca chegaria ao servidor — e a
   # pasta de dados nasceria desprotegida no primeiro deploy.
   --include-glob 'dados/.htaccess'
   --include-glob 'assets/videos/.htaccess'
   --include-glob 'assets/img/uploads/.htaccess'
+
+  # --- Infraestrutura do servidor: NÃO é nossa, e --limpar apagaria ---
+  #
+  # .well-known é onde o AutoSSL põe o arquivo de validação do domínio. Apagar
+  # essa pasta não derruba o site na hora: derruba quando o certificado vencer,
+  # porque a renovação falha calada. E como o .htaccess força HTTPS, "certificado
+  # vencido" significa site inacessível.
+  #
+  # cgi-bin e error_log são criados pelo cPanel e ele espera encontrá-los.
+  --exclude-glob '.well-known/'
+  --exclude-glob 'cgi-bin/'
+  --exclude-glob 'error_log'
 
   # --- Conteúdo da cliente e senha: existem só no servidor ---
   --exclude-glob 'dados/*'
@@ -105,10 +112,6 @@ EXCLUIR=(
   --exclude-glob '.idea/'
 )
 
-# 'dados/*' e não 'dados/': assim a pasta é criada no servidor e o .htaccess que
-# a protege sobe junto, mas nada de dentro dela é tocado. Mesma lógica nas
-# pastas de upload.
-
 # ---------------------------------------------------------------------------
 # Modo
 # ---------------------------------------------------------------------------
@@ -120,8 +123,7 @@ for arg in "$@"; do
   case "$arg" in
     --real)   MODO_REAL=1 ;;
     --limpar) LIMPAR=1 ;;
-    *) echo "Argumento desconhecido: $arg" >&2
-       echo "Uso: $0 [--real] [--limpar]" >&2; exit 1 ;;
+    *) echo "Uso: $0 [--real] [--limpar]" >&2; exit 1 ;;
   esac
 done
 
@@ -141,36 +143,23 @@ fi
 # ---------------------------------------------------------------------------
 
 echo "Origem : $RAIZ/"
-echo "Destino: ftps://${FTP_USUARIO}@${FTP_HOST}:${FTP_PORTA}${DESTINO}"
+echo "Destino: sftp://${SSH_USUARIO}@${SSH_HOST}:${SSH_PORTA}${DESTINO}"
+echo "Chave  : $CHAVE"
 echo
 
-# TLS: três ajustes, e o terceiro merece explicação.
-#
-# ssl-force + ssl-protect-data recusam a conexão se o servidor não oferecer TLS,
-# em vez de continuar em texto claro — vale para o login e para os dados.
-#
-# check-hostname no, com verify-certificate SIM: o servidor apresenta um
-# certificado legítimo da HostGator (*.hostgator.com.br, emitido pela Sectigo),
-# que não cobre ftp.wellira.online. É o normal em hospedagem compartilhada, e
-# não há hostname alternativo utilizável: o reverso do IP aponta para Cloudflare
-# e o hostname do servidor resolve para outro endereço.
-#
-# A saída fácil seria "verify-certificate no", que aceitaria QUALQUER
-# certificado, inclusive um autoassinado de quem estivesse no meio do caminho.
-# Manter a verificação da cadeia e dispensar só a conferência do nome exige que
-# o certificado seja emitido por uma autoridade confiável — barra bem mais alta
-# do que desligar tudo, e sem custo de manutenção.
-lftp -u "${FTP_USUARIO},${FTP_SENHA}" \
-     -e "set ftp:ssl-force true;
-         set ftp:ssl-protect-data true;
-         set ssl:verify-certificate yes;
-         set ssl:check-hostname no;
-         set ftp:passive-mode true;
+# O lftp fala SFTP through de um ssh que ele mesmo executa. Passar a chave e a
+# porta pelo connect-program é o que permite autenticar sem senha — não há
+# prompt, e nada de credencial fica no deploy.conf.
+# O usuário vai no próprio "open", com vírgula e nada depois: é assim que o lftp
+# entende "sem senha, quem autentica é o ssh". Passado por -u na linha de
+# comando, ele ainda pede senha e a conexão morre antes de começar.
+lftp -e "set sftp:connect-program 'ssh -a -x -i $CHAVE -p $SSH_PORTA';
+         set sftp:auto-confirm yes;
          set net:max-retries 2;
-         set net:timeout 20;
+         set net:timeout 30;
+         open -u ${SSH_USUARIO}, sftp://${SSH_HOST};
          mirror --reverse ${OPCOES[*]} ${EXCLUIR[*]} '$RAIZ/' '${DESTINO}';
-         bye" \
-     -p "${FTP_PORTA}" "${FTP_HOST}"
+         bye"
 
 echo
 if [[ $MODO_REAL -eq 0 ]]; then
@@ -181,9 +170,8 @@ if [[ $MODO_REAL -eq 0 ]]; then
 else
   echo "Enviado."
   echo
-  echo "Se for o primeiro deploy, confira no servidor:"
-  echo "  - dados/senha.php existe? (gere com: php tools/gerar-hash.php \"senha\")"
-  echo "  - dados/ tem permissão de escrita? (o painel cria as subpastas sozinho)"
-  echo "  - assets/videos/ e assets/img/uploads/ têm permissão de escrita?"
-  echo "  - https://${FTP_HOST}/admin abre a tela de login?"
+  echo "Se for o primeiro deploy, falta:"
+  echo "  - dados/senha.php  (senha do painel — ver README)"
+  echo "  - permissão de escrita em dados/, assets/videos/, assets/img/uploads/"
+  echo "  - abrir https://${SSH_HOST}/admin e conferir a tela de login"
 fi
