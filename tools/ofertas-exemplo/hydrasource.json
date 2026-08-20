@@ -16,21 +16,6 @@
   "botao_sub2": "Secure checkout on the manufacturer's website.",
   "texto_titulo": "The honest version",
   "texto": "The physics here isn't magic: the unit chills a surface until moisture in the air condenses on it, then filters what it collects. Dehumidifiers have done the first half for decades. What you're paying for is the filtration and the convenience of having it come out drinkable.\n\nIn a normally humid room, mine produced a bit under two gallons a day, enough for a household's drinking water, not enough to cook and clean with. It also runs constantly, and you will hear it. It's about as loud as a window air conditioner.\n\nWhere it genuinely earned its place: no more hauling cases of bottled water, and no plastic piling up by the door. Whether that's worth the price depends entirely on where you live, which is what the next section is about.",
-  "como_funciona_titulo": "How it works",
-  "como_funciona": [
-    {
-      "titulo": "Plug it into a standard outlet",
-      "texto": "No plumbing, no installation. It needs a power socket and room to breathe."
-    },
-    {
-      "titulo": "It condenses moisture from the air",
-      "texto": "A cooled coil pulls humidity out of the room, the same principle as a dehumidifier."
-    },
-    {
-      "titulo": "The water is filtered into the tank",
-      "texto": "Multi-stage filtration before it reaches the dispenser. Filters are replaceable."
-    }
-  ],
   "nao_e_para_voce_titulo": "This isn't for you if…",
   "nao_e_para_voce": [
     "You live somewhere dry, below about 40% humidity, output drops sharply",
@@ -41,19 +26,9 @@
   "nao_e_para_voce_nota": "If none of those are dealbreakers for you, it's a genuinely useful machine.",
   "selos": [
     {
-      "icone": "retorno",
-      "titulo": "30-day returns",
-      "texto": "Handled by the manufacturer"
-    },
-    {
       "icone": "envio",
       "titulo": "Ships from the USA",
       "texto": "No overseas wait times"
-    },
-    {
-      "icone": "escudo",
-      "titulo": "2-year warranty",
-      "texto": "Parts and labor"
     }
   ],
   "faq_titulo": "Common questions",

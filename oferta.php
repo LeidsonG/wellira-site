@@ -161,22 +161,6 @@ function faixa(): string
   </section>
   <?php endif; ?>
 
-  <?php if (!empty($oferta['como_funciona'])): ?>
-  <section<?= faixa() ?>>
-    <div class="wrap">
-      <h2><?= e($oferta['como_funciona_titulo'] ?? 'How it works') ?></h2>
-      <ol class="steps">
-        <?php foreach ($oferta['como_funciona'] as $passo): ?>
-          <li>
-            <h3><?= e($passo['titulo'] ?? '') ?></h3>
-            <p><?= e($passo['texto'] ?? '') ?></p>
-          </li>
-        <?php endforeach; ?>
-      </ol>
-    </div>
-  </section>
-  <?php endif; ?>
-
   <?php if (!empty($oferta['autor']['texto'])): $a = $oferta['autor']; ?>
   <section<?= faixa() ?>>
     <div class="wrap">
