@@ -145,9 +145,9 @@ const AUTOR_PADRAO = [
     'nome'  => 'Charlotte Hayes',
     'cargo' => 'Founder & editor',
     'foto'  => '/assets/img/charlotte.jpg',
-    'texto' => "I bought this with my own money, twice, before writing anything about it. "
+    'texto' => "I bought this with my own money before writing anything about it. "
              . "I don't recommend products I haven't lived with, and I don't publish the ones "
-             . "that disappoint me. There are three sitting in a drawer that never made it onto this site.",
+             . "that disappoint me.",
 ];
 
 /** Título padrão da seção de assinatura. */
