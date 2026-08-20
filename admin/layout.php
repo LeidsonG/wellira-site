@@ -7,7 +7,7 @@
  */
 
 /** Abre a página. $titulo aparece na aba; $largo dá mais espaço ao formulário. */
-function painel_topo(string $titulo, bool $logado = true, bool $largo = false): void
+function painel_topo(string $titulo, bool $logado = true, bool $largo = false, string $classe = ''): void
 {
     ?><!DOCTYPE html>
 <html lang="pt-BR">
@@ -18,39 +18,43 @@ function painel_topo(string $titulo, bool $logado = true, bool $largo = false): 
 <title><?= e($titulo) ?> · Painel Wellira</title>
 <link rel="icon" type="image/png" href="/assets/img/favicon.png">
 <link rel="stylesheet" href="/assets/css/admin.css">
+<script src="/assets/js/admin.js" defer></script>
 </head>
-<body<?= $largo ? ' class="largo"' : '' ?>>
+<?php $classes = trim(($largo ? 'largo ' : '') . $classe); ?>
+<body<?= $classes !== '' ? ' class="' . e($classes) . '"' : '' ?>>
 
+<?php if ($logado): ?>
 <header class="topo">
   <div class="wrap">
     <a class="marca" href="/admin/">Well<span>ira</span> <em>painel</em></a>
-    <?php if ($logado): ?>
       <nav>
         <a href="/admin/">Ofertas</a>
         <a href="/admin/editar.php">Nova oferta</a>
         <a href="/admin/senha.php">Trocar acesso</a>
         <a class="sair" href="/admin/sair.php">Sair</a>
       </nav>
-    <?php endif; ?>
   </div>
 </header>
+<?php endif; ?>
 
 <main class="wrap">
 <?php
 }
 
 /** Fecha a página. */
-function painel_rodape(): void
+function painel_rodape(bool $logado = true): void
 {
     ?>
 </main>
 
+<?php if ($logado): ?>
 <footer class="rodape">
   <div class="wrap">
     Painel da Wellira. As alterações entram no ar assim que você salva uma
     oferta como <strong>publicada</strong>.
   </div>
 </footer>
+<?php endif; ?>
 
 <script>
 /* Confirmação de ação destrutiva.

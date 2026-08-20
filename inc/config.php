@@ -126,6 +126,34 @@ const ICONES = [
 ];
 
 // ---------------------------------------------------------------------------
+// Assinatura padrão das ofertas
+// ---------------------------------------------------------------------------
+
+/**
+ * Quem assina a seção "Why I'm sharing this".
+ *
+ * Fixo de propósito: é a mesma pessoa em todas as ofertas, e deixar a cliente
+ * redigitar nome, cargo, foto e história a cada produto só produz divergência
+ * entre páginas — uma com o cargo escrito de um jeito, outra com a foto
+ * faltando. O painel já abre com estes valores preenchidos; ela edita se
+ * quiser, ou desliga a seção inteira no interruptor.
+ *
+ * A foto começa com "/" e por isso é usada como caminho literal, sem passar
+ * pela pasta de uploads. É um arquivo do projeto, não algo que ela envie.
+ */
+const AUTOR_PADRAO = [
+    'nome'  => 'Charlotte Hayes',
+    'cargo' => 'Founder & editor',
+    'foto'  => '/assets/img/charlotte.jpg',
+    'texto' => "I bought this with my own money, twice, before writing anything about it. "
+             . "I don't recommend products I haven't lived with, and I don't publish the ones "
+             . "that disappoint me. There are three sitting in a drawer that never made it onto this site.",
+];
+
+/** Título padrão da seção de assinatura. */
+const AUTOR_TITULO_PADRAO = "Why I'm sharing this";
+
+// ---------------------------------------------------------------------------
 // Identidade pública do site
 // ---------------------------------------------------------------------------
 

@@ -168,13 +168,20 @@ function faixa(): string
   </section>
   <?php endif; ?>
 
-  <?php if (!empty($oferta['autor']['texto'])): $a = $oferta['autor']; ?>
+  <?php if (($oferta['mostrar_autor'] ?? true) !== false && !empty($oferta['autor']['texto'])): $a = $oferta['autor']; ?>
   <section<?= faixa() ?>>
     <div class="wrap">
       <h2><?= e($oferta['autor_titulo'] ?? "Why I'm sharing this") ?></h2>
       <div class="author">
-        <?php if (!empty($a['foto'])): ?>
-          <img class="author-photo" src="<?= e(URL_UPLOADS . '/' . rawurlencode(basename($a['foto']))) ?>"
+        <?php if (!empty($a['foto'])):
+          // Caminho começando com "/" é arquivo do projeto (a foto padrão da
+          // assinatura). Qualquer outra coisa é nome de arquivo enviado pelo
+          // painel, e aí só o basename entra — o resto viraria path traversal.
+          $foto = $a['foto'][0] === '/'
+                ? $a['foto']
+                : URL_UPLOADS . '/' . rawurlencode(basename($a['foto']));
+        ?>
+          <img class="author-photo" src="<?= e($foto) ?>"
                alt="<?= e($a['nome'] ?? '') ?>" width="88" height="88">
         <?php else: ?>
           <div class="author-photo" aria-hidden="true"><?= e(substr((string) ($a['nome'] ?? 'W'), 0, 1)) ?></div>
@@ -193,7 +200,7 @@ function faixa(): string
   </section>
   <?php endif; ?>
 
-  <?php if (!empty($oferta['nao_e_para_voce'])): ?>
+  <?php if (($oferta['mostrar_nao_e_para_voce'] ?? true) !== false && !empty($oferta['nao_e_para_voce'])): ?>
   <section<?= faixa() ?>>
     <div class="wrap">
       <h2><?= e($oferta['nao_e_para_voce_titulo'] ?? "This isn't for you if…") ?></h2>
@@ -213,7 +220,7 @@ function faixa(): string
 
   <section<?= faixa() ?>>
     <div class="wrap">
-      <?php if (!empty($oferta['selos'])): ?>
+      <?php if (($oferta['mostrar_selos'] ?? true) !== false && !empty($oferta['selos'])): ?>
         <ul class="badges">
           <?php foreach ($oferta['selos'] as $selo): ?>
             <li>
@@ -229,7 +236,7 @@ function faixa(): string
     </div>
   </section>
 
-  <?php if (!empty($oferta['faq'])): ?>
+  <?php if (($oferta['mostrar_faq'] ?? true) !== false && !empty($oferta['faq'])): ?>
   <section<?= faixa() ?>>
     <div class="wrap">
       <h2><?= e($oferta['faq_titulo'] ?? 'Common questions') ?></h2>

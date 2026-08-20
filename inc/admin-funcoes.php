@@ -108,6 +108,16 @@ function normalizar_oferta(array $post): array
     $o['status']  = ($post['status'] ?? 'rascunho') === 'publicado' ? 'publicado' : 'rascunho';
     $o['indexar'] = !empty($post['indexar']);
 
+    // Interruptores das seções opcionais.
+    //
+    // Antes, esconder um bloco significava apagar o conteúdo dele — e voltar
+    // atrás custava redigitar tudo. O interruptor separa "não quero mostrar" de
+    // "não tenho o que mostrar": o texto continua gravado, apenas não é
+    // impresso. Ausente vale true, para que oferta antiga não perca seção.
+    foreach (['autor', 'nao_e_para_voce', 'selos', 'faq'] as $secao) {
+        $o['mostrar_' . $secao] = !empty($post['mostrar_' . $secao]);
+    }
+
     // --- Topo ---------------------------------------------------------------
     $campos_linha = [
         'eyebrow'        => 80,
@@ -155,8 +165,9 @@ function normalizar_oferta(array $post): array
         'foto'  => limpar_linha($post['autor_foto'] ?? '', 200),
         'texto' => limpar_bloco($post['autor_texto'] ?? '', 2000),
     ];
-    // O template só imprime a seção quando há texto; sem ele o resto é inútil.
-    if ($autor['texto'] !== '') {
+    // Gravado mesmo com a seção desligada: quem desliga costuma religar, e
+    // perder a história redigitada seria o pior momento para descobrir isso.
+    if ($autor['texto'] !== '' || $autor['nome'] !== '') {
         $o['autor'] = array_filter($autor, fn($v) => $v !== '');
     }
 

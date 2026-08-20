@@ -40,12 +40,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-painel_topo('Entrar', false);
+painel_topo('Entrar', false, false, 'entrada');
 ?>
 
 <div class="caixa-login">
-  <h1>Painel Wellira</h1>
-  <p class="sub">Entre para criar e editar as páginas de oferta.</p>
+  <div class="login-marca">
+    <img src="/assets/img/favicon.png" alt="" width="30" height="30">
+    Well<span>ira</span>
+  </div>
+
+  <h1>Entrar no painel</h1>
+  <p class="sub">Para criar e editar as páginas de oferta.</p>
 
   <?php
   if (!empty($_GET['expirou'])) {
@@ -73,6 +78,11 @@ painel_topo('Entrar', false);
            autocomplete="current-password">
     <button type="submit">Entrar</button>
   </form>
+
+  <p class="login-rodape">
+    Esqueceu a senha? Ela não pode ser recuperada por aqui —
+    fale com o suporte técnico para receber um acesso novo.
+  </p>
 </div>
 
-<?php painel_rodape(); ?>
+<?php painel_rodape(false); ?>

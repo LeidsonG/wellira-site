@@ -66,8 +66,18 @@ if (($oferta['status'] ?? '') === 'publicado') {
     $mensagem .= ' Continua como rascunho, fora do ar.';
 }
 
-if (($_POST['acao'] ?? '') === 'salvar_ver' && ($oferta['status'] ?? '') === 'publicado') {
+$acao = (string) ($_POST['acao'] ?? '');
+
+if ($acao === 'salvar_ver' && ($oferta['status'] ?? '') === 'publicado') {
     header('Location: /' . $slug);
+    exit;
+}
+
+// "Salvar e continuar" devolve ao formulário, na mesma oferta. É o botão de
+// quem está escrevendo: salvar a cada parágrafo sem perder o lugar.
+if ($acao === 'salvar_continuar') {
+    header('Location: /admin/editar.php?slug=' . rawurlencode($slug)
+         . '&ok=' . rawurlencode('Salvo.'));
     exit;
 }
 
