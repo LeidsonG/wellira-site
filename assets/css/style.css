@@ -219,23 +219,6 @@ p  { margin: 0 0 1.1rem; text-wrap: pretty; /* evita palavra órfã no fim do pa
   margin-bottom: 0.55rem;
 }
 
-/* ⚠️ PROTÓTIPO — nota explicativa sob o vídeo, em português, só para a fase de
-   aprovação. REMOVER antes de publicar (ver checklist no README.md). */
-.video-nota {
-  margin-top: 0.8rem;
-  padding: 0.75rem 0.95rem;
-  background: #fffbea;
-  border: 1px dashed #d6bd6b;
-  border-radius: 9px;
-  font-size: 0.85rem;
-  line-height: 1.55;
-  color: #6b5d2f;
-}
-.video-nota code {
-  background: #f1e7c4; padding: 0.05rem 0.32rem;
-  border-radius: 4px; font-size: 0.95em;
-}
-
 /* ---------- Divulgação de afiliado ----------
    A FTC exige "clear and conspicuous": precisa aparecer ANTES do primeiro
    botão, não só no rodapé. */
