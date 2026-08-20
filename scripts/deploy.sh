@@ -134,13 +134,27 @@ echo "Origem : $RAIZ/"
 echo "Destino: ftps://${FTP_USUARIO}@${FTP_HOST}:${FTP_PORTA}${DESTINO}"
 echo
 
-# ftp:ssl-force + ssl-protect-data: recusa a conexão se o servidor não oferecer
-# TLS, em vez de continuar em texto claro. Sem isso, uma falha do TLS viraria
-# login e arquivos trafegando abertos.
+# TLS: três ajustes, e o terceiro merece explicação.
+#
+# ssl-force + ssl-protect-data recusam a conexão se o servidor não oferecer TLS,
+# em vez de continuar em texto claro — vale para o login e para os dados.
+#
+# check-hostname no, com verify-certificate SIM: o servidor apresenta um
+# certificado legítimo da HostGator (*.hostgator.com.br, emitido pela Sectigo),
+# que não cobre ftp.wellira.online. É o normal em hospedagem compartilhada, e
+# não há hostname alternativo utilizável: o reverso do IP aponta para Cloudflare
+# e o hostname do servidor resolve para outro endereço.
+#
+# A saída fácil seria "verify-certificate no", que aceitaria QUALQUER
+# certificado, inclusive um autoassinado de quem estivesse no meio do caminho.
+# Manter a verificação da cadeia e dispensar só a conferência do nome exige que
+# o certificado seja emitido por uma autoridade confiável — barra bem mais alta
+# do que desligar tudo, e sem custo de manutenção.
 lftp -u "${FTP_USUARIO},${FTP_SENHA}" \
      -e "set ftp:ssl-force true;
          set ftp:ssl-protect-data true;
-         set ssl:verify-certificate no;
+         set ssl:verify-certificate yes;
+         set ssl:check-hostname no;
          set ftp:passive-mode true;
          set net:max-retries 2;
          set net:timeout 20;

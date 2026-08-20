@@ -19,6 +19,7 @@ FTP_PORTA="21"
 # já cair dentro de public_html, e nesse caso o destino é "/". Se a conta cair
 # no /home do usuário, use "/public_html".
 #
-# Para descobrir:
-#   lftp -u "usuario,senha" -p 21 ftp.wellira.online -e "pwd; ls; bye"
+# Para descobrir (note os dois "set", sem eles o lftp para no certificado):
+#   lftp -u "leidson@wellira.online" -p 21 ftp.wellira.online \
+#     -e "set ssl:check-hostname no; set ssl:verify-certificate yes; pwd; ls; bye"
 DESTINO="/"
