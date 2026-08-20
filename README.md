@@ -194,50 +194,6 @@ A senha não fica no arquivo: o script pergunta na hora.
 > existe só no servidor e não tem outra cópia. As exclusões valem inclusive com
 > `--limpar`.
 
-### Comentários não vão para produção
-
-O que sobe é uma **cópia temporária** com os comentários removidos de CSS, JS e
-HTML — arquivos que o navegador baixa inteiros. Cerca de 10 KB a menos por
-deploy, e o raciocínio interno do projeto não fica público.
-
-Os `.php` **mantêm** os comentários: o servidor executa e envia só o resultado,
-então eles nunca chegam ao visitante. Removê-los não esconderia nada de ninguém
-e tiraria a documentação de onde ela mais importa — o arquivo que alguém vai
-abrir quando algo quebrar em produção.
-
-Feito numa cópia, e não numa branch separada, para manter **uma fonte de verdade
-só**. Duas branches divergem, e uma hora sobe o que existe numa e não na outra.
-
-A limpeza é conservadora: remove bloco `/* */` e linha inteira `//`, mas não
-mexe em comentário que venha depois de código na mesma linha. Distinguir
-`// nota` de `https://exemplo.com` exigiria entender strings e regex do
-JavaScript, e um removedor esperto que erra uma vez quebra o site em silêncio.
-
-## Rastreamento (Meta Pixel + GA4)
-
-Os IDs ficam no topo de `assets/js/rastreamento.js`. Vazios, nada carrega.
-
-Arquivo único de propósito: as institucionais são `.html` estáticas e as ofertas
-saem do `oferta.php` — trecho repetido em cada página faria alguma ficar para
-trás na hora de trocar um ID.
-
-**Só dispara em `wellira.online`.** A trava de domínio evita que a prévia do
-GitHub Pages e o servidor local somem às estatísticas. Não é cosmético: a Meta
-aprende com quem converte, e ensiná-la com os próprios testes piora a entrega.
-
-**O painel não é rastreado.**
-
-### Eventos
-
-| Evento | Quando | Para quê |
-|---|---|---|
-| `PageView` / GA4 padrão | toda página | volume e origem do tráfego |
-| `Lead` (Meta) + `clique_oferta` (GA4) | clique no botão que vai ao fornecedor | é o sinal que a Meta usa para otimizar |
-
-A compra acontece no site do fornecedor, fora do nosso alcance — o clique é o
-sinal mais próximo dela que conseguimos registrar. Sem esse evento a campanha
-otimiza por visita, e visita barata não é venda.
-
 ## Rodando local
 
 Com PHP, para testar o roteamento das ofertas e o painel:
