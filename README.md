@@ -30,8 +30,12 @@ Hospedagem: HostGator (plano compartilhado, cPanel). Deploy por FTPS.
 - [ ] Conferir que `SITE_URL` em `inc/config.php` bate com o domínio real
 - [ ] Voltar os caminhos de assets para absolutos (`/assets/...`) quando o
       roteamento por PHP entrar e as ofertas passarem a viver em `/<slug>/`
+- [ ] **Preencher `META_PIXEL_ID` e `GA4_ID`** em `assets/js/rastreamento.js`
+      — sem isso o rastreamento não carrega
 - [ ] Após o primeiro deploy: registrar o site no **Google Search Console** e
       enviar `https://wellira.online/sitemap.xml`
+- [ ] Conferir o Pixel com a extensão **Meta Pixel Helper** numa página de
+      oferta real, e o evento `Lead` clicando no botão
 
 Busca rápida para conferir se sobrou algo:
 
@@ -72,7 +76,8 @@ admin/                  Painel administrativo (PT-BR, protegido por senha)
 404.html                Página de erro
 .htaccess               Roteamento, HTTPS, Options -Indexes, bloqueios
 robots.txt              Aberto aos buscadores; aponta o sitemap
-assets/css/             Folha de estilo única
+assets/css/             Folha de estilo do site e do painel
+assets/js/rastreamento.js  Meta Pixel + GA4 — IDs no topo do arquivo
 assets/img/favicon.png  Marca — favicon e ícone do cabeçalho
 assets/videos/          Vídeos enviados pela cliente (fora do repositório)
 assets/img/uploads/     Imagens enviadas pela cliente (fora do repositório)
@@ -188,6 +193,31 @@ A senha não fica no arquivo: o script pergunta na hora.
 > e a senha), `assets/videos/` nem `assets/img/uploads/`. Esse conteúdo
 > existe só no servidor e não tem outra cópia. As exclusões valem inclusive com
 > `--delete`.
+
+## Rastreamento (Meta Pixel + GA4)
+
+Os IDs ficam no topo de `assets/js/rastreamento.js`. Vazios, nada carrega.
+
+Arquivo único de propósito: as institucionais são `.html` estáticas e as ofertas
+saem do `oferta.php` — trecho repetido em cada página faria alguma ficar para
+trás na hora de trocar um ID.
+
+**Só dispara em `wellira.online`.** A trava de domínio evita que a prévia do
+GitHub Pages e o servidor local somem às estatísticas. Não é cosmético: a Meta
+aprende com quem converte, e ensiná-la com os próprios testes piora a entrega.
+
+**O painel não é rastreado.**
+
+### Eventos
+
+| Evento | Quando | Para quê |
+|---|---|---|
+| `PageView` / GA4 padrão | toda página | volume e origem do tráfego |
+| `Lead` (Meta) + `clique_oferta` (GA4) | clique no botão que vai ao fornecedor | é o sinal que a Meta usa para otimizar |
+
+A compra acontece no site do fornecedor, fora do nosso alcance — o clique é o
+sinal mais próximo dela que conseguimos registrar. Sem esse evento a campanha
+otimiza por visita, e visita barata não é venda.
 
 ## Rodando local
 

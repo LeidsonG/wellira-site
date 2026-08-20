@@ -108,6 +108,7 @@ function faixa(): string
 <link rel="apple-touch-icon" href="/assets/img/favicon.png">
 
 <link rel="stylesheet" href="/assets/css/style.css">
+<script src="/assets/js/rastreamento.js" defer></script>
 </head>
 <body>
 
