@@ -142,6 +142,9 @@ fi
 # Envio
 # ---------------------------------------------------------------------------
 
+SAIDA="$(mktemp)"
+trap 'rm -f "$SAIDA"' EXIT
+
 echo "Origem : $RAIZ/"
 echo "Destino: sftp://${SSH_USUARIO}@${SSH_HOST}:${SSH_PORTA}${DESTINO}"
 echo "Chave  : $CHAVE"
@@ -155,11 +158,37 @@ echo
 # comando, ele ainda pede senha e a conexão morre antes de começar.
 lftp -e "set sftp:connect-program 'ssh -a -x -i $CHAVE -p $SSH_PORTA';
          set sftp:auto-confirm yes;
-         set net:max-retries 2;
-         set net:timeout 30;
+         set net:max-retries 5;
+         set net:timeout 120;
+         set net:reconnect-interval-base 5;
          open -u ${SSH_USUARIO}, sftp://${SSH_HOST};
          mirror --reverse ${OPCOES[*]} ${EXCLUIR[*]} '$RAIZ/' '${DESTINO}';
-         bye"
+         bye" 2>&1 | tee "$SAIDA"
+
+# O lftp sai com 0 mesmo quando o mirror aborta no meio. Aconteceu no primeiro
+# deploy real: ele removeu o WordPress, parou antes de enviar um único arquivo,
+# e o script anunciou "Enviado" — o site ficou fora do ar com um WordPress sem
+# miolo. Conferir a saída é a única forma de saber que terminou de verdade.
+if grep -qiE "^(mirror: )?(fatal|error)|Login failed|No such file|Access failed|interrupt" "$SAIDA"; then
+  echo
+  echo "❌ O lftp relatou erro. NÃO confie no resultado — releia a saída acima." >&2
+  rm -f "$SAIDA"
+  exit 1
+fi
+
+# Remoção sem nenhum envio é o sintoma exato do mirror que aborta no meio.
+# Deploy sem transferência nenhuma, por outro lado, é normal quando nada mudou —
+# por isso a condição exige as duas coisas juntas.
+if [[ $MODO_REAL -eq 1 ]] \
+   && grep -qi "Removing" "$SAIDA" \
+   && ! grep -q "Transferring file" "$SAIDA"; then
+  echo
+  echo "❌ Removeu arquivos remotos e não enviou nenhum: o mirror abortou no meio." >&2
+  echo "   Rode de novo — o mirror é incremental e retoma de onde parou." >&2
+  rm -f "$SAIDA"
+  exit 1
+fi
+rm -f "$SAIDA"
 
 echo
 if [[ $MODO_REAL -eq 0 ]]; then
