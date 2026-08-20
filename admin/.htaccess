@@ -1,0 +1,33 @@
+# =============================================================================
+# Painel administrativo — proteções da pasta
+# =============================================================================
+# O login em PHP é a tranca principal. O que está aqui reduz a superfície ao
+# redor dela: o que o navegador guarda, o que os buscadores enxergam e o que
+# um arquivo esquecido nesta pasta poderia expor.
+
+# Nada daqui pode ser cacheado. Sem isto, a página de uma oferta em rascunho
+# fica no cache do navegador e reaparece depois do logout, no botão "voltar".
+<IfModule mod_headers.c>
+    Header set Cache-Control "no-store, no-cache, must-revalidate, private"
+    Header set Pragma "no-cache"
+
+    # O painel nunca deve ser embutido em iframe: é assim que se engana alguém
+    # logado a clicar num botão que não está vendo (clickjacking).
+    Header always set X-Frame-Options "DENY"
+
+    # Fora do índice mesmo que algo escape do robots.txt.
+    Header set X-Robots-Tag "noindex, nofollow, noarchive"
+</IfModule>
+
+# Nada de listagem de arquivos.
+Options -Indexes
+
+# Só os pontos de entrada previstos respondem. Um .bak, um .php~ deixado por
+# editor ou um .json de teste nesta pasta não vira URL acessível.
+<FilesMatch "\.(json|md|log|bak|sql|txt|inc|swp|~)$">
+    Require all denied
+</FilesMatch>
+
+<FilesMatch "^\.">
+    Require all denied
+</FilesMatch>

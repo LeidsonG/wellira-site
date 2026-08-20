@@ -5,11 +5,17 @@ deploy.conf
 *.pem
 *.key
 
+# Senha do painel. O repositório é público — este arquivo NUNCA entra.
+inc/senha.php
+
 # Conteúdo criado pela cliente no painel — vive no servidor, nunca no repo.
 # Os .htaccess destas pastas são exceção: são proteção, não conteúdo, e
 # precisam ser versionados e enviados no deploy.
 dados/ofertas/*
 !dados/ofertas/.gitkeep
+dados/backups/
+dados/cliques/
+dados/tentativas-*.json
 assets/videos/*
 !assets/videos/.htaccess
 assets/img/uploads/*

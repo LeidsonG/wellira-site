@@ -29,6 +29,41 @@ define('URL_VIDEOS', '/assets/videos');
 define('DIR_UPLOADS', dirname(__DIR__) . '/assets/img/uploads');
 define('URL_UPLOADS', '/assets/img/uploads');
 
+/**
+ * Cópias automáticas de cada oferta, gravadas antes de toda sobrescrita.
+ *
+ * O conteúdo da cliente existe só no servidor e não passa por git. Sem isto,
+ * apagar um parágrafo por engano e salvar é irreversível.
+ */
+define('DIR_BACKUPS', DIR_DADOS . '/backups');
+
+/** Quantas versões anteriores guardar por oferta. */
+const BACKUPS_POR_OFERTA = 10;
+
+/** Contadores de clique por oferta (S3), um arquivo por slug. */
+define('DIR_CLIQUES', DIR_DADOS . '/cliques');
+
+/**
+ * Hash da senha do painel.
+ *
+ * Fica em arquivo separado e fora do git de propósito: o repositório é público.
+ * Gere o seu com `php tools/gerar-hash.php` e grave o resultado em
+ * inc/senha.php. Ver README.
+ */
+define('ARQUIVO_SENHA', __DIR__ . '/senha.php');
+
+// ---------------------------------------------------------------------------
+// Limites de upload
+// ---------------------------------------------------------------------------
+
+/**
+ * Teto por arquivo. O plano compartilhado tem I/O limitado e o vídeo é servido
+ * pelo próprio Apache, sem streaming — arquivo grande derruba a página em 4G
+ * antes de derrubar o servidor.
+ */
+const MAX_UPLOAD_VIDEO  = 64 * 1024 * 1024;  // 64 MB
+const MAX_UPLOAD_IMAGEM = 4 * 1024 * 1024;   // 4 MB
+
 // ---------------------------------------------------------------------------
 // Avisos legais
 // ---------------------------------------------------------------------------
