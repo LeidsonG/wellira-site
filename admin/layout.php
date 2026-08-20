@@ -52,6 +52,19 @@ function painel_rodape(): void
   </div>
 </footer>
 
+<script>
+/* Confirmação de ação destrutiva.
+   O texto vem do atributo data-confirmar e não de JavaScript gerado em PHP:
+   interpolar o título dentro de confirm('...') quebrava a string sempre que ele
+   tinha apóstrofo, e um handler com erro de sintaxe não impede envio nenhum. */
+document.addEventListener('submit', function (evento) {
+  var mensagem = evento.target.getAttribute && evento.target.getAttribute('data-confirmar');
+  if (mensagem && !window.confirm(mensagem)) {
+    evento.preventDefault();
+  }
+});
+</script>
+
 </body>
 </html>
 <?php

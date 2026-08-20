@@ -101,8 +101,12 @@ painel_aviso('erro', $_GET['erro'] ?? null);
               <input type="hidden" name="acao" value="duplicar">
               <button type="submit" class="link">Duplicar</button>
             </form>
+            <?php /* A mensagem vai num data-attribute, não em JS embutido: título
+                     com apóstrofo ("Here's what changed") fechava a string do
+                     confirm() e o handler morria com erro de sintaxe — o
+                     formulário então enviava SEM perguntar nada. */ ?>
             <form method="post" action="/admin/acoes.php" class="em-linha"
-                  onsubmit="return confirm('Excluir a oferta &quot;<?= e($o['titulo']) ?>&quot;?\n\nA página sai do ar. Uma cópia de segurança fica guardada.');">
+                  data-confirmar="Excluir a oferta &quot;<?= e($o['titulo']) ?>&quot;?&#10;&#10;A página sai do ar. Uma cópia de segurança fica guardada.">
               <?= csrf_campo() ?>
               <input type="hidden" name="slug" value="<?= e($o['slug']) ?>">
               <input type="hidden" name="acao" value="excluir">
