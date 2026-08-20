@@ -192,7 +192,26 @@ A senha não fica no arquivo: o script pergunta na hora.
 > ⚠️ O script **nunca** envia o conteúdo de `dados/` (ofertas, backups, cliques
 > e a senha), `assets/videos/` nem `assets/img/uploads/`. Esse conteúdo
 > existe só no servidor e não tem outra cópia. As exclusões valem inclusive com
-> `--delete`.
+> `--limpar`.
+
+### Comentários não vão para produção
+
+O que sobe é uma **cópia temporária** com os comentários removidos de CSS, JS e
+HTML — arquivos que o navegador baixa inteiros. Cerca de 10 KB a menos por
+deploy, e o raciocínio interno do projeto não fica público.
+
+Os `.php` **mantêm** os comentários: o servidor executa e envia só o resultado,
+então eles nunca chegam ao visitante. Removê-los não esconderia nada de ninguém
+e tiraria a documentação de onde ela mais importa — o arquivo que alguém vai
+abrir quando algo quebrar em produção.
+
+Feito numa cópia, e não numa branch separada, para manter **uma fonte de verdade
+só**. Duas branches divergem, e uma hora sobe o que existe numa e não na outra.
+
+A limpeza é conservadora: remove bloco `/* */` e linha inteira `//`, mas não
+mexe em comentário que venha depois de código na mesma linha. Distinguir
+`// nota` de `https://exemplo.com` exigiria entender strings e regex do
+JavaScript, e um removedor esperto que erra uma vez quebra o site em silêncio.
 
 ## Rastreamento (Meta Pixel + GA4)
 

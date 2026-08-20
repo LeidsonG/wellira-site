@@ -130,7 +130,32 @@ fi
 # Envio
 # ---------------------------------------------------------------------------
 
-echo "Origem : $RAIZ/"
+# ---------------------------------------------------------------------------
+# Cópia limpa
+# ---------------------------------------------------------------------------
+#
+# O que sobe é uma cópia temporária sem os comentários de CSS, JS e HTML, que
+# o navegador baixa junto com o arquivo. Os .php mantêm os comentários: o
+# servidor executa e manda só o resultado, então eles nunca chegam ao visitante
+# — e são o que salva a vida de quem for depurar algo em produção.
+#
+# Fazer isso numa cópia, e não numa branch separada, mantém uma fonte de verdade
+# só. Duas branches divergem, e uma hora sobe o que existe numa e não na outra.
+
+ENVIO="$(mktemp -d)"
+trap 'rm -rf "$ENVIO"' EXIT
+
+echo "Montando cópia limpa..."
+rsync -a --exclude '.git/' "$RAIZ/" "$ENVIO/"
+
+if command -v php >/dev/null 2>&1; then
+  php "$RAIZ/scripts/limpar-comentarios.php" "$ENVIO"
+else
+  echo "  ⚠️ php não encontrado: subindo com os comentários."
+fi
+echo
+
+echo "Origem : $RAIZ/ (via cópia limpa)"
 echo "Destino: ftps://${FTP_USUARIO}@${FTP_HOST}:${FTP_PORTA}${DESTINO}"
 echo
 
@@ -158,7 +183,7 @@ lftp -u "${FTP_USUARIO},${FTP_SENHA}" \
          set ftp:passive-mode true;
          set net:max-retries 2;
          set net:timeout 20;
-         mirror --reverse ${OPCOES[*]} ${EXCLUIR[*]} '$RAIZ/' '${DESTINO}';
+         mirror --reverse ${OPCOES[*]} ${EXCLUIR[*]} '$ENVIO/' '${DESTINO}';
          bye" \
      -p "${FTP_PORTA}" "${FTP_HOST}"
 
