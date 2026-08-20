@@ -2,15 +2,23 @@
 #
 # deploy.conf está no .gitignore. Nunca versione o arquivo preenchido:
 # o repositório é público.
+#
+# A SENHA NÃO ENTRA AQUI de propósito. O script pergunta na hora, para que ela
+# não fique salva em disco nem no histórico do shell. Se precisar automatizar,
+# exporte FTP_SENHA no ambiente antes de rodar.
 
-# Usuário do cPanel / SSH
-SSH_USUARIO="usuario"
+FTP_USUARIO="leidson@wellira.online"
+FTP_HOST="ftp.wellira.online"
 
-# Host da HostGator. Aceita o domínio ou o servidor direto.
-SSH_HOST="wellira.online"
+# FTPS explícito (AUTH TLS) na 21. O script recusa conexão sem criptografia.
+FTP_PORTA="21"
 
-# A HostGator costuma usar 2222 no plano compartilhado, não 22.
-SSH_PORTA="2222"
-
-# Raiz pública no servidor, sem barra no fim.
-DESTINO="/home/usuario/public_html"
+# Raiz pública, do ponto de vista DESTA conta de FTP.
+#
+# Confira antes do primeiro deploy: contas de FTP criadas no cPanel costumam
+# já cair dentro de public_html, e nesse caso o destino é "/". Se a conta cair
+# no /home do usuário, use "/public_html".
+#
+# Para descobrir:
+#   lftp -u "usuario,senha" -p 21 ftp.wellira.online -e "pwd; ls; bye"
+DESTINO="/"

@@ -1,27 +1,42 @@
 #!/usr/bin/env bash
 #
-# Deploy para a HostGator por rsync sobre SSH.
+# Deploy para a HostGator por FTPS explícito (porta 21), usando lftp.
 #
 # ⚠️  A REGRA MAIS IMPORTANTE DESTE ARQUIVO
 #
-# As ofertas, os vídeos e as imagens que a cliente cria pelo painel existem
-# SOMENTE no servidor. Não estão no git, não estão na sua máquina, e não há
-# outra cópia. Um --delete sem exclusão apaga o trabalho dela para sempre.
+# As ofertas, os vídeos, as imagens e a SENHA do painel existem SOMENTE no
+# servidor. Não estão no git, não estão na sua máquina, e não há outra cópia.
+# Um espelhamento com remoção, sem exclusões, apaga o trabalho da cliente para
+# sempre.
 #
 # Por isso este script:
-#   1. nunca envia dados/ofertas, assets/videos nem assets/img/uploads
-#   2. nunca envia inc/senha.php, que é do servidor
-#   3. roda em modo simulação por padrão — só envia de verdade com --real
+#   1. nunca envia dados/, assets/videos nem assets/img/uploads
+#   2. roda em modo simulação por padrão — só envia de verdade com --real
+#   3. só remove arquivo remoto com --limpar, e mesmo assim respeitando (1)
+#
+# ⚠️  FTP puro manda usuário e senha em texto claro pela rede. Este script usa
+# FTPS explícito (AUTH TLS) e recusa cair para FTP sem criptografia.
 #
 set -euo pipefail
 
 RAIZ="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$RAIZ"
 
+if ! command -v lftp >/dev/null 2>&1; then
+  cat >&2 <<'FIM'
+ERRO: o lftp não está instalado.
+
+  Ubuntu/Debian/WSL:  sudo apt install lftp
+  macOS (Homebrew):   brew install lftp
+
+O rsync não serve aqui: a hospedagem oferece FTP, não SSH.
+FIM
+  exit 1
+fi
+
 # ---------------------------------------------------------------------------
 # Credenciais
 # ---------------------------------------------------------------------------
-# Ficam em deploy.conf, fora do git. Modelo em scripts/deploy.conf.exemplo.
 
 CONF="$RAIZ/deploy.conf"
 if [[ ! -f "$CONF" ]]; then
@@ -32,83 +47,83 @@ fi
 # shellcheck source=/dev/null
 source "$CONF"
 
-: "${SSH_USUARIO:?defina SSH_USUARIO em deploy.conf}"
-: "${SSH_HOST:?defina SSH_HOST em deploy.conf}"
-: "${SSH_PORTA:=22}"
-: "${DESTINO:?defina DESTINO em deploy.conf (ex: /home/usuario/public_html)}"
+: "${FTP_USUARIO:?defina FTP_USUARIO em deploy.conf}"
+: "${FTP_HOST:?defina FTP_HOST em deploy.conf}"
+: "${FTP_PORTA:=21}"
+: "${DESTINO:=/}"
+
+# A senha não fica no deploy.conf: é perguntada na hora, para não acabar salva
+# em disco nem no histórico do shell.
+if [[ -z "${FTP_SENHA:-}" ]]; then
+  read -rsp "Senha FTP de ${FTP_USUARIO}: " FTP_SENHA
+  echo
+fi
 
 # ---------------------------------------------------------------------------
 # O que NÃO vai
 # ---------------------------------------------------------------------------
-#
-# Conteúdo da cliente e segredos vêm primeiro, porque são os que doem.
+# Conteúdo da cliente e segredos primeiro, porque são os que doem.
 
 EXCLUIR=(
-  # --- Conteúdo da cliente: existe só no servidor ---
-  --exclude 'dados/ofertas/'
-  --exclude 'dados/backups/'
-  --exclude 'dados/cliques/'
-  --exclude 'dados/tentativas-*.json'
-  --exclude 'assets/videos/*'
-  --exclude 'assets/img/uploads/*'
+  # --- Conteúdo da cliente e senha: existem só no servidor ---
+  --exclude-glob 'dados/*'
+  --exclude-glob 'assets/videos/*'
+  --exclude-glob 'assets/img/uploads/*'
 
-  # --- Segredos ---
-  --exclude 'inc/senha.php'
-  --exclude 'deploy.conf'
-  --exclude '.env*'
+  # --- Segredos e controle de versão ---
+  --exclude-glob 'deploy.conf'
+  --exclude-glob '.env*'
+  --exclude-glob '.git/'
+  --exclude-glob '.gitignore'
 
   # --- Não pertence a produção ---
-  --exclude '.git/'
-  --exclude '.gitignore'
-  --exclude 'scripts/'
-  --exclude 'tools/'
-  --exclude '*.md'
-  --exclude '.nojekyll'
+  --exclude-glob 'scripts/'
+  --exclude-glob 'tools/'
+  --exclude-glob '*.md'
+  --exclude-glob '.nojekyll'
 
   # --- Protótipos estáticos: existem para a prévia do GitHub Pages ---
-  --exclude 'vitalane.html'
-  --exclude 'hydrasource.html'
+  --exclude-glob 'vitalane.html'
+  --exclude-glob 'hydrasource.html'
 
   # --- Lixo de editor e sistema ---
-  --exclude '.DS_Store'
-  --exclude 'Thumbs.db'
-  --exclude '*.swp'
-  --exclude '*.tmp'
-  --exclude '.vscode/'
-  --exclude '.idea/'
+  --exclude-glob '.DS_Store'
+  --exclude-glob 'Thumbs.db'
+  --exclude-glob '*.swp'
+  --exclude-glob '*.tmp'
+  --exclude-glob '.vscode/'
+  --exclude-glob '.idea/'
 )
 
-# As pastas de conteúdo são excluídas com barra ('dados/ofertas/') e não com
-# '/*': assim o rsync nem cria nem toca a pasta, mas os .htaccess que a protegem
-# continuam sendo enviados, porque são versionados e moram um nível acima.
+# 'dados/*' e não 'dados/': assim a pasta é criada no servidor e o .htaccess que
+# a protege sobe junto, mas nada de dentro dela é tocado. Mesma lógica nas
+# pastas de upload.
 
 # ---------------------------------------------------------------------------
-# Simulação por padrão
+# Modo
 # ---------------------------------------------------------------------------
 
 MODO_REAL=0
-USAR_DELETE=0
+LIMPAR=0
 
 for arg in "$@"; do
   case "$arg" in
     --real)   MODO_REAL=1 ;;
-    --delete) USAR_DELETE=1 ;;
-    *) echo "Argumento desconhecido: $arg" >&2; exit 1 ;;
+    --limpar) LIMPAR=1 ;;
+    *) echo "Argumento desconhecido: $arg" >&2
+       echo "Uso: $0 [--real] [--limpar]" >&2; exit 1 ;;
   esac
 done
 
-OPCOES=(-avz --human-readable --itemize-changes
-        -e "ssh -p ${SSH_PORTA}"
-        --chmod=D755,F644)
+OPCOES=(--verbose --parallel=3 --no-perms)
 
-if [[ $USAR_DELETE -eq 1 ]]; then
-  OPCOES+=(--delete)
-  echo "⚠️  MODO --delete: arquivos que não existem aqui serão APAGADOS lá."
-  echo "    As pastas de conteúdo da cliente estão excluídas e não serão tocadas."
-fi
+[[ $LIMPAR    -eq 1 ]] && OPCOES+=(--delete)
+[[ $MODO_REAL -eq 0 ]] && OPCOES+=(--dry-run)
 
-if [[ $MODO_REAL -eq 0 ]]; then
-  OPCOES+=(--dry-run)
+if [[ $LIMPAR -eq 1 ]]; then
+  echo "⚠️  MODO --limpar: arquivos que não existem aqui serão APAGADOS lá."
+  echo "    dados/, assets/videos/ e assets/img/uploads/ estão excluídos e não serão tocados."
+  echo
 fi
 
 # ---------------------------------------------------------------------------
@@ -116,10 +131,22 @@ fi
 # ---------------------------------------------------------------------------
 
 echo "Origem : $RAIZ/"
-echo "Destino: ${SSH_USUARIO}@${SSH_HOST}:${DESTINO}/"
+echo "Destino: ftps://${FTP_USUARIO}@${FTP_HOST}:${FTP_PORTA}${DESTINO}"
 echo
 
-rsync "${OPCOES[@]}" "${EXCLUIR[@]}" "$RAIZ/" "${SSH_USUARIO}@${SSH_HOST}:${DESTINO}/"
+# ftp:ssl-force + ssl-protect-data: recusa a conexão se o servidor não oferecer
+# TLS, em vez de continuar em texto claro. Sem isso, uma falha do TLS viraria
+# login e arquivos trafegando abertos.
+lftp -u "${FTP_USUARIO},${FTP_SENHA}" \
+     -e "set ftp:ssl-force true;
+         set ftp:ssl-protect-data true;
+         set ssl:verify-certificate no;
+         set ftp:passive-mode true;
+         set net:max-retries 2;
+         set net:timeout 20;
+         mirror --reverse ${OPCOES[*]} ${EXCLUIR[*]} '$RAIZ/' '${DESTINO}';
+         bye" \
+     -p "${FTP_PORTA}" "${FTP_HOST}"
 
 echo
 if [[ $MODO_REAL -eq 0 ]]; then
@@ -130,8 +157,9 @@ if [[ $MODO_REAL -eq 0 ]]; then
 else
   echo "Enviado."
   echo
-  echo "Confira no servidor, se for o primeiro deploy:"
-  echo "  - inc/senha.php existe? (gere com: php tools/gerar-hash.php \"senha\")"
-  echo "  - dados/, dados/backups/, dados/cliques/ têm permissão de escrita?"
+  echo "Se for o primeiro deploy, confira no servidor:"
+  echo "  - dados/senha.php existe? (gere com: php tools/gerar-hash.php \"senha\")"
+  echo "  - dados/ tem permissão de escrita? (o painel cria as subpastas sozinho)"
   echo "  - assets/videos/ e assets/img/uploads/ têm permissão de escrita?"
+  echo "  - https://${FTP_HOST}/admin abre a tela de login?"
 fi
