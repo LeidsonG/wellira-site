@@ -5,46 +5,27 @@ título, vídeo, texto e botões que levam ao site do fornecedor, onde a compra 
 concluída. A raiz `/` é uma página institucional, para que quem apagar o caminho
 da URL encontre um site legítimo em vez de um erro.
 
-Hospedagem: HostGator (plano compartilhado, cPanel). Deploy por FTPS.
+Hospedagem: HostGator (plano compartilhado, cPanel). Deploy por SFTP com chave SSH.
+
+> **Este repositório é público.** Nada de credencial, chave, ID de medição ou
+> caminho de servidor entra aqui — nem em código, nem em documentação, nem em
+> mensagem de commit. O que é segredo vive só no servidor e no `.gitignore`:
+> `deploy.conf`, `dados/senha.php` e `assets/js/ids.js`.
 
 ---
 
-## 🚨 ANTES DE PUBLICAR NA HOSTGATOR
+## Estado
 
-> **A indexação já está configurada para produção.** O site é aberto aos
-> buscadores; o que fica de fora é decidido caso a caso (ver *Indexação* abaixo).
-> Não há mais bloqueio geral para desligar.
+**No ar desde 20/08/2026** em `wellira.online`. O WordPress que ocupava o
+`public_html` foi substituído, com backup completo guardado fora do servidor.
 
-- [ ] **Gerar a senha provisória do painel** e gravar em `dados/senha.php` no servidor
-      (`php tools/gerar-hash.php "senha"`)
-- [ ] Conferir permissão de escrita em `dados/`, `assets/videos/` e
-      `assets/img/uploads/`
-- [ ] Rodar `./scripts/deploy.sh` (simulação) e conferir a lista antes do `--real`
-- [ ] **Remover a nota `.video-nota`** sob o vídeo (texto em português, só para a
-      fase de aprovação) e a regra correspondente no CSS
-- [ ] Substituir os produtos fictícios (Vitalane, HydraSource) pelos reais —
-      e, ao criar a oferta real, **não** copiar o `"indexar": false` deles
-- [ ] Apagar os gêmeos estáticos `vitalane.html` e `hydrasource.html`, que só
-      existem para a prévia do GitHub Pages
-- [ ] Substituir foto, nome e história na seção "Why I'm sharing this"
-- [ ] Conferir que `SITE_URL` em `inc/config.php` bate com o domínio real
-- [ ] Voltar os caminhos de assets para absolutos (`/assets/...`) quando o
-      roteamento por PHP entrar e as ofertas passarem a viver em `/<slug>/`
-- [ ] **Preencher `META_PIXEL_ID` e `GA4_ID`** em `assets/js/rastreamento.js`
-      — sem isso o rastreamento não carrega
-- [ ] Após o primeiro deploy: registrar o site no **Google Search Console** e
-      enviar `https://wellira.online/sitemap.xml`
-- [ ] Conferir o Pixel com a extensão **Meta Pixel Helper** numa página de
-      oferta real, e o evento `Lead` clicando no botão
+O que ainda falta está em `todo.md`. O resumo: nenhuma oferta real publicada,
+o Google Analytics não foi configurado, e a seção "Why I'm sharing this" ainda
+usa uma persona de demonstração.
 
-Busca rápida para conferir se sobrou algo:
+---
 
-```bash
-grep -rn "noindex" . --include="*.html"          # só os gêmeos e o 404
-grep -rn '"indexar": false' dados/ofertas/       # nenhuma oferta real aqui
-```
-
-### Indexação
+## Indexação
 
 Aberto por padrão. Fica fora do índice:
 
@@ -53,7 +34,7 @@ Aberto por padrão. Fica fora do índice:
 | Ofertas de demonstração | `"indexar": false` no JSON da oferta |
 | Gêmeos estáticos (`vitalane.html`, `hydrasource.html`) | `meta robots` na página |
 | `404.html` | `meta robots` na página |
-| `/admin/`, `/dados/`, `/inc/`, `/tools/` | `robots.txt` |
+| `/go/<slug>` | `robots.txt` + `X-Robots-Tag` |
 
 Oferta sem o campo `indexar` **é indexável** — o padrão favorece a oferta real.
 O `sitemap.xml` é gerado por `sitemap.php` a partir dos mesmos critérios.
@@ -63,7 +44,7 @@ O `sitemap.xml` é gerado por `sitemap.php` a partir dos mesmos critérios.
 ## Estrutura
 
 A raiz do repositório **é** a raiz do site — o que a hospedagem serve a partir de
-`public_html`. Isso mantém o deploy por FTPS trivial e é o que o GitHub Pages
+`public_html`. Isso mantém o deploy trivial e é o que o GitHub Pages
 exige para a prévia. O que não é público fica separado por pasta:
 
 ```
@@ -72,12 +53,13 @@ index.html              Página institucional (a "raiz segura")
 oferta.php              Template das ofertas — recebe /<slug> do .htaccess
 sitemap.php             Gera /sitemap.xml a partir das ofertas publicadas
 go.php                  Saída /go/<slug>: conta o clique e redireciona
-admin/                  Painel administrativo (PT-BR, protegido por senha)
+admin/                  Painel administrativo (PT-BR, usuário + senha)
 404.html                Página de erro
 .htaccess               Roteamento, HTTPS, Options -Indexes, bloqueios
 robots.txt              Aberto aos buscadores; aponta o sitemap
 assets/css/             Folha de estilo do site e do painel
-assets/js/rastreamento.js  Meta Pixel + GA4 — IDs no topo do arquivo
+assets/js/rastreamento.js  Meta Pixel + GA4 (IDs vêm de ids.js, fora do repo)
+assets/js/ids.js           IDs de medição — FORA do repositório
 assets/img/favicon.png  Marca — favicon e ícone do cabeçalho
 assets/videos/          Vídeos enviados pela cliente (fora do repositório)
 assets/img/uploads/     Imagens enviadas pela cliente (fora do repositório)
@@ -90,7 +72,7 @@ inc/config.php          Aviso base, ícones dos selos, caminhos, limites
 inc/funcoes.php         Carregamento, escape, vídeo, validações
 inc/auth.php            Sessão, login, CSRF, limite de tentativas
 inc/admin-funcoes.php   Normalização, gravação atômica, backup, upload
-dados/senha.php         Hash da senha — FORA do repositório, gravável pelo painel
+dados/senha.php         Usuário + hash — FORA do repositório, gravável pelo painel
 dados/ofertas/          Uma oferta por arquivo JSON (fora do repositório)
 dados/backups/          Versões anteriores de cada oferta (fora do repositório)
 dados/cliques/          Contador por oferta (fora do repositório)
@@ -99,7 +81,7 @@ dados/cliques/          Contador por oferta (fora do repositório)
 tools/dev-router.php    Reproduz o .htaccess no servidor embutido do PHP
 tools/ofertas-exemplo/  Ofertas de exemplo, para popular um ambiente novo
 tools/gerar-hash.php    Gera o hash da senha do painel
-scripts/deploy.sh       Deploy por FTPS (lftp), com o conteúdo da cliente protegido
+scripts/deploy.sh       Deploy por SFTP (lftp + chave), com o conteúdo protegido
 README.md · GUIA-PAINEL.md
 
 ─ Temporário, sai depois da aprovação ─────────────────────────
@@ -120,29 +102,33 @@ eletrodoméstico, sem que nenhuma página nasça com seção vazia.
 
 ## Painel administrativo
 
-Fica em `/admin`, é em português e protegido por senha. A cliente cria, edita,
-duplica e publica ofertas por ele, sem FTP. Guia de uso dela: `GUIA-PAINEL.md`.
+Fica em `/admin`, é em português e pede **usuário e senha**. A cliente cria,
+edita, duplica e publica ofertas por ele, sem tocar em arquivo. Guia de uso
+dela: `GUIA-PAINEL.md`.
 
-### Instalar a senha
+### Instalar o acesso
 
 Não há página de instalação de propósito — página de setup é porta que alguém
-esquece aberta. O hash é gerado na linha de comando e copiado para o servidor:
+esquece aberta. As credenciais são geradas na linha de comando:
 
 ```bash
-php tools/gerar-hash.php "uma-senha-longa-de-verdade"
+php tools/gerar-hash.php <usuario> "<senha-longa>" > dados/senha.php
 ```
 
-Grave a saída em **`dados/senha.php`**. O arquivo está no `.gitignore` e é
-excluído do deploy: nasce e vive no servidor.
+A saída é só o conteúdo do arquivo, sem cabeçalho: **qualquer byte antes do
+`<?php` vira saída quando o arquivo é lido**, os cabeçalhos vão junto, e todo
+`header()` posterior deixa de funcionar. Foi assim que o redirecionamento do
+login parou de funcionar em produção uma vez.
 
-Fica em `dados/` e não em `inc/` porque **a cliente troca a própria senha pelo
-painel** (`/admin/senha.php`), então o arquivo precisa ser gravável pelo PHP.
-Deixar código executável gravável pelo servidor web é o que transforma qualquer
-falha de escrita em execução remota; `dados/` já é gravável e já está fechado
-para a web.
+Envie o arquivo ao servidor e deixe-o com permissão `600`.
 
-Na prática: entregue uma senha provisória e peça que ela troque no primeiro
-acesso.
+Ele fica em `dados/` e não em `inc/` porque **a cliente troca o próprio acesso
+pelo painel**, então precisa ser gravável pelo PHP. Deixar código executável
+gravável pelo servidor web é o que transforma qualquer falha de escrita em
+execução remota; `dados/` já é gravável e já está fechado para a web.
+
+Na prática: entregue credenciais provisórias e peça que ela troque no primeiro
+acesso, em *Trocar acesso*.
 
 ### Permissões de escrita no servidor
 
@@ -170,12 +156,16 @@ As pastas de `dados/` são criadas sozinhas na primeira gravação, desde que
 | `.htaccess` sem execução de PHP nas pastas de upload | o mesmo, em profundidade |
 | Escrita atômica (temporário + `rename`) | arquivo corrompido por timeout |
 | Backup das 10 versões anteriores | erro de edição da cliente |
+| Sessão gravada dentro da conta, não no caminho padrão do cPanel | pasta padrão inexistente derrubava o login |
 | Troca de senha exige a senha atual + `session_regenerate_id()` | sessão esquecida aberta virar troca de dono |
 
 ## Deploy
 
-Por **FTPS explícito** (porta 21), com `lftp` — a hospedagem oferece FTP, não
-SSH. Instale com `sudo apt install lftp`.
+Por **SFTP com chave SSH**, usando `lftp` (`sudo apt install lftp`).
+
+A conta não tem shell — `rsync` precisa executar um processo do outro lado e
+não serve. O SFTP autentica com a mesma chave, e o `mirror` do lftp já compara
+tamanho e data, enviando só o que mudou.
 
 ```bash
 ./scripts/deploy.sh              # simulação — mostra o que iria, sem enviar
