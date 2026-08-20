@@ -308,6 +308,31 @@ function registrar_tentativa(): void
         json_encode(['contagem' => $contagem + 1, 'ultima' => time()]),
         LOCK_EX
     );
+
+    limpar_tentativas_velhas();
+}
+
+/**
+ * Remove contadores de IPs que já saíram da janela.
+ *
+ * Sem isto os arquivos só somem no login bem-sucedido daquele mesmo IP, ou
+ * seja: nunca, no caso de quem só erra. Um varredor rodando de endereços
+ * diferentes criaria um arquivo por IP, sem teto — e plano compartilhado conta
+ * inodes, não só espaço. A limpeza roda em 1 de cada 20 tentativas para não
+ * varrer a pasta a cada requisição.
+ */
+function limpar_tentativas_velhas(): void
+{
+    if (random_int(1, 20) !== 1) {
+        return;
+    }
+    $limite = time() - max(LOGIN_JANELA_SEG, LOGIN_BLOQUEIO_SEG);
+
+    foreach (glob(DIR_DADOS . '/tentativas-*.json') ?: [] as $arquivo) {
+        if ((int) @filemtime($arquivo) < $limite) {
+            @unlink($arquivo);
+        }
+    }
 }
 
 /** Zera a contagem depois de um login bem-sucedido. */
