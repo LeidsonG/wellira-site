@@ -50,6 +50,20 @@ function cta(string $link, string $texto, ?string $sub = null): string
     $html .= '</div>';
     return $html;
 }
+
+/**
+ * Atributo de classe da próxima seção, alternando a faixa de fundo.
+ *
+ * O listrado não pode ficar fixo no HTML: como toda seção é opcional, basta a
+ * cliente esvaziar um campo para duas seções claras ficarem coladas e o
+ * contraste entre blocos sumir. Decidir na hora de imprimir mantém a
+ * alternância correta em qualquer combinação de blocos.
+ */
+function faixa(): string
+{
+    static $n = 0;
+    return $n++ % 2 === 1 ? ' class="band"' : '';
+}
 ?>
 <!DOCTYPE html>
 <html lang="en-US">
@@ -108,7 +122,7 @@ function cta(string $link, string $texto, ?string $sub = null): string
   </section>
 
   <?php if (!empty($oferta['beneficios'])): ?>
-  <section class="band">
+  <section<?= faixa() ?>>
     <div class="wrap">
       <?php if (!empty($oferta['beneficios_titulo'])): ?>
         <h2><?= e($oferta['beneficios_titulo']) ?></h2>
@@ -126,7 +140,7 @@ function cta(string $link, string $texto, ?string $sub = null): string
   <?php endif; ?>
 
   <?php if (!empty($oferta['texto'])): ?>
-  <section>
+  <section<?= faixa() ?>>
     <div class="wrap">
       <?php if (!empty($oferta['texto_titulo'])): ?>
         <h2><?= e($oferta['texto_titulo']) ?></h2>
@@ -137,7 +151,7 @@ function cta(string $link, string $texto, ?string $sub = null): string
   <?php endif; ?>
 
   <?php if (!empty($oferta['como_funciona'])): ?>
-  <section class="band">
+  <section<?= faixa() ?>>
     <div class="wrap">
       <h2><?= e($oferta['como_funciona_titulo'] ?? 'How it works') ?></h2>
       <ol class="steps">
@@ -153,7 +167,7 @@ function cta(string $link, string $texto, ?string $sub = null): string
   <?php endif; ?>
 
   <?php if (!empty($oferta['autor']['texto'])): $a = $oferta['autor']; ?>
-  <section>
+  <section<?= faixa() ?>>
     <div class="wrap">
       <h2><?= e($oferta['autor_titulo'] ?? "Why I'm sharing this") ?></h2>
       <div class="author">
@@ -178,7 +192,7 @@ function cta(string $link, string $texto, ?string $sub = null): string
   <?php endif; ?>
 
   <?php if (!empty($oferta['nao_e_para_voce'])): ?>
-  <section class="band">
+  <section<?= faixa() ?>>
     <div class="wrap">
       <h2><?= e($oferta['nao_e_para_voce_titulo'] ?? "This isn't for you if…") ?></h2>
       <div class="not-for-you">
@@ -195,7 +209,7 @@ function cta(string $link, string $texto, ?string $sub = null): string
   </section>
   <?php endif; ?>
 
-  <section>
+  <section<?= faixa() ?>>
     <div class="wrap">
       <?php if (!empty($oferta['selos'])): ?>
         <ul class="badges">
@@ -214,7 +228,7 @@ function cta(string $link, string $texto, ?string $sub = null): string
   </section>
 
   <?php if (!empty($oferta['faq'])): ?>
-  <section class="band">
+  <section<?= faixa() ?>>
     <div class="wrap">
       <h2><?= e($oferta['faq_titulo'] ?? 'Common questions') ?></h2>
       <div class="faq">
