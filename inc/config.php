@@ -80,7 +80,7 @@ define('ARQUIVO_SENHA', DIR_DADOS . '/senha.php');
  * pelo próprio Apache, sem streaming — arquivo grande derruba a página em 4G
  * antes de derrubar o servidor.
  */
-const MAX_UPLOAD_VIDEO  = 64 * 1024 * 1024;  // 64 MB
+const MAX_UPLOAD_VIDEO  = 128 * 1024 * 1024; // 128 MB
 const MAX_UPLOAD_IMAGEM = 4 * 1024 * 1024;   // 4 MB
 
 // ---------------------------------------------------------------------------
