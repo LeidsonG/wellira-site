@@ -71,9 +71,17 @@ const ICONES = [
     'cadeado'  => '<rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/>',
 ];
 
+// ---------------------------------------------------------------------------
+// Identidade pública do site
+// ---------------------------------------------------------------------------
+
 /**
- * ⚠️ PREVIEW — enquanto o site roda no GitHub Pages com produtos fictícios,
- * as páginas saem com noindex. Trocar para false antes de publicar em produção.
- * Ver checklist no README.md.
+ * Endereço canônico, sem barra final.
+ *
+ * Toda página declara <link rel="canonical"> apontando para cá, e o sitemap é
+ * montado a partir disso. É o que impede o Google de tratar as prévias do
+ * GitHub Pages e as variações de URL (com/sem www, com/sem barra) como páginas
+ * concorrentes: o conteúdo pode ser servido de vários endereços, mas só um
+ * conta para a busca.
  */
-const BLOQUEAR_INDEXACAO = true;
+const SITE_URL = 'https://wellira.online';

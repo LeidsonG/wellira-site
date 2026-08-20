@@ -1,17 +1,30 @@
-# ============================================================================
-# ⚠️  ARQUIVO TEMPORÁRIO DE PREVIEW — APAGAR ANTES DE PUBLICAR NA HOSTGATOR
-# ============================================================================
+# =============================================================================
+# Wellira — robots.txt
+# =============================================================================
+# O site é aberto aos buscadores. O que está bloqueado aqui é o que não tem
+# razão de aparecer numa busca: área administrativa, dados internos e arquivos
+# de trabalho.
 #
-# Enquanto o site está no GitHub Pages, ele contém produtos FICTÍCIOS criados
-# apenas para aprovação do layout. Este arquivo impede que buscadores indexem
-# esse conteúdo e o confundam com uma oferta real.
-#
-# >>> APAGAR este robots.txt e remover as tags <meta name="robots"> das
-# >>> páginas HTML antes de subir o site definitivo. Se ficarem, o site real
-# >>> nunca aparecerá no Google.
-#
-# Checklist completo no README.md.
-# ============================================================================
+# Importante: bloquear aqui NÃO tira uma página do índice — só impede a leitura.
+# Para manter algo fora do Google, use <meta name="robots" content="noindex">
+# na própria página (nas ofertas, o campo "indexar": false no JSON).
+# =============================================================================
 
 User-agent: *
-Disallow: /
+
+# Painel e dados: nada aqui é conteúdo público.
+Disallow: /admin/
+Disallow: /dados/
+Disallow: /inc/
+Disallow: /tools/
+
+# Páginas de demonstração para aprovação da cliente. Produto fictício indexado
+# é o tipo de conteúdo que derruba a reputação do domínio inteiro.
+Disallow: /vitalane.html
+Disallow: /hydrasource.html
+
+# Uploads e vídeos podem ser rastreados: aparecer na busca de imagens e vídeos
+# é tráfego, não risco.
+Allow: /assets/
+
+Sitemap: https://wellira.online/sitemap.xml

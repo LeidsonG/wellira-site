@@ -47,6 +47,18 @@ ServerSignature Off
     RewriteCond %{HTTP:X-Forwarded-Proto} !https
     RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
 
+    # Um domínio só: www.wellira.online → wellira.online.
+    #
+    # Servir o mesmo conteúdo nos dois endereços divide o histórico de links
+    # entre duas versões que o Google trata como sites diferentes. O 301 fixa
+    # qual é a oficial e transfere o que já foi acumulado. Precisa bater com o
+    # SITE_URL de inc/config.php, que é a origem dos canonical e do sitemap.
+    RewriteCond %{HTTP_HOST} ^www\.(.+)$ [NC]
+    RewriteRule ^ https://%1%{REQUEST_URI} [R=301,L]
+
+    # O sitemap é gerado pelo PHP, mas os buscadores procuram por /sitemap.xml.
+    RewriteRule ^sitemap\.xml$ sitemap.php [L]
+
     # Normaliza a barra final: /oferta/ → /oferta
     #
     # Não é preciosismo. A página de erro é servida pelo PHP com readfile, e os

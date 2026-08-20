@@ -22,13 +22,15 @@
 <meta name="twitter:card" content="summary_large_image">
 
 <!-- ==========================================================================
-     ⚠️  ATENÇÃO — BLOQUEIO DE INDEXAÇÃO ATIVO  ⚠️
-     A meta "robots" abaixo, somada ao robots.txt na raiz, impede que esta
-     página apareça no Google enquanto está hospedada no GitHub Pages.
+     Página de DEMONSTRAÇÃO — gêmeo estático da oferta.
 
-     >>> REMOVER esta meta E o robots.txt ANTES de publicar na HostGator. <<<
-     Se forem esquecidos, o site real jamais será encontrado no Google.
-     Checklist completo no README.md.
+     Existe só para o GitHub Pages, que não executa PHP: é o que permite à
+     cliente ver o layout na prévia. Em produção quem responde é a rota
+     /{slug} via oferta.php.
+
+     O noindex é permanente, por dois motivos que continuam valendo depois do
+     lançamento: o produto é fictício, e o conteúdo é cópia da rota real — se
+     indexado, as duas versões disputariam a mesma busca.
      ========================================================================== -->
 <meta name="robots" content="noindex, nofollow">
 

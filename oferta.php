@@ -38,6 +38,14 @@ $botao       = (string) ($oferta['botao_texto'] ?? 'See the Official Site');
 $meta        = (string) ($oferta['meta_descricao'] ?? ($oferta['subtitulo'] ?? ''));
 $titulo_aba  = trim((string) ($oferta['titulo_aba'] ?? $titulo));
 
+$url_canonica = SITE_URL . '/' . $slug;
+
+// Ofertas de demonstração ficam fora do índice sem sair do ar: a cliente
+// precisa do link para mostrar o layout, mas produto fictício indexado é
+// exatamente o que faz o Google classificar o site como conteúdo enganoso.
+// Ausente = indexável, para que a oferta real não dependa de ninguém lembrar.
+$indexar = ($oferta['indexar'] ?? true) !== false;
+
 /** Botão de ação, repetido ao longo da página. */
 function cta(string $link, string $texto, ?string $sub = null): string
 {
@@ -74,14 +82,17 @@ function faixa(): string
 <?php if ($meta !== ''): ?>
 <meta name="description" content="<?= e($meta) ?>">
 <?php endif; ?>
-<?php if (BLOQUEAR_INDEXACAO): ?>
-<!-- ⚠️ Bloqueio de indexação ativo. Trocar BLOQUEAR_INDEXACAO para false em
-     inc/config.php antes de publicar em produção. Ver README.md. -->
-<meta name="robots" content="noindex, nofollow">
+<link rel="canonical" href="<?= e($url_canonica) ?>">
+<?php if (!$indexar): ?>
+<!-- Oferta marcada como não indexável ("indexar": false no JSON). Usado em
+     páginas de demonstração e teste, que não devem disputar espaço no Google
+     com as ofertas reais. -->
+<meta name="robots" content="noindex, follow">
 <?php endif; ?>
 
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="Wellira">
+<meta property="og:url" content="<?= e($url_canonica) ?>">
 <meta property="og:title" content="<?= e($titulo_aba) ?>">
 <?php if ($meta !== ''): ?>
 <meta property="og:description" content="<?= e($meta) ?>">

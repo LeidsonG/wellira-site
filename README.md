@@ -11,31 +11,45 @@ Hospedagem: HostGator (plano compartilhado, cPanel). Deploy por SFTP.
 
 ## 🚨 ANTES DE PUBLICAR NA HOSTGATOR
 
-> **O site está com a indexação BLOQUEADA de propósito.** Enquanto roda no GitHub
-> Pages para aprovação, os produtos são fictícios e não podem ser confundidos com
-> ofertas reais. Se estes bloqueios subirem para o domínio definitivo, **o site
-> real jamais será encontrado no Google.**
+> **A indexação já está configurada para produção.** O site é aberto aos
+> buscadores; o que fica de fora é decidido caso a caso (ver *Indexação* abaixo).
+> Não há mais bloqueio geral para desligar.
 
-- [ ] **Apagar o `robots.txt`** da raiz (ele contém `Disallow: /`)
-- [ ] **Remover a tag `<meta name="robots" content="noindex, nofollow">`** de:
-      `index.html`, `vitalane.html`, `hydrasource.html`, `404.html`
-- [ ] **Trocar `BLOQUEAR_INDEXACAO` para `false`** em `inc/config.php`
 - [ ] **Não enviar a pasta `tools/`** no deploy
-- [ ] Remover os comentários de aviso que acompanham essas tags
 - [ ] **Remover a nota `.video-nota`** sob o vídeo (texto em português, só para a
       fase de aprovação) e a regra correspondente no CSS
-- [ ] Substituir os produtos fictícios (Vitalane, HydraSource) pelos reais
+- [ ] Substituir os produtos fictícios (Vitalane, HydraSource) pelos reais —
+      e, ao criar a oferta real, **não** copiar o `"indexar": false` deles
+- [ ] Apagar os gêmeos estáticos `vitalane.html` e `hydrasource.html`, que só
+      existem para a prévia do GitHub Pages
 - [ ] Substituir foto, nome e história na seção "Why I'm sharing this"
 - [ ] Preencher o estado/país da lei aplicável nos Termos (último marcador)
+- [ ] Conferir que `SITE_URL` em `inc/config.php` bate com o domínio real
 - [ ] Voltar os caminhos de assets para absolutos (`/assets/...`) quando o
       roteamento por PHP entrar e as ofertas passarem a viver em `/<slug>/`
+- [ ] Após o primeiro deploy: registrar o site no **Google Search Console** e
+      enviar `https://wellira.online/sitemap.xml`
 
 Busca rápida para conferir se sobrou algo:
 
 ```bash
-grep -rn "noindex" . --include="*.html"
-ls robots.txt 2>/dev/null && echo "robots.txt AINDA EXISTE"
+grep -rn "noindex" . --include="*.html"          # só os gêmeos e o 404
+grep -rn '"indexar": false' dados/ofertas/       # nenhuma oferta real aqui
 ```
+
+### Indexação
+
+Aberto por padrão. Fica fora do índice:
+
+| O quê | Como |
+|---|---|
+| Ofertas de demonstração | `"indexar": false` no JSON da oferta |
+| Gêmeos estáticos (`vitalane.html`, `hydrasource.html`) | `meta robots` na página |
+| `404.html` | `meta robots` na página |
+| `/admin/`, `/dados/`, `/inc/`, `/tools/` | `robots.txt` |
+
+Oferta sem o campo `indexar` **é indexável** — o padrão favorece a oferta real.
+O `sitemap.xml` é gerado por `sitemap.php` a partir dos mesmos critérios.
 
 ---
 
@@ -49,9 +63,10 @@ exige para a prévia. O que não é público fica separado por pasta:
 ─ Servido pela web ────────────────────────────────────────────
 index.html              Página institucional (a "raiz segura")
 oferta.php              Template das ofertas — recebe /<slug> do .htaccess
+sitemap.php             Gera /sitemap.xml a partir das ofertas publicadas
 404.html                Página de erro
 .htaccess               Roteamento, HTTPS, Options -Indexes, bloqueios
-robots.txt              ⚠️ temporário, ver checklist acima
+robots.txt              Aberto aos buscadores; aponta o sitemap
 assets/css/             Folha de estilo única
 assets/img/favicon.png  Marca — favicon e ícone do cabeçalho
 assets/videos/          Vídeos enviados pela cliente (fora do repositório)
