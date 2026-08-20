@@ -19,7 +19,14 @@ $destino = ($_GET['destino'] ?? 'imagem') === 'video' ? 'video' : 'imagem';
 $erro    = null;
 $enviado = null;
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+// Precisa vir ANTES do csrf_validar(): com o corpo acima de post_max_size o PHP
+// descarta $_POST inteiro, e a validação de CSRF falharia primeiro, devolvendo
+// "Sessão expirada" para o que na verdade é um arquivo grande demais.
+if (post_estourou()) {
+    $erro = 'Arquivo grande demais. O servidor aceita no máximo '
+          . round(ini_bytes((string) ini_get('post_max_size')) / 1048576, 1)
+          . ' MB por envio.';
+} elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
     csrf_validar();
     $destino = ($_POST['destino'] ?? 'imagem') === 'video' ? 'video' : 'imagem';
 
@@ -31,7 +38,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-$limite = $destino === 'video' ? MAX_UPLOAD_VIDEO : MAX_UPLOAD_IMAGEM;
+$limite = limite_upload($destino);
 
 painel_topo($destino === 'video' ? 'Enviar vídeo' : 'Enviar imagem');
 ?>
@@ -66,9 +73,16 @@ if ($enviado !== null) {
         <?= $destino === 'video'
             ? 'Somente MP4.'
             : 'JPG, PNG ou WebP.' ?>
-        Limite de <?= round($limite / 1048576) ?> MB.
+        Limite de <?= round($limite / 1048576, 1) ?> MB.
         O arquivo é conferido pelo conteúdo, não pelo nome — renomear a extensão não funciona.
       </p>
+      <?php if ($destino === 'video' && $limite < MAX_UPLOAD_VIDEO): ?>
+        <p class="ajuda">
+          <strong>O servidor limita mais do que gostaríamos.</strong> Para vídeo
+          maior, use o YouTube: cole o endereço no campo de vídeo da oferta, em
+          vez de enviar o arquivo.
+        </p>
+      <?php endif; ?>
     </div>
 
     <button type="submit">Enviar</button>

@@ -10,15 +10,6 @@
 
 require_once __DIR__ . '/funcoes.php';
 
-/** Cria a pasta se faltar. As de dados nascem fechadas para a web. */
-function garantir_pasta(string $caminho): bool
-{
-    if (is_dir($caminho)) {
-        return true;
-    }
-    return @mkdir($caminho, 0755, true);
-}
-
 /**
  * Grava um arquivo sem risco de deixá-lo pela metade.
  *
@@ -296,6 +287,67 @@ function slug_livre(string $desejado): string
 // Upload
 // ---------------------------------------------------------------------------
 
+/** Converte "2M", "8M", "512K" do php.ini em bytes. */
+function ini_bytes(string $valor): int
+{
+    $valor = trim($valor);
+    if ($valor === '') {
+        return 0;
+    }
+    $numero = (int) $valor;
+    switch (strtolower(substr($valor, -1))) {
+        case 'g': return $numero * 1024 * 1024 * 1024;
+        case 'm': return $numero * 1024 * 1024;
+        case 'k': return $numero * 1024;
+        default:  return $numero;
+    }
+}
+
+/**
+ * Limite real de upload, em bytes.
+ *
+ * O teto que vale é o MENOR entre o nosso e os dois do PHP. A hospedagem
+ * compartilhada costuma vir com upload_max_filesize de 2M e post_max_size de
+ * 8M, muito abaixo dos 64 MB que queríamos para vídeo — anunciar o nosso número
+ * faria a cliente tentar de novo e de novo um envio que nunca ia passar.
+ */
+function limite_upload(string $genero): int
+{
+    $nosso = ($genero === 'video') ? MAX_UPLOAD_VIDEO : MAX_UPLOAD_IMAGEM;
+
+    $limites = [$nosso];
+    foreach (['upload_max_filesize', 'post_max_size'] as $chave) {
+        $bytes = ini_bytes((string) ini_get($chave));
+        if ($bytes > 0) {
+            $limites[] = $bytes;
+        }
+    }
+    return min($limites);
+}
+
+/**
+ * O POST chegou vazio por exceder post_max_size?
+ *
+ * Quando o corpo passa de post_max_size, o PHP descarta tudo: $_POST e $_FILES
+ * voltam vazios. Sem detectar isso aqui, a validação de CSRF é a primeira a
+ * falhar e a cliente recebe "Sessão expirada" ao enviar um vídeo grande — uma
+ * mensagem que não tem nada a ver com o que aconteceu e que ela não tem como
+ * decifrar.
+ */
+function post_estourou(): bool
+{
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        return false;
+    }
+    if (!empty($_POST) || !empty($_FILES)) {
+        return false;
+    }
+    $enviado = (int) ($_SERVER['CONTENT_LENGTH'] ?? 0);
+    $teto    = ini_bytes((string) ini_get('post_max_size'));
+
+    return $teto > 0 && $enviado > $teto;
+}
+
 /**
  * Descobre o tipo real do arquivo lendo os primeiros bytes.
  *
@@ -348,8 +400,13 @@ function receber_upload(array $arquivo, string $genero): array
     if (($arquivo['error'] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_NO_FILE) {
         return ['erro' => 'Nenhum arquivo enviado.'];
     }
-    if (($arquivo['error'] ?? 1) !== UPLOAD_ERR_OK) {
-        return ['erro' => 'O envio falhou. O arquivo pode ser grande demais para o servidor.'];
+    $erro = $arquivo['error'] ?? 1;
+    if ($erro === UPLOAD_ERR_INI_SIZE || $erro === UPLOAD_ERR_FORM_SIZE) {
+        return ['erro' => 'Arquivo grande demais. O limite do servidor é '
+                        . round(limite_upload($genero) / 1048576, 1) . ' MB.'];
+    }
+    if ($erro !== UPLOAD_ERR_OK) {
+        return ['erro' => 'O envio falhou. Tente de novo; se insistir, o arquivo pode ser grande demais.'];
     }
     // Garante que o caminho veio mesmo de um upload HTTP desta requisição, e
     // não é um caminho do sistema de arquivos forjado no formulário.
@@ -364,15 +421,14 @@ function receber_upload(array $arquivo, string $genero): array
 
     if ($genero === 'video') {
         $permitidos = ['mp4'];
-        $limite     = MAX_UPLOAD_VIDEO;
         $pasta      = DIR_VIDEOS;
         $rotulo     = 'vídeo MP4';
     } else {
         $permitidos = ['jpg', 'png', 'webp'];
-        $limite     = MAX_UPLOAD_IMAGEM;
         $pasta      = DIR_UPLOADS;
         $rotulo     = 'imagem JPG, PNG ou WebP';
     }
+    $limite = limite_upload($genero);
 
     if (!in_array($tipo, $permitidos, true)) {
         return ['erro' => 'Aqui só entra ' . $rotulo . '.'];
@@ -395,44 +451,4 @@ function receber_upload(array $arquivo, string $genero): array
     @chmod($destino, 0644);
 
     return ['nome' => $nome];
-}
-
-// ---------------------------------------------------------------------------
-// Cliques (S3)
-// ---------------------------------------------------------------------------
-
-/** Quantos cliques a oferta acumulou. */
-function ler_cliques(string $slug): int
-{
-    if (!slug_valido($slug)) {
-        return 0;
-    }
-    $arquivo = DIR_CLIQUES . '/' . $slug . '.txt';
-    return is_file($arquivo) ? (int) file_get_contents($arquivo) : 0;
-}
-
-/**
- * Soma um clique.
- *
- * Abre com 'c' e trava o arquivo: dois visitantes clicando no mesmo instante
- * leriam o mesmo número e gravariam o mesmo valor, perdendo um clique.
- */
-function somar_clique(string $slug): void
-{
-    if (!slug_valido($slug) || !garantir_pasta(DIR_CLIQUES)) {
-        return;
-    }
-    $f = @fopen(DIR_CLIQUES . '/' . $slug . '.txt', 'c+');
-    if ($f === false) {
-        return;
-    }
-    if (flock($f, LOCK_EX)) {
-        $atual = (int) stream_get_contents($f);
-        ftruncate($f, 0);
-        rewind($f);
-        fwrite($f, (string) ($atual + 1));
-        fflush($f);
-        flock($f, LOCK_UN);
-    }
-    fclose($f);
 }
