@@ -5,7 +5,7 @@ título, vídeo, texto e botões que levam ao site do fornecedor, onde a compra 
 concluída. A raiz `/` é uma página institucional, para que quem apagar o caminho
 da URL encontre um site legítimo em vez de um erro.
 
-Hospedagem: HostGator (plano compartilhado, cPanel). Deploy por SFTP.
+Hospedagem: HostGator (plano compartilhado, cPanel). Deploy por FTPS.
 
 ---
 
@@ -15,7 +15,7 @@ Hospedagem: HostGator (plano compartilhado, cPanel). Deploy por SFTP.
 > buscadores; o que fica de fora é decidido caso a caso (ver *Indexação* abaixo).
 > Não há mais bloqueio geral para desligar.
 
-- [ ] **Gerar a senha do painel** e gravar em `inc/senha.php` no servidor
+- [ ] **Gerar a senha provisória do painel** e gravar em `dados/senha.php` no servidor
       (`php tools/gerar-hash.php "senha"`)
 - [ ] Conferir permissão de escrita em `dados/`, `assets/videos/` e
       `assets/img/uploads/`
@@ -59,7 +59,7 @@ O `sitemap.xml` é gerado por `sitemap.php` a partir dos mesmos critérios.
 ## Estrutura
 
 A raiz do repositório **é** a raiz do site — o que a hospedagem serve a partir de
-`public_html`. Isso mantém o deploy por SFTP trivial e é o que o GitHub Pages
+`public_html`. Isso mantém o deploy por FTPS trivial e é o que o GitHub Pages
 exige para a prévia. O que não é público fica separado por pasta:
 
 ```
@@ -85,7 +85,7 @@ inc/config.php          Aviso base, ícones dos selos, caminhos, limites
 inc/funcoes.php         Carregamento, escape, vídeo, validações
 inc/auth.php            Sessão, login, CSRF, limite de tentativas
 inc/admin-funcoes.php   Normalização, gravação atômica, backup, upload
-inc/senha.php           Hash da senha — FORA do repositório, criado no servidor
+dados/senha.php         Hash da senha — FORA do repositório, gravável pelo painel
 dados/ofertas/          Uma oferta por arquivo JSON (fora do repositório)
 dados/backups/          Versões anteriores de cada oferta (fora do repositório)
 dados/cliques/          Contador por oferta (fora do repositório)
@@ -94,7 +94,7 @@ dados/cliques/          Contador por oferta (fora do repositório)
 tools/dev-router.php    Reproduz o .htaccess no servidor embutido do PHP
 tools/ofertas-exemplo/  Ofertas de exemplo, para popular um ambiente novo
 tools/gerar-hash.php    Gera o hash da senha do painel
-scripts/deploy.sh       Deploy por rsync, com o conteúdo da cliente protegido
+scripts/deploy.sh       Deploy por FTPS (lftp), com o conteúdo da cliente protegido
 README.md · GUIA-PAINEL.md
 
 ─ Temporário, sai depois da aprovação ─────────────────────────
@@ -116,7 +116,7 @@ eletrodoméstico, sem que nenhuma página nasça com seção vazia.
 ## Painel administrativo
 
 Fica em `/admin`, é em português e protegido por senha. A cliente cria, edita,
-duplica e publica ofertas por ele, sem SFTP. Guia de uso dela: `GUIA-PAINEL.md`.
+duplica e publica ofertas por ele, sem FTP. Guia de uso dela: `GUIA-PAINEL.md`.
 
 ### Instalar a senha
 
@@ -127,8 +127,17 @@ esquece aberta. O hash é gerado na linha de comando e copiado para o servidor:
 php tools/gerar-hash.php "uma-senha-longa-de-verdade"
 ```
 
-Grave a saída em **`inc/senha.php`**. O arquivo está no `.gitignore` e é
-excluído do deploy: ele nasce e vive no servidor.
+Grave a saída em **`dados/senha.php`**. O arquivo está no `.gitignore` e é
+excluído do deploy: nasce e vive no servidor.
+
+Fica em `dados/` e não em `inc/` porque **a cliente troca a própria senha pelo
+painel** (`/admin/senha.php`), então o arquivo precisa ser gravável pelo PHP.
+Deixar código executável gravável pelo servidor web é o que transforma qualquer
+falha de escrita em execução remota; `dados/` já é gravável e já está fechado
+para a web.
+
+Na prática: entregue uma senha provisória e peça que ela troque no primeiro
+acesso.
 
 ### Permissões de escrita no servidor
 
@@ -156,18 +165,27 @@ As pastas de `dados/` são criadas sozinhas na primeira gravação, desde que
 | `.htaccess` sem execução de PHP nas pastas de upload | o mesmo, em profundidade |
 | Escrita atômica (temporário + `rename`) | arquivo corrompido por timeout |
 | Backup das 10 versões anteriores | erro de edição da cliente |
+| Troca de senha exige a senha atual + `session_regenerate_id()` | sessão esquecida aberta virar troca de dono |
 
 ## Deploy
+
+Por **FTPS explícito** (porta 21), com `lftp` — a hospedagem oferece FTP, não
+SSH. Instale com `sudo apt install lftp`.
 
 ```bash
 ./scripts/deploy.sh              # simulação — mostra o que iria, sem enviar
 ./scripts/deploy.sh --real       # envia
+./scripts/deploy.sh --real --limpar   # remove também o que não existe mais aqui
 ```
 
 Credenciais em `deploy.conf` na raiz (modelo em `scripts/deploy.conf.exemplo`).
+A senha não fica no arquivo: o script pergunta na hora.
 
-> ⚠️ O script **nunca** envia `dados/ofertas/`, `dados/backups/`,
-> `dados/cliques/`, `assets/videos/` nem `assets/img/uploads/`. Esse conteúdo
+> O script força TLS e **recusa a conexão** se o servidor não oferecer. FTP puro
+> manda usuário e senha em texto claro pela rede.
+
+> ⚠️ O script **nunca** envia o conteúdo de `dados/` (ofertas, backups, cliques
+> e a senha), `assets/videos/` nem `assets/img/uploads/`. Esse conteúdo
 > existe só no servidor e não tem outra cópia. As exclusões valem inclusive com
 > `--delete`.
 

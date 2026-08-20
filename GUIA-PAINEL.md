@@ -13,6 +13,14 @@ nada de programação.
 Se errar a senha cinco vezes, o painel bloqueia por 15 minutos. É proposital:
 impede que alguém fique tentando adivinhar.
 
+### Troque a senha no primeiro acesso
+
+A senha que você recebeu é **provisória**. No menu do topo, clique em
+**Trocar senha**, informe a provisória em "senha atual" e escolha a sua.
+
+Use pelo menos 10 caracteres. Uma frase de que você lembre, com números, é mais
+segura e mais fácil do que uma palavra curta complicada.
+
 > **A sessão expira depois de 2 horas paradas.** Se você deixar a página aberta
 > e voltar no dia seguinte, vai precisar entrar de novo. O que estiver salvo não
 > se perde — mas o que estiver escrito e **não** salvo, sim. Salve antes de sair
