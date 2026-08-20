@@ -173,16 +173,44 @@ tamanho e data, enviando só o que mudou.
 ./scripts/deploy.sh --real --limpar   # remove também o que não existe mais aqui
 ```
 
-Credenciais em `deploy.conf` na raiz (modelo em `scripts/deploy.conf.exemplo`).
-A senha não fica no arquivo: o script pergunta na hora.
-
-> O script força TLS e **recusa a conexão** se o servidor não oferecer. FTP puro
-> manda usuário e senha em texto claro pela rede.
+Configuração em `deploy.conf` na raiz (modelo em `scripts/deploy.conf.exemplo`).
+**Não há senha em lugar nenhum**: quem autentica é a chave SSH indicada ali.
 
 > ⚠️ O script **nunca** envia o conteúdo de `dados/` (ofertas, backups, cliques
-> e a senha), `assets/videos/` nem `assets/img/uploads/`. Esse conteúdo
+> e as credenciais), `assets/videos/` nem `assets/img/uploads/`. Esse conteúdo
 > existe só no servidor e não tem outra cópia. As exclusões valem inclusive com
 > `--limpar`.
+
+O `lftp` sai com código 0 mesmo quando o espelhamento aborta no meio — já
+aconteceu, e o site ficou fora do ar com o WordPress pela metade. Por isso o
+script lê a saída e falha explicitamente quando remove arquivos sem enviar
+nenhum.
+
+### Fluxo de manutenção
+
+```bash
+git checkout staging                          # 1. sempre em staging
+
+php -S localhost:8000 tools/dev-router.php    # 2. validar no navegador
+
+git add <arquivos> && git commit              # 3. commitar
+git push origin staging                       #    (atualiza a prévia do Pages)
+
+git checkout main && git merge staging        # 4. promover
+git push origin main
+
+./scripts/deploy.sh                           # 5. simulação — conferir a lista
+./scripts/deploy.sh --real                    # 6. enviar
+
+git checkout staging                          # 7. voltar para o trabalho
+```
+
+**Quando usar `--limpar`:** só quando você APAGOU um arquivo do projeto e ele
+precisa sumir do servidor. No dia a dia não é necessário — o envio normal
+sobrescreve o que mudou e ignora o resto.
+
+**O que a cliente cria nunca é tocado.** Pode subir quantas vezes quiser: as
+ofertas, os vídeos, as imagens e as credenciais dela ficam onde estão.
 
 ## Rodando local
 
