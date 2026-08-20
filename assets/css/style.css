@@ -88,7 +88,7 @@ p  { margin: 0 0 1.1rem; text-wrap: pretty; /* evita palavra órfã no fim do pa
 
 /* ---------- Hero ---------- */
 
-.hero { padding: 3rem 0 1.5rem; }
+.hero { padding: 3rem 0 0.5rem; }
 .eyebrow {
   display: inline-block; font-size: 0.75rem; font-weight: 700;
   text-transform: uppercase; letter-spacing: 0.09em;
@@ -99,6 +99,13 @@ p  { margin: 0 0 1.1rem; text-wrap: pretty; /* evita palavra órfã no fim do pa
 /* ---------- Botões ---------- */
 
 .cta-block { margin: 2rem 0; text-align: center; }
+
+/* O botão quase sempre fecha a seção. Nesse caso a margem dele soma com o
+   padding da seção seguinte e abre um vão grande entre o botão e o próximo
+   título — o espaço da seção já basta. Vale para as pontas dos dois lados,
+   inclusive na seção que contém só o botão. */
+.cta-block:first-child { margin-top: 0; }
+.cta-block:last-child  { margin-bottom: 0; }
 
 .btn {
   display: block; width: 100%;
