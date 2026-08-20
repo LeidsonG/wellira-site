@@ -1,30 +1,28 @@
 # =============================================================================
 # Wellira — robots.txt
 # =============================================================================
-# O site é aberto aos buscadores. O que está bloqueado aqui é o que não tem
-# razão de aparecer numa busca: área administrativa, dados internos e arquivos
-# de trabalho.
+# O site é aberto aos buscadores. Este arquivo existe por um motivo principal:
+# declarar o sitemap. As poucas regras abaixo têm cada uma sua razão.
 #
-# Importante: bloquear aqui NÃO tira uma página do índice — só impede a leitura.
-# Para manter algo fora do Google, use <meta name="robots" content="noindex">
-# na própria página (nas ofertas, o campo "indexar": false no JSON).
+# O que NÃO fica aqui, de propósito:
+#
+# - Caminhos internos (/admin, /inc, /dados). robots.txt é público: listar
+#   pasta sensível não protege nada e entrega o mapa a quem varre o site.
+#   Quem protege essas pastas é o "Require all denied" do .htaccess, que é
+#   bloqueio de verdade, no servidor — não pedido de boa vontade ao robô.
+#
+# - Páginas que devem sair do índice. Disallow impede a LEITURA, e uma página
+#   não lida é uma página cuja meta "noindex" o Google nunca enxerga: ela pode
+#   continuar aparecendo na busca, só que sem descrição. Para tirar do índice,
+#   o caminho é deixar rastrear e usar noindex na própria página, que é o que
+#   os protótipos estáticos e o 404 fazem.
 # =============================================================================
 
 User-agent: *
 
-# Painel e dados: nada aqui é conteúdo público.
-Disallow: /admin/
-Disallow: /dados/
-Disallow: /inc/
-Disallow: /tools/
-
-# Páginas de demonstração para aprovação da cliente. Produto fictício indexado
-# é o tipo de conteúdo que derruba a reputação do domínio inteiro.
-Disallow: /vitalane.html
-Disallow: /hydrasource.html
-
-# Uploads e vídeos podem ser rastreados: aparecer na busca de imagens e vídeos
-# é tráfego, não risco.
-Allow: /assets/
+# A saída de afiliado não é conteúdo: só conta o clique e redireciona.
+# Bloquear aqui evita que robô inflando o contador estrague a única métrica que
+# a cliente usa para saber qual página converte.
+Disallow: /go/
 
 Sitemap: https://wellira.online/sitemap.xml
