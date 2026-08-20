@@ -54,8 +54,17 @@ body.largo .wrap { width: min(100% - 2rem, 1080px); }
   display: flex; align-items: center; justify-content: space-between;
   gap: 1rem; padding: 0.8rem 0; flex-wrap: wrap;
 }
-.marca { font-weight: 750; font-size: 1.05rem; color: var(--tinta); text-decoration: none; }
+.marca {
+  display: inline-flex; align-items: center;
+  font-weight: 750; font-size: 1.05rem; color: var(--tinta); text-decoration: none;
+}
 .marca span { color: var(--marca); }
+
+/* O espaçamento vem da margem do ícone, nunca de gap no container.
+   Com gap, o flex separaria também "Well" do <span>ira</span> — são dois itens
+   distintos para ele, e o nome apareceria partido no meio. Foi o que aconteceu
+   na tela de login antes desta correção. */
+.marca-icone { flex: 0 0 auto; margin-right: 0.5rem; border-radius: 6px; }
 .marca em {
   font-style: normal; font-weight: 500; color: var(--tinta-tenue);
   font-size: 0.8rem; margin-left: 0.2rem;
@@ -128,11 +137,10 @@ body.entrada main { padding: 1.5rem; width: 100%; }
   box-shadow: 0 12px 32px rgba(16,24,40,.08), 0 2px 6px rgba(16,24,40,.04);
 }
 .login-marca {
-  display: flex; align-items: center; gap: 0.6rem; margin-bottom: 1.5rem;
-  font-size: 1.15rem; font-weight: 750;
+  display: inline-flex; align-items: center; margin-bottom: 1.5rem;
+  font-size: 1.25rem; font-weight: 750; letter-spacing: -0.02em;
 }
-.login-marca img { border-radius: 7px; }
-.login-marca strong { font-weight: 750; }
+.login-marca .marca-icone { width: 30px; height: 30px; border-radius: 7px; }
 .login-marca span { color: var(--marca); }
 
 .caixa-login h1 { font-size: 1.3rem; margin-bottom: 0.3rem; }

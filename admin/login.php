@@ -45,10 +45,7 @@ painel_topo('Entrar', false, false, 'entrada');
 
 <div class="caixa-login">
   <div class="login-marca">
-    <img src="/assets/img/favicon.png" alt="" width="30" height="30">
-    <?php /* A palavra inteira num elemento só: o flex do container trata cada
-             nó filho como item, e "Well" solto ganhava o gap no meio. */ ?>
-    <strong>Well<span>ira</span></strong>
+    <img class="marca-icone" src="/assets/img/favicon.png" alt="" width="30" height="30">Well<span>ira</span>
   </div>
 
   <h1>Entrar no painel</h1>

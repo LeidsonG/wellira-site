@@ -26,7 +26,8 @@ function painel_topo(string $titulo, bool $logado = true, bool $largo = false, s
 <?php if ($logado): ?>
 <header class="topo">
   <div class="wrap">
-    <a class="marca" href="/admin/">Well<span>ira</span> <em>painel</em></a>
+    <a class="marca" href="/admin/"><img class="marca-icone" src="/assets/img/favicon.png"
+         alt="" width="26" height="26">Well<span>ira</span> <em>painel</em></a>
       <?php
       /* Marca o item da página aberta.
          Sem isso o menu é uma fileira de links idênticos, e a única pista de
