@@ -243,3 +243,53 @@ function nao_encontrado(): void
     }
     exit;
 }
+
+
+/** Cria a pasta se faltar. */
+function garantir_pasta(string $caminho): bool
+{
+    if (is_dir($caminho)) {
+        return true;
+    }
+    return @mkdir($caminho, 0755, true);
+}
+
+// ---------------------------------------------------------------------------
+// Cliques (S3)
+// ---------------------------------------------------------------------------
+
+/** Quantos cliques a oferta acumulou. */
+function ler_cliques(string $slug): int
+{
+    if (!slug_valido($slug)) {
+        return 0;
+    }
+    $arquivo = DIR_CLIQUES . '/' . $slug . '.txt';
+    return is_file($arquivo) ? (int) file_get_contents($arquivo) : 0;
+}
+
+/**
+ * Soma um clique.
+ *
+ * Abre com 'c' e trava o arquivo: dois visitantes clicando no mesmo instante
+ * leriam o mesmo número e gravariam o mesmo valor, perdendo um clique.
+ */
+function somar_clique(string $slug): void
+{
+    if (!slug_valido($slug) || !garantir_pasta(DIR_CLIQUES)) {
+        return;
+    }
+    $f = @fopen(DIR_CLIQUES . '/' . $slug . '.txt', 'c+');
+    if ($f === false) {
+        return;
+    }
+    if (flock($f, LOCK_EX)) {
+        $atual = (int) stream_get_contents($f);
+        ftruncate($f, 0);
+        rewind($f);
+        fwrite($f, (string) ($atual + 1));
+        fflush($f);
+        flock($f, LOCK_UN);
+    }
+    fclose($f);
+}

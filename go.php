@@ -14,7 +14,7 @@
  * trocar o link.
  */
 
-require_once __DIR__ . '/inc/admin-funcoes.php';
+require_once __DIR__ . '/inc/funcoes.php';
 
 $slug   = (string) ($_GET['slug'] ?? '');
 $oferta = carregar_oferta($slug);
