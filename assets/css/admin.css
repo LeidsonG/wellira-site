@@ -66,7 +66,17 @@ body.largo .wrap { width: min(100% - 2rem, 1080px); }
   padding: 0.4rem 0.7rem; border-radius: 7px;
 }
 .topo nav a:hover { color: var(--marca); background: var(--marca-clara); }
-.topo nav a.sair { color: var(--tinta-tenue); }
+
+/* Página aberta: fundo cheio e peso maior. O hover usa o mesmo tom claro, então
+   sem o preenchimento sólido os dois estados se confundiriam. */
+.topo nav a.ativo {
+  background: var(--marca); color: #fff; font-weight: 650;
+}
+.topo nav a.ativo:hover { background: var(--marca-escura); color: #fff; }
+
+/* Sair em vermelho: é a única ação do menu que interrompe o trabalho. */
+.topo nav a.sair { color: var(--erro); margin-left: 0.4rem; }
+.topo nav a.sair:hover { background: var(--erro-fundo); color: var(--erro); }
 
 main { padding: 1.5rem 0 4rem; }
 
@@ -122,6 +132,7 @@ body.entrada main { padding: 1.5rem; width: 100%; }
   font-size: 1.15rem; font-weight: 750;
 }
 .login-marca img { border-radius: 7px; }
+.login-marca strong { font-weight: 750; }
 .login-marca span { color: var(--marca); }
 
 .caixa-login h1 { font-size: 1.3rem; margin-bottom: 0.3rem; }

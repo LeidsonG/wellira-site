@@ -266,8 +266,8 @@ if (!empty($_GET['ok'])) {
       <input type="text" id="video_poster" name="video_poster"
              value="<?= v($o, 'video_poster') ?>" maxlength="200">
       <p class="ajuda">
-        Nome do arquivo já enviado —
-        <a href="/admin/upload.php?destino=imagem" target="_blank" rel="noopener">enviar imagem</a>.
+        Nome do arquivo já enviado.
+        <a href="/admin/upload.php?destino=imagem" target="_blank" rel="noopener">Enviar imagem</a>.
         Vazio no YouTube: usa a capa do próprio vídeo.
       </p>
     </div>
@@ -333,7 +333,7 @@ if (!empty($_GET['ok'])) {
     <?php interruptor($o, 'autor', 'grupo-autor'); ?>
     <div id="grupo-autor" class="grupo-alternavel<?= ligada($o, 'autor') ? '' : ' desligado' ?>">
     <p class="ajuda ajuda-topo">
-      Preenchido com a assinatura padrão da Wellira. Edite se precisar — ou
+      Preenchido com a assinatura padrão da Wellira. Edite se precisar, ou
       desligue no interruptor acima para esta oferta específica.
     </p>
 

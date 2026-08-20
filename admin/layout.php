@@ -27,10 +27,27 @@ function painel_topo(string $titulo, bool $logado = true, bool $largo = false, s
 <header class="topo">
   <div class="wrap">
     <a class="marca" href="/admin/">Well<span>ira</span> <em>painel</em></a>
+      <?php
+      /* Marca o item da página aberta.
+         Sem isso o menu é uma fileira de links idênticos, e a única pista de
+         onde a pessoa está é o título da página — que no celular fica abaixo
+         da dobra. */
+      // Compara o caminho inteiro. basename() não serve: em /admin/ ele devolve
+      // "admin", que não é nome de arquivo nenhum, e a lista nunca casava.
+      $aqui = (string) parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH);
+      $itens = [
+          ['/admin/',            'Ofertas',       ['/admin/', '/admin/index.php']],
+          // Só acende em oferta NOVA. Editando uma existente, "Nova oferta"
+          // aceso diria que ela está criando algo, que é o oposto do que faz.
+          ['/admin/editar.php',  'Nova oferta',   empty($_GET['slug']) ? ['/admin/editar.php'] : []],
+          ['/admin/senha.php',   'Trocar acesso', ['/admin/senha.php']],
+      ];
+      ?>
       <nav>
-        <a href="/admin/">Ofertas</a>
-        <a href="/admin/editar.php">Nova oferta</a>
-        <a href="/admin/senha.php">Trocar acesso</a>
+        <?php foreach ($itens as [$href, $rotulo, $casa]): ?>
+          <?php $ativo = in_array($aqui, $casa, true); ?>
+          <a href="<?= e($href) ?>"<?= $ativo ? ' class="ativo" aria-current="page"' : '' ?>><?= e($rotulo) ?></a>
+        <?php endforeach; ?>
         <a class="sair" href="/admin/sair.php">Sair</a>
       </nav>
   </div>

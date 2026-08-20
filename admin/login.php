@@ -46,7 +46,9 @@ painel_topo('Entrar', false, false, 'entrada');
 <div class="caixa-login">
   <div class="login-marca">
     <img src="/assets/img/favicon.png" alt="" width="30" height="30">
-    Well<span>ira</span>
+    <?php /* A palavra inteira num elemento só: o flex do container trata cada
+             nó filho como item, e "Well" solto ganhava o gap no meio. */ ?>
+    <strong>Well<span>ira</span></strong>
   </div>
 
   <h1>Entrar no painel</h1>
@@ -80,8 +82,8 @@ painel_topo('Entrar', false, false, 'entrada');
   </form>
 
   <p class="login-rodape">
-    Esqueceu a senha? Ela não pode ser recuperada por aqui —
-    fale com o suporte técnico para receber um acesso novo.
+    Esqueceu a senha? Ela não pode ser recuperada por aqui.
+    Fale com o suporte técnico para receber um acesso novo.
   </p>
 </div>
 
