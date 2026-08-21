@@ -255,20 +255,28 @@
         if (!corpo) { caixa.appendChild(vazio('Escreva o texto de venda para ver aqui')); return; }
         if (titulo) caixa.appendChild(el('h3', 'previa-h2', titulo));
 
-        // Mesmas regras do template: linha em branco separa parágrafo,
-        // "## " no começo da linha vira subtítulo.
-        var blocos = corpo.split(/\n\s*\n/).slice(0, 4);
+        // Mesmas regras do paragrafos() em inc/funcoes.php: linha em branco
+        // separa parágrafo, "## " no começo do bloco vira subtítulo.
+        //
+        // As quebras são normalizadas antes de dividir. O PHP usa \R, que
+        // cobre \r\n e \r; o JS não tem equivalente, e texto colado do Word
+        // ou de um editor do Windows chega com \r\n.
+        var normalizado = corpo.replace(/\r\n?/g, '\n');
+        var blocos = normalizado.split(/\n[ \t]*\n/);
+
+        // TODOS os blocos são desenhados, e não só os primeiros. Cortar em
+        // quatro escondia justamente os subtítulos, que num texto de venda
+        // aparecem depois da abertura — e a prévia parecia ignorar o "##".
+        // Quem limita a altura é o CSS, com rolagem própria.
         blocos.forEach(function (b) {
           b = b.trim();
+          if (b === '') return;
           if (b.indexOf('## ') === 0) {
             caixa.appendChild(el('h4', 'previa-h3', b.slice(3)));
           } else {
-            caixa.appendChild(el('p', 'previa-p', b.length > 180 ? b.slice(0, 180) + '…' : b));
+            caixa.appendChild(el('p', 'previa-p', b.length > 150 ? b.slice(0, 150) + '…' : b));
           }
         });
-        if (corpo.split(/\n\s*\n/).length > 4) {
-          caixa.appendChild(el('p', 'previa-mais', '…continua'));
-        }
       },
 
       autor: function (caixa) {

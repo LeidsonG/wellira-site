@@ -450,6 +450,10 @@ textarea { resize: vertical; line-height: 1.6; }
   font-size: 0.8rem; line-height: 1.5; color: var(--tinta-fraca);
   overflow-wrap: anywhere;
 }
+/* O texto de venda tem 600 a 900 palavras: a prévia mostra tudo, mas dentro de
+   uma caixa com rolagem própria. Cortar blocos escondia os subtítulos. */
+.previa[data-previa="texto"] { max-height: 340px; overflow-y: auto; }
+
 .previa > *:first-child { margin-top: 0; }
 .previa > *:last-child  { margin-bottom: 0; }
 
