@@ -8,15 +8,16 @@ nada de programação.
 ## Entrar
 
 1. Acesse **wellira.online/admin**
-2. Digite a senha e clique em **Entrar**
+2. Digite **usuário e senha** e clique em **Entrar**
 
-Se errar a senha cinco vezes, o painel bloqueia por 15 minutos. É proposital:
-impede que alguém fique tentando adivinhar.
+Se errar cinco vezes, o painel bloqueia por 15 minutos. É proposital: impede que
+alguém fique tentando adivinhar.
 
-### Troque a senha no primeiro acesso
+### Troque o acesso no primeiro login
 
-A senha que você recebeu é **provisória**. No menu do topo, clique em
-**Trocar senha**, informe a provisória em "senha atual" e escolha a sua.
+O usuário e a senha que você recebeu são **provisórios**. No menu do topo,
+clique em **Trocar acesso**, informe a senha provisória em "senha atual" e
+escolha as suas.
 
 Use pelo menos 10 caracteres. Uma frase de que você lembre, com números, é mais
 segura e mais fácil do que uma palavra curta complicada.
@@ -30,16 +31,47 @@ segura e mais fácil do que uma palavra curta complicada.
 
 ## Criar uma oferta
 
-Clique em **+ Nova oferta**. O formulário segue a mesma ordem da página final,
-de cima para baixo.
+Na tela **Ofertas**, clique em **+ Nova oferta**.
 
-### A regra mais importante
+### O formulário tem abas
 
-> **Campo vazio = o bloco some da página.**
+O formulário é dividido em abas, na mesma ordem em que os blocos aparecem na
+página final:
 
-Você não precisa preencher tudo. Se um produto não tem perguntas frequentes,
-deixe a seção em branco e ela simplesmente não aparece — sem buraco no layout,
-sem espaço sobrando. Preencha só o que faz sentido para aquele produto.
+```
+Topo · Vídeo · Botão · Texto · Autor · Não é para você · Selos · FAQ · Busca · Publicação
+```
+
+Clique numa aba para ir direto nela. **A aba com uma bolinha verde já tem
+conteúdo** — assim você vê num relance o que está preenchido sem abrir uma por
+uma. No celular, arraste a barra de abas para o lado para ver as demais.
+
+Você troca de aba à vontade: nada se perde antes de salvar.
+
+### Como fica na página
+
+No fim de cada aba há uma caixa **"Como fica na página"**, que mostra aquele
+bloco montado com o **seu texto**, atualizando enquanto você digita.
+
+Serve para conferir sem abrir a página numa outra janela. Se ela avisar
+*"Sem texto: o bloco não aparece"*, é porque falta preencher algo.
+
+### Mostrar ou esconder uma seção
+
+As seções **Autor**, **Não é para você**, **Selos** e **FAQ** têm um
+interruptor no topo: **"Mostrar esta seção na página"**.
+
+- **Ligado** — a seção aparece para o visitante
+- **Desligado** — a caixa escurece com o aviso *"Não aparece na página"*, mas
+  **o texto continua guardado**
+
+Isso é melhor do que apagar: se mudar de ideia, é só religar. Você não perde
+nada.
+
+### Listas que crescem
+
+Em "Não é para você", "Selos" e "FAQ", use o botão **+ Adicionar** para incluir
+quantos itens quiser. O **×** ao lado remove um item.
 
 ### O mínimo para publicar
 
@@ -82,6 +114,33 @@ Este é o segundo.
 
 Só isso. Não existe negrito nem itálico, e é de propósito: assim toda página
 sai com a mesma cara, sem risco de uma ficar diferente das outras.
+
+### Usando o ChatGPT
+
+Na aba *Texto* há uma caixa **"Prompt para o ChatGPT escrever este texto"**.
+Clique em **Copiar prompt**, cole no ChatGPT e troque a linha do produto pelas
+informações que o fornecedor mandou.
+
+O prompt já ensina o formato certo (linha em branco separa parágrafo, `##` vira
+subtítulo) e já proíbe o que o fornecedor não autoriza. Sem ele, o ChatGPT
+devolve texto com asteriscos e traços que aparecem feios na página.
+
+> Leia o que voltar antes de colar. O ChatGPT não sabe se você usou o produto,
+> e o texto é assinado pela Charlotte em primeira pessoa.
+
+---
+
+## O botão
+
+O botão que leva ao fornecedor aparece **três vezes** na página: no topo, no
+meio e no fim. Você preenche o texto dele **uma vez só**, na aba *Botão*, e os
+três ficam iguais.
+
+| Campo | O que é |
+|---|---|
+| **Link do fornecedor** | para onde o botão leva. Obrigatório |
+| **Texto do botão** | o que está escrito nele |
+| **Linha de apoio** | a frase pequena embaixo do botão |
 
 ---
 
@@ -139,6 +198,59 @@ em nenhum produto.
 
 > Na dúvida sobre uma frase, pergunte antes de publicar. É mais rápido do que
 > tirar do ar depois.
+
+---
+
+## A aba Busca
+
+Dois campos que **não aparecem na página**, mas importam.
+
+### Descrição para o Google
+
+É o trechinho cinza embaixo do título no resultado de busca. Escreva em inglês,
+150 a 160 caracteres, pensando em fazer a pessoa **clicar** — não em descrever
+tudo.
+
+Um modelo que funciona:
+
+```
+An honest look at [PRODUTO] after [TEMPO]: what actually changed,
+what didn't, and who should probably skip it.
+```
+
+Se deixar vazio, o sistema usa o subtítulo da oferta. Funciona, mas escrever à
+mão traz mais visitas.
+
+### Avisos legais desta oferta
+
+**Na maioria das ofertas, deixe vazio.** Toda página já traz automaticamente
+este aviso no rodapé, sem você fazer nada:
+
+> *Orders are completed on the manufacturer's website, which is solely
+> responsible for payment, shipping, returns and warranty.*
+
+Só preencha quando **alguém exigir** um texto específico:
+
+- **A plataforma de afiliado** exige divulgação de comissão
+- **O fornecedor** mandou uma frase exata no material dele
+- **Suplemento**, quando o fornecedor pede o aviso da FDA
+
+A pergunta que resolve: *"alguém me obrigou a escrever isso?"* Se ninguém
+obrigou, vazio é a resposta certa — texto legal a mais no rodapé só rouba
+atenção do botão.
+
+---
+
+## Salvar
+
+O botão **Salvar** grava e **mantém você no formulário**, na mesma aba. Salve
+quantas vezes quiser enquanto escreve.
+
+**Salvar e abrir a página ↗** grava e abre a página numa aba nova, para você ver
+o resultado.
+
+O aviso de status no alto da tela mostra **Rascunho** ou **No ar**, então você
+sempre sabe se aquilo está publicado.
 
 ---
 
