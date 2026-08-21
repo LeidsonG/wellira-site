@@ -144,7 +144,15 @@ function render_video(array $oferta): string
 
     $estilo = '';
     if ($poster !== '') {
-        $url    = URL_VIDEOS . '/' . rawurlencode(basename($poster));
+        // A capa é enviada pela tela de IMAGEM do painel e mora em
+        // assets/img/uploads — não na pasta de vídeos. Este código apontava
+        // para URL_VIDEOS e toda capa saía 404, silenciosamente: o botão
+        // ficava só com o fundo escuro e ninguém via erro nenhum.
+        // O fallback para a pasta de vídeos cobre pôster antigo enviado por lá.
+        $nome = basename($poster);
+        $url  = is_file(DIR_UPLOADS . '/' . $nome)
+              ? URL_UPLOADS . '/' . rawurlencode($nome)
+              : URL_VIDEOS . '/' . rawurlencode($nome);
         $estilo = ' style="background-image:url(\'' . e($url) . '\')"';
     }
 
