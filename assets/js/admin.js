@@ -378,17 +378,24 @@
         if (!perguntas.length) { caixa.appendChild(vazio('Nenhuma pergunta: o bloco não aparece')); return; }
         caixa.appendChild(el('h3', 'previa-h2', val('faq_titulo') || 'Common questions'));
 
-        // Reproduz o <details> da página: a primeira pergunta nasce aberta,
-        // com a resposta à vista, e as demais mostram só o "+".
+        // Todas as perguntas com suas respostas, e não só a primeira aberta.
+        // Imitar o acordeão da página escondia o conteúdo que ela precisa
+        // reler — e conferir o texto é a única razão de a prévia existir.
         var respostas = Array.prototype.map.call(document.getElementsByName('faq_resposta[]'),
                                                  function (e2) { return e2.value.trim(); });
         var lista = el('div', 'previa-faq-lista');
-        perguntas.slice(0, 5).forEach(function (q, i) {
-          var item = el('div', 'previa-faq' + (i === 0 ? ' aberto' : ''));
+
+        perguntas.forEach(function (q, i) {
+          var item = el('div', 'previa-faq');
           item.appendChild(el('span', 'previa-faq-p', q));
-          if (i === 0 && respostas[i]) {
-            var r = respostas[i];
-            item.appendChild(el('p', 'previa-faq-r', r.length > 140 ? r.slice(0, 140) + '…' : r));
+
+          var r = respostas[i] || '';
+          if (r) {
+            item.appendChild(el('p', 'previa-faq-r', r.length > 220 ? r.slice(0, 220) + '…' : r));
+          } else {
+            // Pergunta sem resposta não vira item na página. Dizer isso aqui
+            // evita ela publicar achando que a pergunta apareceu.
+            item.appendChild(el('p', 'previa-faq-falta', 'Sem resposta: esta pergunta não aparece'));
           }
           lista.appendChild(item);
         });

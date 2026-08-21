@@ -543,24 +543,36 @@ textarea { resize: vertical; line-height: 1.6; }
 .previa-selo strong { display: block; font-size: 0.72rem; color: var(--tinta); margin-top: 0.3rem; }
 .previa-selo span   { display: block; font-size: 0.66rem; color: var(--tinta-tenue); }
 
-/* Acordeão igual ao da página: "+" à direita, "–" no item aberto, e só o
-   primeiro mostra a resposta. */
+/* Todas as perguntas com resposta à vista. O acordeão real esconde as demais,
+   mas aqui o objetivo é reler o texto, não imitar a interação. O contraste
+   entre pergunta e resposta faz o trabalho que o "+" fazia na página. */
 .previa-faq-lista { border-top: 1px solid var(--linha); }
 .previa-faq {
-  border-bottom: 1px solid var(--linha); padding: 0.5rem 1.4rem 0.5rem 0;
+  border-bottom: 1px solid var(--linha); padding: 0.6rem 0 0.65rem 0.95rem;
   position: relative;
 }
+.previa-faq:last-child { border-bottom: 0; padding-bottom: 0; }
+
+/* Marcador de pergunta, no lugar do "+" da página. */
+.previa-faq::before {
+  content: "▸"; position: absolute; left: 0; top: 0.62rem;
+  color: #0d7d71; font-size: 0.72rem; line-height: 1;
+}
 .previa-faq-p {
-  display: block; font-weight: 650; color: var(--tinta); font-size: 0.78rem;
+  display: block; font-weight: 700; color: var(--tinta);
+  font-size: 0.79rem; line-height: 1.35;
 }
-.previa-faq::after {
-  content: "+"; position: absolute; right: 0.15rem; top: 0.35rem;
-  color: #0d7d71; font-size: 1rem; line-height: 1;
-}
-.previa-faq.aberto::after { content: "\2013"; }
 .previa-faq-r {
-  margin: 0.3rem 0 0; font-size: 0.74rem; color: var(--tinta-fraca);
+  margin: 0.25rem 0 0; font-size: 0.75rem; color: var(--tinta-fraca);
+  line-height: 1.5;
 }
+.previa-faq-falta {
+  margin: 0.25rem 0 0; font-size: 0.72rem; color: #b3261e; font-style: italic;
+}
+
+/* O FAQ costuma ter cinco ou seis perguntas: cabe rolagem própria, como no
+   texto de venda, para a prévia não empurrar a barra de salvar para longe. */
+.previa[data-previa="faq"] { max-height: 320px; overflow-y: auto; }
 
 /* ---------- Botões ---------- */
 
