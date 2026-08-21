@@ -100,6 +100,44 @@ if (!$selos)      { $selos      = [['icone' => 'escudo', 'titulo' => '', 'texto'
 if (!$faq)        { $faq        = [['pergunta' => '', 'resposta' => '']]; }
 
 /**
+ * Miniatura de como a seção fica na página.
+ *
+ * Formas cinzas, sem texto real: o objetivo é a cliente reconhecer o BLOCO,
+ * não ler um exemplo. Ela edita campos com nomes técnicos ("eyebrow",
+ * "botao_sub2") e não tem como saber onde cada um cai sem abrir a página numa
+ * outra aba e comparar. A miniatura responde isso em meio segundo.
+ */
+function exemplo(string $qual): void
+{
+    $formas = [
+        'topo' => '<span class="mini-pill"></span><span class="mini-h1"></span><span class="mini-linha curta"></span>',
+        'video' => '<span class="mini-video"><span class="mini-play"></span></span>',
+        'botao' => '<span class="mini-botao"></span><span class="mini-linha mini-centro muito-curta"></span>',
+        'texto' => '<span class="mini-h2"></span><span class="mini-linha"></span><span class="mini-linha"></span>'
+                 . '<span class="mini-linha curta"></span><span class="mini-h3"></span>'
+                 . '<span class="mini-linha"></span><span class="mini-linha curta"></span>',
+        'autor' => '<span class="mini-autor"><span class="mini-foto"></span>'
+                 . '<span class="mini-autor-txt"><span class="mini-linha muito-curta"></span>'
+                 . '<span class="mini-linha curta"></span><span class="mini-linha"></span></span></span>',
+        'nao' => '<span class="mini-h2"></span><span class="mini-item"></span>'
+               . '<span class="mini-item"></span><span class="mini-item"></span>',
+        'selos' => '<span class="mini-selos"><span class="mini-selo"></span>'
+                 . '<span class="mini-selo"></span><span class="mini-selo"></span></span>',
+        'faq' => '<span class="mini-h2"></span><span class="mini-faq"></span>'
+               . '<span class="mini-faq"></span><span class="mini-faq"></span>',
+    ];
+    if (!isset($formas[$qual])) {
+        return;
+    }
+    ?>
+    <div class="exemplo">
+      <span class="exemplo-rotulo">Como fica na página</span>
+      <div class="exemplo-arte"><?= $formas[$qual] /* formas fixas, sem dado da cliente */ ?></div>
+    </div>
+    <?php
+}
+
+/**
  * Prompt que a cliente cola no ChatGPT.
  *
  * Ela já usa o ChatGPT para escrever o texto de venda. Sem instrução, o que
@@ -157,9 +195,18 @@ if (!empty($_GET['ok'])) {
       <p class="cabeca-sub">/<?= e($slug) ?></p>
     <?php endif; ?>
   </div>
-  <?php if (!$novo): ?>
-    <a class="botao botao-fraco" href="/<?= e($slug) ?>" target="_blank" rel="noopener">Ver página ↗</a>
-  <?php endif; ?>
+  <div class="cabeca-lado">
+    <?php /* Publicação virou a penúltima aba, seguindo o fluxo de quem escreve
+             primeiro e decide publicar depois. A etiqueta mantém o estado à
+             vista o tempo todo, sem precisar abrir a aba para conferir. */ ?>
+    <?php $publicada = ($o['status'] ?? 'rascunho') === 'publicado'; ?>
+    <span class="etiqueta <?= $publicada ? 'etiqueta-ok' : 'etiqueta-fraca' ?>">
+      <?= $publicada ? 'No ar' : 'Rascunho' ?>
+    </span>
+    <?php if (!$novo): ?>
+      <a class="botao botao-fraco" href="/<?= e($slug) ?>" target="_blank" rel="noopener">Ver página ↗</a>
+    <?php endif; ?>
+  </div>
 </div>
 
 <nav class="abas" role="tablist" aria-label="Seções da oferta"></nav>
@@ -172,36 +219,8 @@ if (!empty($_GET['ok'])) {
            navegador fazia a cliente cair numa aba de outra oferta. */ ?>
   <input type="hidden" name="aba" id="aba-atual" value="<?= (int) ($_GET['aba'] ?? 0) ?>">
 
-  <!-- ==================== 1. Publicação ==================== -->
-  <section id="sec-publicacao" data-secao="Publicação">
-    <div class="campo">
-      <label>Situação</label>
-      <div class="radios">
-        <label class="radio">
-          <input type="radio" name="status" value="rascunho"
-                 <?= ($o['status'] ?? 'rascunho') !== 'publicado' ? 'checked' : '' ?>>
-          <span><strong>Rascunho</strong><br><small>Só você vê. Quem abrir o endereço recebe "página não encontrada".</small></span>
-        </label>
-        <label class="radio">
-          <input type="radio" name="status" value="publicado"
-                 <?= ($o['status'] ?? '') === 'publicado' ? 'checked' : '' ?>>
-          <span><strong>Publicada</strong><br><small>No ar. Qualquer pessoa com o link acessa.</small></span>
-        </label>
-      </div>
-    </div>
-
-    <div class="campo">
-      <label class="check">
-        <input type="checkbox" name="indexar" value="1"
-               <?= ($o['indexar'] ?? true) !== false ? 'checked' : '' ?>>
-        <span>Deixar esta página aparecer no Google</span>
-      </label>
-      <p class="ajuda">Desmarque só em páginas de teste. Ofertas de verdade devem ficar marcadas.</p>
-    </div>
-  </section>
-
   <!-- ==================== 2. Topo ==================== -->
-  <section id="sec-topo" data-secao="Topo" hidden>
+  <section id="sec-topo" data-secao="Topo">
     <div class="campo">
       <label for="titulo">Título <span class="obrig">obrigatório</span></label>
       <input type="text" id="titulo" name="titulo" value="<?= v($o, 'titulo') ?>"
@@ -238,6 +257,7 @@ if (!empty($_GET['ok'])) {
       </div>
     </div>
     <p class="ajuda">Vazios, os dois somem da página.</p>
+    <?php exemplo('topo'); ?>
   </section>
 
   <!-- ==================== 3. Vídeo ==================== -->
@@ -271,6 +291,7 @@ if (!empty($_GET['ok'])) {
         Vazio no YouTube: usa a capa do próprio vídeo.
       </p>
     </div>
+    <?php exemplo('video'); ?>
   </section>
 
   <!-- ==================== 4. Botão ==================== -->
@@ -298,6 +319,7 @@ if (!empty($_GET['ok'])) {
         <input type="text" id="botao_sub2" name="botao_sub2" value="<?= v($o, 'botao_sub2') ?>" maxlength="200">
       </div>
     </div>
+    <?php exemplo('botao'); ?>
   </section>
 
   <!-- ==================== 5. Texto ==================== -->
@@ -326,6 +348,7 @@ if (!empty($_GET['ok'])) {
       <textarea id="prompt-gpt" class="prompt-texto" rows="10" readonly><?= e($prompt_chatgpt) ?></textarea>
       <button type="button" class="botao botao-fraco" data-copiar="prompt-gpt">Copiar prompt</button>
     </details>
+    <?php exemplo('texto'); ?>
   </section>
 
   <!-- ==================== 6. Autor ==================== -->
@@ -371,6 +394,7 @@ if (!empty($_GET['ok'])) {
                value="<?= v($o, 'autor_titulo', AUTOR_TITULO_PADRAO) ?>" maxlength="120">
       </div>
     </div>
+    <?php exemplo('autor'); ?>
     </div>
   </section>
 
@@ -417,6 +441,7 @@ if (!empty($_GET['ok'])) {
       <label for="nao_e_para_voce_nota">Observação final</label>
       <textarea id="nao_e_para_voce_nota" name="nao_e_para_voce_nota" rows="3"><?= e((string) ($o['nao_e_para_voce_nota'] ?? '')) ?></textarea>
     </div>
+    <?php exemplo('nao'); ?>
     </div>
   </section>
 
@@ -468,6 +493,7 @@ if (!empty($_GET['ok'])) {
     <button type="button" class="adicionar" data-adicionar="lista-selos" data-molde="molde-selos">
       + Adicionar selo
     </button>
+    <?php exemplo('selos'); ?>
     </div>
   </section>
 
@@ -514,6 +540,7 @@ if (!empty($_GET['ok'])) {
     <button type="button" class="adicionar" data-adicionar="lista-faq" data-molde="molde-faq">
       + Adicionar pergunta
     </button>
+    <?php exemplo('faq'); ?>
     </div>
   </section>
 
@@ -542,6 +569,34 @@ if (!empty($_GET['ok'])) {
            que faziam quase a mesma coisa com nomes parecidos — e o primeiro
            jogava de volta para a lista no meio da escrita. Agora salvar
            mantém a cliente onde ela está, que é o que um editor deve fazer. */ ?>
+  <!-- ==================== 10. Publicação ==================== -->
+  <section id="sec-publicacao" data-secao="Publicação" hidden>
+    <div class="campo">
+      <label>Situação</label>
+      <div class="radios">
+        <label class="radio">
+          <input type="radio" name="status" value="rascunho"
+                 <?= ($o['status'] ?? 'rascunho') !== 'publicado' ? 'checked' : '' ?>>
+          <span><strong>Rascunho</strong><br><small>Só você vê. Quem abrir o endereço recebe "página não encontrada".</small></span>
+        </label>
+        <label class="radio">
+          <input type="radio" name="status" value="publicado"
+                 <?= ($o['status'] ?? '') === 'publicado' ? 'checked' : '' ?>>
+          <span><strong>Publicada</strong><br><small>No ar. Qualquer pessoa com o link acessa.</small></span>
+        </label>
+      </div>
+    </div>
+
+    <div class="campo">
+      <label class="check">
+        <input type="checkbox" name="indexar" value="1"
+               <?= ($o['indexar'] ?? true) !== false ? 'checked' : '' ?>>
+        <span>Deixar esta página aparecer no Google</span>
+      </label>
+      <p class="ajuda">Desmarque só em páginas de teste. Ofertas de verdade devem ficar marcadas.</p>
+    </div>
+  </section>
+
   <div class="barra-salvar">
     <button type="submit" name="acao" value="salvar">Salvar</button>
     <?php if (!$novo): ?>
