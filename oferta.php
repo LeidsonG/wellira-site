@@ -232,7 +232,7 @@ function faixa(): string
         </ul>
       <?php endif; ?>
 
-      <?= cta($link, $botao, $oferta['botao_sub2'] ?? null) ?>
+      <?= cta($link, $botao, $oferta['botao_sub'] ?? null) ?>
     </div>
   </section>
 
@@ -249,7 +249,7 @@ function faixa(): string
         <?php endforeach; ?>
       </div>
 
-      <?= cta($link, $botao) ?>
+      <?= cta($link, $botao, $oferta['botao_sub'] ?? null) ?>
     </div>
   </section>
   <?php endif; ?>

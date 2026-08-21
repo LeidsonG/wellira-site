@@ -130,7 +130,6 @@ function normalizar_oferta(array $post): array
         'video_poster'   => 200,
         'botao_texto'    => 80,
         'botao_sub'      => 200,
-        'botao_sub2'     => 200,
         'texto_titulo'   => 120,
         'autor_titulo'   => 120,
         'nao_e_para_voce_titulo' => 120,

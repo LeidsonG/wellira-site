@@ -193,6 +193,11 @@ if (!empty($_GET['ok'])) {
   </div>
 </div>
 
+<?php /* Os traçados dos ícones vêm da constante ICONES, definida por nós em
+         inc/config.php. Não é conteúdo da cliente, e é por isso que a prévia
+         pode montá-los como SVG sem risco. */ ?>
+<script type="application/json" id="icones-svg"><?= json_encode(ICONES, JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) ?></script>
+
 <nav class="abas" role="tablist" aria-label="Seções da oferta"></nav>
 
 <form method="post" action="/admin/salvar.php" class="formulario" data-abas>
@@ -293,15 +298,14 @@ if (!empty($_GET['ok'])) {
              value="<?= v($o, 'botao_texto', 'See the Official Site') ?>" maxlength="80">
     </div>
 
-    <div class="dupla">
-      <div class="campo">
-        <label for="botao_sub">Linha sob o 1º botão</label>
-        <input type="text" id="botao_sub" name="botao_sub" value="<?= v($o, 'botao_sub') ?>" maxlength="200">
-      </div>
-      <div class="campo">
-        <label for="botao_sub2">Linha sob o 2º botão</label>
-        <input type="text" id="botao_sub2" name="botao_sub2" value="<?= v($o, 'botao_sub2') ?>" maxlength="200">
-      </div>
+    <div class="campo">
+      <label for="botao_sub">Linha de apoio sob o botão</label>
+      <input type="text" id="botao_sub" name="botao_sub" value="<?= v($o, 'botao_sub') ?>" maxlength="200">
+      <p class="ajuda">
+        A página repete o botão três vezes, e todas usam este mesmo texto.
+        Antes eram dois campos para dizer quase a mesma coisa em lugares
+        diferentes — dava trabalho e produzia páginas incoerentes.
+      </p>
     </div>
     <?php exemplo('botao'); ?>
   </section>

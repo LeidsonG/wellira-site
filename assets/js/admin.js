@@ -220,6 +220,34 @@
       return n;
     }
 
+    /** Traçados dos ícones, publicados pelo PHP a partir da constante ICONES. */
+    var ICONES = (function () {
+      var tag = document.getElementById('icones-svg');
+      try { return tag ? JSON.parse(tag.textContent) : {}; } catch (e) { return {}; }
+    })();
+
+    /**
+     * Monta o SVG de um selo.
+     *
+     * innerHTML aqui é seguro e deliberado: o traçado vem de inc/config.php,
+     * não do formulário. O nome do ícone ainda é validado contra a lista antes
+     * de ser usado como chave.
+     */
+    function icone(nome) {
+      if (!ICONES[nome]) return null;
+      var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      svg.setAttribute('viewBox', '0 0 24 24');
+      svg.setAttribute('width', '22');
+      svg.setAttribute('height', '22');
+      svg.setAttribute('fill', 'none');
+      svg.setAttribute('stroke', 'currentColor');
+      svg.setAttribute('stroke-width', '1.8');
+      svg.setAttribute('stroke-linecap', 'round');
+      svg.setAttribute('stroke-linejoin', 'round');
+      svg.innerHTML = ICONES[nome];
+      return svg;
+    }
+
     /** Marcador do que ainda não foi preenchido. */
     function vazio(rotulo) {
       return el('p', 'previa-vazio', rotulo);
@@ -312,9 +340,16 @@
         if (!linhas.length) { caixa.appendChild(vazio('Nenhuma linha: o bloco não aparece')); return; }
         var titulo = val('nao_e_para_voce_titulo');
         caixa.appendChild(el('h3', 'previa-h2', titulo || "This isn't for you if…"));
+        var moldura = el('div', 'previa-nao');
         var ul = el('ul', 'previa-lista');
-        linhas.slice(0, 5).forEach(function (t) { ul.appendChild(el('li', null, t)); });
-        caixa.appendChild(ul);
+        linhas.slice(0, 6).forEach(function (t) { ul.appendChild(el('li', null, t)); });
+        moldura.appendChild(ul);
+        caixa.appendChild(moldura);
+
+        var nota = val('nao_e_para_voce_nota');
+        if (nota) {
+          caixa.appendChild(el('p', 'previa-nota', nota.length > 120 ? nota.slice(0, 120) + '…' : nota));
+        }
       },
 
       selos: function (caixa) {
@@ -323,9 +358,13 @@
         if (!titulos.length) { caixa.appendChild(vazio('Nenhum selo: o bloco não aparece')); return; }
         var textos = Array.prototype.map.call(document.getElementsByName('selo_texto[]'),
                                               function (e2) { return e2.value.trim(); });
+        var nomes = Array.prototype.map.call(document.getElementsByName('selo_icone[]'),
+                                             function (e2) { return e2.value; });
         var grade = el('div', 'previa-selos');
         titulos.slice(0, 3).forEach(function (t, i) {
           var s2 = el('div', 'previa-selo');
+          var ico = icone(nomes[i]);
+          if (ico) s2.appendChild(ico);
           s2.appendChild(el('strong', null, t));
           if (textos[i]) s2.appendChild(el('span', null, textos[i]));
           grade.appendChild(s2);
@@ -338,9 +377,22 @@
         var perguntas = valores('faq_pergunta[]');
         if (!perguntas.length) { caixa.appendChild(vazio('Nenhuma pergunta: o bloco não aparece')); return; }
         caixa.appendChild(el('h3', 'previa-h2', val('faq_titulo') || 'Common questions'));
-        perguntas.slice(0, 4).forEach(function (q) {
-          caixa.appendChild(el('div', 'previa-faq', '▸ ' + q));
+
+        // Reproduz o <details> da página: a primeira pergunta nasce aberta,
+        // com a resposta à vista, e as demais mostram só o "+".
+        var respostas = Array.prototype.map.call(document.getElementsByName('faq_resposta[]'),
+                                                 function (e2) { return e2.value.trim(); });
+        var lista = el('div', 'previa-faq-lista');
+        perguntas.slice(0, 5).forEach(function (q, i) {
+          var item = el('div', 'previa-faq' + (i === 0 ? ' aberto' : ''));
+          item.appendChild(el('span', 'previa-faq-p', q));
+          if (i === 0 && respostas[i]) {
+            var r = respostas[i];
+            item.appendChild(el('p', 'previa-faq-r', r.length > 140 ? r.slice(0, 140) + '…' : r));
+          }
+          lista.appendChild(item);
         });
+        caixa.appendChild(lista);
       }
     };
 
