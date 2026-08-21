@@ -32,6 +32,20 @@
 
 * { box-sizing: border-box; }
 
+/* Reserva o espaço da barra de rolagem SEMPRE.
+   Sem isto, trocar para uma aba mais alta faz a barra aparecer, a viewport
+   encolher ~15px e todo o conteúdo centralizado saltar para a esquerda. A cada
+   clique. O scrollbar-gutter resolve nos navegadores atuais; o overflow-y
+   garante o mesmo nos antigos, à custa de uma barra sempre visível. */
+html {
+  scrollbar-gutter: stable;
+  overflow-y: scroll;
+}
+
+/* Nada pode empurrar a página para os lados. Se algum bloco estourar a largura
+   (tabela larga, palavra longa, textarea), quem rola é ele, não o documento. */
+html, body { max-width: 100%; overflow-x: hidden; }
+
 body {
   margin: 0;
   background: var(--fundo);
@@ -160,6 +174,7 @@ body.entrada main { padding: 1.5rem; width: 100%; }
    Lista de ofertas
    ========================================================================== */
 
+.lista-rolagem { overflow-x: auto; border-radius: var(--raio); }
 .lista {
   width: 100%; border-collapse: collapse; background: var(--papel);
   border: 1px solid var(--linha); border-radius: var(--raio); overflow: hidden;
@@ -288,7 +303,7 @@ input:focus, textarea:focus, select:focus {
 textarea { resize: vertical; line-height: 1.6; }
 #texto { font-size: 0.95rem; line-height: 1.7; }
 
-.ajuda { font-size: 0.82rem; color: var(--tinta-fraca); margin: 0.35rem 0 0; }
+.ajuda { font-size: 0.82rem; color: var(--tinta-fraca); margin: 0.35rem 0 0; overflow-wrap: anywhere; }
 .ajuda-topo { margin: 0 0 1.15rem; }
 .ajuda code {
   background: #eef1f4; padding: 0.05rem 0.3rem; border-radius: 4px;
@@ -414,11 +429,11 @@ textarea { resize: vertical; line-height: 1.6; }
 .prompt-caixa .botao { margin-top: 0.7rem; }
 
 /* =============================================================================
-   Miniatura "como fica na página"
+   Previsão de como a seção fica na página
    =============================================================================
-   Formas cinzas, sem texto. O objetivo é reconhecer o BLOCO, não ler o exemplo:
-   a cliente edita campos com nome técnico e não tem como saber onde cada um cai
-   sem abrir a página numa outra aba e comparar. */
+   Miniatura do bloco real, com o texto que ela acabou de digitar. A primeira
+   versão eram formas cinzas fixas: mostravam o formato, não a oferta — e por
+   isso não ajudavam a decidir se o texto estava bom. */
 
 .exemplo {
   margin-top: 1.4rem; padding-top: 1.1rem;
@@ -428,57 +443,86 @@ textarea { resize: vertical; line-height: 1.6; }
   display: block; font-size: 0.72rem; font-weight: 650; letter-spacing: 0.05em;
   text-transform: uppercase; color: var(--tinta-tenue); margin-bottom: 0.6rem;
 }
-.exemplo-arte {
+
+.previa {
   background: #fff; border: 1px solid var(--linha); border-radius: 8px;
-  padding: 0.9rem; display: flex; flex-direction: column; gap: 0.4rem;
-  align-items: flex-start; max-width: 320px;
+  padding: 1rem 1.1rem; max-width: 420px;
+  font-size: 0.8rem; line-height: 1.5; color: var(--tinta-fraca);
+  overflow-wrap: anywhere;
 }
-.exemplo-arte > span, .mini-autor-txt > span { display: block; }
+.previa > *:first-child { margin-top: 0; }
+.previa > *:last-child  { margin-bottom: 0; }
 
-.mini-pill  { width: 74px; height: 12px; border-radius: 999px; background: var(--marca-clara); }
-.mini-h1    { width: 92%;  height: 15px; border-radius: 4px; background: #c8ced6; }
-.mini-h2    { width: 55%;  height: 12px; border-radius: 4px; background: #c8ced6; }
-.mini-h3    { width: 42%;  height: 10px; border-radius: 4px; background: #d5dae1; margin-top: 0.3rem; }
-.mini-linha { width: 100%; height: 7px;  border-radius: 3px; background: #e6eaee; }
-.mini-linha.curta       { width: 72%; }
-.mini-linha.muito-curta { width: 45%; }
-.mini-centro { align-self: center; }
+.previa-vazio {
+  margin: 0; color: var(--tinta-tenue); font-style: italic; font-size: 0.8rem;
+}
 
-.mini-video {
+.previa-pill {
+  display: inline-block; background: var(--marca-clara); color: var(--marca-escura);
+  font-size: 0.62rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.06em; padding: 0.15rem 0.5rem; border-radius: 999px;
+  margin-bottom: 0.5rem;
+}
+.previa-h1 {
+  margin: 0 0 0.35rem; font-size: 1rem; line-height: 1.25;
+  font-weight: 750; color: var(--tinta); letter-spacing: -0.01em;
+}
+.previa-h2 {
+  margin: 0 0 0.5rem; font-size: 0.88rem; font-weight: 700; color: var(--tinta);
+}
+.previa-h3 {
+  margin: 0.7rem 0 0.3rem; font-size: 0.8rem; font-weight: 650; color: var(--tinta);
+}
+.previa-lede { margin: 0 0 0.4rem; font-size: 0.82rem; }
+.previa-p    { margin: 0 0 0.5rem; }
+.previa-mais { margin: 0; color: var(--tinta-tenue); font-style: italic; }
+
+.previa-video {
   width: 100%; aspect-ratio: 16/9; border-radius: 6px; background: #dfe4e9;
-  display: grid; place-items: center;
+  display: grid; place-items: center; margin-bottom: 0.45rem;
 }
-.mini-play {
-  width: 0; height: 0; border-left: 13px solid #fff;
-  border-top: 8px solid transparent; border-bottom: 8px solid transparent;
-  margin-left: 3px;
+.previa-play {
+  width: 0; height: 0; border-left: 15px solid #fff;
+  border-top: 9px solid transparent; border-bottom: 9px solid transparent;
+  margin-left: 4px;
 }
-
-.mini-botao { width: 100%; height: 26px; border-radius: 6px; background: var(--marca); }
-
-.mini-autor { display: flex; gap: 0.6rem; align-items: flex-start; width: 100%; }
-.mini-foto  { width: 34px; height: 34px; border-radius: 50%; background: #d5dae1; flex: 0 0 auto; }
-.mini-autor-txt { flex: 1 1 auto; display: flex; flex-direction: column; gap: 0.35rem; }
-
-.mini-item {
-  width: 100%; height: 8px; border-radius: 3px; background: #e6eaee;
-  position: relative; padding-left: 14px;
-}
-.mini-item::before {
-  content: ""; position: absolute; left: 0; top: 0;
-  width: 8px; height: 8px; border-radius: 50%; background: #cdd4dc;
+.previa-legenda {
+  margin: 0; text-align: center; font-size: 0.74rem; color: var(--tinta-tenue);
 }
 
-.mini-selos { display: flex; gap: 0.4rem; width: 100%; }
-.mini-selo {
-  flex: 1 1 0; height: 34px; border-radius: 6px;
-  background: #eef1f4; border: 1px solid var(--linha);
+.previa-botao {
+  display: block; background: var(--marca); color: #fff; text-align: center;
+  border-radius: 7px; padding: 0.5rem 0.7rem; font-weight: 650; font-size: 0.8rem;
+  margin-bottom: 0.4rem;
 }
 
-.mini-faq {
-  width: 100%; height: 18px; border-radius: 5px;
-  background: #eef1f4; border: 1px solid var(--linha);
+.previa-autor { display: flex; gap: 0.7rem; align-items: flex-start; }
+.previa-foto {
+  width: 40px; height: 40px; border-radius: 50%; object-fit: cover;
+  flex: 0 0 auto; background: #dfe4e9;
 }
+.previa-autor-txt { flex: 1 1 auto; min-width: 0; }
+.previa-autor-txt strong { display: block; color: var(--tinta); font-size: 0.82rem; }
+.previa-cargo {
+  display: block; color: var(--tinta-tenue); font-size: 0.74rem; margin-bottom: 0.35rem;
+}
+
+.previa-lista { margin: 0; padding-left: 1.1rem; }
+.previa-lista li { margin-bottom: 0.25rem; }
+
+.previa-selos { display: flex; gap: 0.4rem; }
+.previa-selo {
+  flex: 1 1 0; min-width: 0; text-align: center;
+  background: #fafbfc; border: 1px solid var(--linha); border-radius: 7px;
+  padding: 0.5rem 0.35rem;
+}
+.previa-selo strong { display: block; font-size: 0.72rem; color: var(--tinta); }
+.previa-selo span   { display: block; font-size: 0.66rem; color: var(--tinta-tenue); }
+
+.previa-faq {
+  border-bottom: 1px solid var(--linha); padding: 0.42rem 0; font-size: 0.78rem;
+}
+.previa-faq:last-child { border-bottom: 0; }
 
 /* ---------- Botões ---------- */
 
@@ -529,7 +573,7 @@ button[type="submit"]:hover, .botao:hover { background: var(--marca-escura); bor
 
   .adicionar { padding: 0.85rem; }
   .interruptor { padding: 1rem; }
-  .exemplo-arte { max-width: 100%; }
+  .previa { max-width: 100%; }
 
   .lista, .lista thead, .lista tbody, .lista tr, .lista td { display: block; width: 100%; }
   .lista thead { display: none; }

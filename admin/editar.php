@@ -100,39 +100,23 @@ if (!$selos)      { $selos      = [['icone' => 'escudo', 'titulo' => '', 'texto'
 if (!$faq)        { $faq        = [['pergunta' => '', 'resposta' => '']]; }
 
 /**
- * Miniatura de como a seção fica na página.
+ * Previsão de como a seção fica na página.
  *
- * Formas cinzas, sem texto real: o objetivo é a cliente reconhecer o BLOCO,
- * não ler um exemplo. Ela edita campos com nomes técnicos ("eyebrow",
- * "botao_sub2") e não tem como saber onde cada um cai sem abrir a página numa
- * outra aba e comparar. A miniatura responde isso em meio segundo.
+ * O conteúdo é montado pelo JavaScript a partir dos campos, e acompanha a
+ * digitação. A primeira versão desenhava formas cinzas fixas: mostrava o
+ * formato do bloco, mas não dizia nada sobre a oferta em si, e por isso não
+ * ajudava a decidir se o texto estava bom.
+ *
+ * Só o invólucro sai do PHP. Nada de valor da cliente é impresso aqui — quem
+ * escreve o texto é o JS, sempre por textContent, então o conteúdo dela nunca
+ * é interpretado como marcação.
  */
 function exemplo(string $qual): void
 {
-    $formas = [
-        'topo' => '<span class="mini-pill"></span><span class="mini-h1"></span><span class="mini-linha curta"></span>',
-        'video' => '<span class="mini-video"><span class="mini-play"></span></span>',
-        'botao' => '<span class="mini-botao"></span><span class="mini-linha mini-centro muito-curta"></span>',
-        'texto' => '<span class="mini-h2"></span><span class="mini-linha"></span><span class="mini-linha"></span>'
-                 . '<span class="mini-linha curta"></span><span class="mini-h3"></span>'
-                 . '<span class="mini-linha"></span><span class="mini-linha curta"></span>',
-        'autor' => '<span class="mini-autor"><span class="mini-foto"></span>'
-                 . '<span class="mini-autor-txt"><span class="mini-linha muito-curta"></span>'
-                 . '<span class="mini-linha curta"></span><span class="mini-linha"></span></span></span>',
-        'nao' => '<span class="mini-h2"></span><span class="mini-item"></span>'
-               . '<span class="mini-item"></span><span class="mini-item"></span>',
-        'selos' => '<span class="mini-selos"><span class="mini-selo"></span>'
-                 . '<span class="mini-selo"></span><span class="mini-selo"></span></span>',
-        'faq' => '<span class="mini-h2"></span><span class="mini-faq"></span>'
-               . '<span class="mini-faq"></span><span class="mini-faq"></span>',
-    ];
-    if (!isset($formas[$qual])) {
-        return;
-    }
     ?>
     <div class="exemplo">
       <span class="exemplo-rotulo">Como fica na página</span>
-      <div class="exemplo-arte"><?= $formas[$qual] /* formas fixas, sem dado da cliente */ ?></div>
+      <div class="previa" data-previa="<?= e($qual) ?>"></div>
     </div>
     <?php
 }

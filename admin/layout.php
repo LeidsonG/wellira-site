@@ -30,6 +30,9 @@ function painel_topo(string $titulo, bool $logado = true, bool $largo = false, s
          alt="" width="26" height="26">Well<span>ira</span> <em>painel</em></a>
       <?php
       /* Marca o item da página aberta.
+         "Nova oferta" saiu daqui: a tela de Ofertas já tem o botão, e um menu
+         com duas entradas para o mesmo caminho faz a pessoa procurar diferença
+         onde não há.
          Sem isso o menu é uma fileira de links idênticos, e a única pista de
          onde a pessoa está é o título da página — que no celular fica abaixo
          da dobra. */
@@ -38,9 +41,6 @@ function painel_topo(string $titulo, bool $logado = true, bool $largo = false, s
       $aqui = (string) parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH);
       $itens = [
           ['/admin/',            'Ofertas',       ['/admin/', '/admin/index.php']],
-          // Só acende em oferta NOVA. Editando uma existente, "Nova oferta"
-          // aceso diria que ela está criando algo, que é o oposto do que faz.
-          ['/admin/editar.php',  'Nova oferta',   empty($_GET['slug']) ? ['/admin/editar.php'] : []],
           ['/admin/senha.php',   'Trocar acesso', ['/admin/senha.php']],
       ];
       ?>
