@@ -59,17 +59,13 @@ fi
 # O que NÃO vai
 # ---------------------------------------------------------------------------
 
+# ⚠️ NUNCA comece esta lista com --include-glob. No lftp, se a PRIMEIRA regra
+# é um include, o padrão inverte: tudo que não casa com include algum fica
+# excluído. Foi exatamente isso que aconteceu aqui — o deploy dizia "Enviado"
+# sem transferir um único arquivo, e com --limpar ainda apagava do servidor o
+# que não estava na lista de includes. Os .htaccess das pastas de conteúdo,
+# que eram a razão dos includes, agora sobem por put explícito após o mirror.
 EXCLUIR=(
-  # --- Os .htaccess destas pastas SÃO proteção e precisam subir ---
-  #
-  # Vêm antes das exclusões porque o lftp decide pela primeira regra que casa.
-  # O glob 'dados/*' também casa com arquivo oculto, então sem estas três linhas
-  # o .htaccess que fecha a pasta para a web nunca chegaria ao servidor — e a
-  # pasta de dados nasceria desprotegida no primeiro deploy.
-  --include-glob 'dados/.htaccess'
-  --include-glob 'assets/videos/.htaccess'
-  --include-glob 'assets/img/uploads/.htaccess'
-
   # --- Infraestrutura do servidor: NÃO é nossa, e --limpar apagaria ---
   #
   # .well-known é onde o AutoSSL põe o arquivo de validação do domínio. Apagar
@@ -163,6 +159,10 @@ lftp -e "set sftp:connect-program 'ssh -a -x -i $CHAVE -p $SSH_PORTA';
          set net:reconnect-interval-base 5;
          open -u ${SSH_USUARIO}, sftp://${SSH_HOST};
          mirror --reverse ${OPCOES[*]} ${EXCLUIR[*]} '$RAIZ/' '${DESTINO}';
+         !echo '--- htaccess das pastas de conteudo ---';
+         put -O '${DESTINO}/dados' '$RAIZ/dados/.htaccess';
+         put -O '${DESTINO}/assets/videos' '$RAIZ/assets/videos/.htaccess';
+         put -O '${DESTINO}/assets/img/uploads' '$RAIZ/assets/img/uploads/.htaccess';
          bye" 2>&1 | tee "$SAIDA"
 
 # O lftp sai com 0 mesmo quando o mirror aborta no meio. Aconteceu no primeiro
@@ -180,7 +180,7 @@ fi
 # Deploy sem transferência nenhuma, por outro lado, é normal quando nada mudou —
 # por isso a condição exige as duas coisas juntas.
 if [[ $MODO_REAL -eq 1 ]] \
-   && grep -qi "Removing" "$SAIDA" \
+   && grep -qi "^Removing" "$SAIDA" \
    && ! grep -q "Transferring file" "$SAIDA"; then
   echo
   echo "❌ Removeu arquivos remotos e não enviou nenhum: o mirror abortou no meio." >&2
