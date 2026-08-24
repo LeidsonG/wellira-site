@@ -18,8 +18,8 @@
   // Ajudantes
   // ---------------------------------------------------------------------------
   //
-  // Ficam aqui, no topo do IIFE, porque são usados por mais de um bloco (o banco
-  // de imagens e a prévia). Antes o el() morava dentro do bloco da prévia; com
+  // Ficam aqui, no topo do IIFE, porque são usados por mais de um bloco (o
+  // envio de imagens e a prévia). Antes o el() morava dentro do bloco da prévia; com
   // 'use strict' uma função declarada dentro de um bloco não sai dele, e
   // duplicar a mesma função em dois lugares é o começo de duas versões dela.
 
@@ -311,50 +311,25 @@
   });
 
   // ---------------------------------------------------------------------------
-  // Imagens da oferta — miniatura viva e banco do que já foi enviado
+  // Imagens da oferta — miniatura viva e envio por trás
   // ---------------------------------------------------------------------------
   //
   // A lista de imagens é uma lista repetível como as outras, mas o campo guarda
   // o NOME DO ARQUIVO — e nome de arquivo é a coisa mais fácil de errar do
   // painel inteiro (um dígito trocado, a extensão .jpeg no lugar de .jpg). Sem
   // retorno na tela, o erro só aparece quando a página publicada mostra um
-  // quadrado vazio. Por isso duas coisas: cada linha mostra a imagem que o nome
-  // aponta, e existe um banco com o que já está no servidor, para ela escolher
-  // clicando em vez de digitar.
+  // quadrado vazio. Daí a miniatura viva em cada linha.
+  //
+  // O envio acontece aqui mesmo, sem sair da oferta, mas NUNCA submetendo este
+  // formulário: o arquivo vai por fetch para /admin/enviar.php e só o nome
+  // devolvido entra no campo. É o motivo de admin/upload.php ter nascido em
+  // página separada — um <input type="file"> dentro de um formulário de vinte
+  // campos faz a cliente perder tudo o que digitou se o envio estourar o
+  // tamanho ou o tempo. Enviando por trás, o texto dela nunca sai da tela.
 
   var listaImagens = document.getElementById('lista-imagens');
 
   if (listaImagens) {
-    var bancoCaixa = document.querySelector('[data-banco]');
-    var bancoGrade = document.querySelector('[data-banco-grade]');
-
-    // Região viva criada já no começo e sempre vazia: o CSS a esconde enquanto
-    // não tem texto, e é o texto entrando que faz o leitor de tela anunciar.
-    var bancoAviso = null;
-    var relogioAviso = null;
-
-    if (bancoCaixa) {
-      bancoAviso = el('p', 'banco-aviso');
-      bancoAviso.setAttribute('role', 'status');
-      bancoCaixa.insertBefore(bancoAviso, bancoCaixa.firstChild);
-    }
-
-    /**
-     * Diz por que o clique no banco não fez nada.
-     *
-     * Some sozinho depois de alguns segundos: é um recado sobre o clique que
-     * acabou de acontecer, não um estado da tela — quem descreve o estado é o
-     * aviso fixo embaixo do botão de adicionar.
-     */
-    function avisarBancoCheio() {
-      if (!bancoAviso) return;
-      var teto = tetoDaLista(listaImagens);
-      bancoAviso.textContent = 'A oferta já está no máximo de ' + teto +
-        ' imagens. Remova uma da lista acima para pôr esta no lugar.';
-      if (relogioAviso) clearTimeout(relogioAviso);
-      relogioAviso = setTimeout(function () { bancoAviso.textContent = ''; }, 6000);
-    }
-
     /** Todos os campos de nome de arquivo, na ordem em que aparecem na tela. */
     function camposArquivo() {
       return Array.prototype.slice.call(
@@ -396,36 +371,12 @@
     }
 
     /**
-     * Marca no banco as imagens que já estão nesta oferta.
-     *
-     * Sem isto, a mesma foto entra duas vezes com facilidade — a grade é uma
-     * parede de miniaturas parecidas e nada distingue a que já foi escolhida.
-     */
-    function marcarUsadas() {
-      if (!bancoGrade) return;
-
-      // Object.create(null): as chaves são nomes de arquivo vindos do
-      // formulário, e um arquivo chamado "constructor" não pode virar um
-      // acerto falso contra o protótipo de Object.
-      var usados = Object.create(null);
-      camposArquivo().forEach(function (c) {
-        var v = c.value.trim();
-        if (v !== '') usados[v] = true;
-      });
-
-      Array.prototype.forEach.call(bancoGrade.querySelectorAll('[data-arquivo]'), function (b) {
-        var nome = b.getAttribute('data-arquivo');
-        var usada = usados[nome] === true;
-        b.classList.toggle('usada', usada);
-        // O ✓ é desenhado pelo CSS; o title diz o mesmo para quem usa leitor
-        // de tela, que não lê conteúdo gerado.
-        b.title = usada ? nome + ' — já está nesta oferta' : nome;
-      });
-    }
-
-    /**
-     * Põe um arquivo do banco na lista: no primeiro campo vazio, ou numa linha
+     * Põe um nome de arquivo na lista: no primeiro campo vazio, ou numa linha
      * nova se todos já estiverem preenchidos.
+     *
+     * Devolve true se entrou. O false só acontece se o teto tiver sido
+     * alcançado entre a conferência de vagas e a chegada da resposta do
+     * servidor — quem chama precisa saber para contar direito o que entrou.
      */
     function inserirArquivo(nome) {
       var campos = camposArquivo();
@@ -436,27 +387,25 @@
       }
 
       if (!alvo) {
-        // Lista cheia e nenhum campo livre. Criar a linha aqui furaria o teto
-        // que o botão "+ Adicionar imagem" respeita — e o salvar cortaria a
-        // sobra depois, sem avisar. Note que a lista pode estar CHEIA e ainda
-        // ter campo vazio: nesse caso o clique acima já preencheu, porque
-        // preencher não faz a lista crescer.
-        if (listaCheia(listaImagens)) { avisarBancoCheio(); return; }
+        // Lista cheia e nenhum campo livre: criar a linha aqui furaria o teto
+        // que o botão "+ Adicionar imagem" respeita, e o salvar cortaria a
+        // sobra depois sem avisar. Note que a lista pode estar CHEIA e ainda
+        // ter campo vazio — nesse caso o laço acima já achou o alvo, porque
+        // preencher um campo existente não faz a lista crescer.
+        if (listaCheia(listaImagens)) return false;
 
         var molde = document.getElementById('molde-imagens');
-        if (!molde) return;
+        if (!molde) return false;
         listaImagens.appendChild(molde.content.cloneNode(true));
         renumerar(listaImagens);
         var novos = camposArquivo();
         alvo = novos[novos.length - 1];
-        if (!alvo) return;
+        if (!alvo) return false;
       }
 
       alvo.value = nome;
       atualizarMiniatura(alvo);
-      marcarUsadas();
       atualizarTeto(listaImagens);
-      if (bancoAviso) bancoAviso.textContent = '';   // deu certo: recado antigo sai
 
       // Um evento 'input' sintético faz o resto do painel reagir como se ela
       // tivesse digitado: a bolinha da aba e a prévia "Como fica na página"
@@ -465,67 +414,151 @@
       // acoplaria este bloco a um que pode não ter carregado.
       alvo.dispatchEvent(new Event('input', { bubbles: true }));
 
-      // Rola até a linha preenchida. Quando a lista é longa, o banco fica
-      // abaixo dela e o campo que acabou de receber o nome está fora da tela:
-      // sem o rolar, o clique parece não ter feito nada.
+      // Rola até a linha preenchida: com a lista longa, o botão de enviar fica
+      // abaixo dela e a linha que acabou de receber o nome está fora da tela.
+      // Sem o rolar, o envio parece não ter feito nada.
       var item = alvo.closest('[data-item]');
       if (item && item.scrollIntoView) {
         item.scrollIntoView({ block: 'center', behavior: 'smooth' });
       }
-      // Não damos foco de propósito: no celular o foco abre o teclado, que
-      // cobre justamente a grade de onde ela costuma escolher a próxima.
+      return true;
     }
 
-    // ---- Banco: monta a grade a partir do JSON publicado pelo PHP ----
+    /**
+     * Quantos nomes ainda cabem na lista.
+     *
+     * São duas fontes: os campos que já existem e estão vazios (preencher um
+     * deles não faz a lista crescer) e o espaço que falta para o teto. Por isso
+     * não basta olhar o número de itens.
+     */
+    function vagas() {
+      var vazios = camposArquivo().filter(function (c) {
+        return c.value.trim() === '';
+      }).length;
 
-    var UPLOADS = (function () {
-      var tag = document.getElementById('uploads-disponiveis');
-      try {
-        var lista = tag ? JSON.parse(tag.textContent) : [];
-        return Array.isArray(lista) ? lista : [];
-      } catch (e) {
-        return [];
+      var teto = tetoDaLista(listaImagens);
+      if (teto === null) return Infinity;   // lista sem teto: cabe o que vier
+
+      var cabeCrescer = Math.max(0, teto - listaImagens.querySelectorAll('[data-item]').length);
+      return vazios + cabeCrescer;
+    }
+
+    // ---- Envio por trás ----
+
+    var envio      = document.querySelector('[data-enviar]');
+    var envioCampo = document.querySelector('[data-enviar-campo]');
+    var envioBotao = document.querySelector('[data-enviar-botao]');
+    var envioAviso = document.querySelector('[data-enviar-estado]');
+
+    function dizer(texto, erro) {
+      if (!envioAviso) return;
+      // O elemento nasce vazio e com role="status"; é o texto entrando que faz
+      // o leitor de tela anunciar. Por isso limpamos com '' em vez de hidden:
+      // região viva escondida não é anunciada quando reaparece.
+      envioAviso.textContent = texto;
+      envioAviso.classList.toggle('enviar-estado-erro', erro === true);
+    }
+
+    /** Trava a interface durante o envio — inclusive contra um segundo envio. */
+    function travarEnvio(travado) {
+      if (envioCampo) envioCampo.disabled = travado;
+      // <label> não tem estado desabilitado; o que impede o clique é o input
+      // desabilitado logo acima. A classe é só a aparência disso.
+      if (envioBotao) {
+        envioBotao.classList.toggle('enviando', travado);
+        envioBotao.setAttribute('aria-disabled', travado ? 'true' : 'false');
       }
-    })();
-
-    if (bancoCaixa && bancoGrade && !UPLOADS.length) {
-      // O PHP já imprime o bloco com hidden quando não há uploads. Repetir a
-      // decisão aqui cobre o caso em que o JSON existe mas não pôde ser lido:
-      // sem isto restaria uma moldura vazia convidando a clicar no nada.
-      bancoCaixa.hidden = true;
     }
 
-    if (bancoCaixa && bancoGrade && UPLOADS.length) {
-      UPLOADS.forEach(function (nome) {
-        if (typeof nome !== 'string' || nome === '') return;
+    function plural(n, singular, pluralForma) {
+      return n + ' ' + (n === 1 ? singular : pluralForma);
+    }
 
-        var botao = document.createElement('button');
-        botao.type = 'button';             // dentro de <form>: sem type ele envia
-        botao.className = 'banco-item';
-        botao.setAttribute('data-arquivo', nome);
-        botao.title = nome;
+    if (envio && envioCampo) {
+      envioCampo.addEventListener('change', function () {
+        var escolhidos = Array.prototype.slice.call(envioCampo.files || []);
+        if (!escolhidos.length) return;
 
-        var img = document.createElement('img');
-        img.src = urlUpload(nome);
-        img.alt = '';                      // decorativa: o nome ao lado já diz qual é
-        img.loading = 'lazy';              // são até 60 arquivos
-        botao.appendChild(img);
+        // O token sai do formulário da oferta, que já o tem. Inventar um aqui
+        // seria inventar uma sessão: sem ele o endpoint recusa, e é melhor
+        // dizer isso antes de gastar o upload dela.
+        var campoCsrf = document.querySelector('[data-abas] input[name="csrf"]');
+        if (!campoCsrf || !campoCsrf.value) {
+          envioCampo.value = '';
+          dizer('Não foi possível preparar o envio nesta página. Use o link de envio abaixo.', true);
+          return;
+        }
 
-        // O nome fica à vista: dois envios do mesmo dia só se distinguem por
-        // ele, e é ele que vai parar no campo.
-        botao.appendChild(el('span', 'banco-nome', nome));
+        var livres = vagas();
 
-        bancoGrade.appendChild(botao);
-      });
+        if (livres <= 0) {
+          envioCampo.value = '';
+          dizer('A oferta já está no máximo de ' + tetoDaLista(listaImagens) +
+                ' imagens. Remova uma da lista acima para poder enviar outra.', true);
+          return;
+        }
 
-      // Só revela o bloco quando há o que mostrar — uma moldura vazia com o
-      // texto "clique numa imagem" seria uma promessa sem conteúdo.
-      bancoCaixa.hidden = false;
+        // O corte é ANTES de enviar, não depois. Mandar cinco e aproveitar duas
+        // deixaria três arquivos órfãos ocupando espaço na hospedagem da
+        // cliente para sempre — ninguém apagaria, porque ninguém saberia.
+        var enviar = escolhidos.slice(0, livres);
+        var sobraram = escolhidos.length - enviar.length;
 
-      bancoGrade.addEventListener('click', function (evento) {
-        var botao = evento.target.closest('[data-arquivo]');
-        if (!botao) return;
-        inserirArquivo(botao.getAttribute('data-arquivo'));
+        var dados = new FormData();
+        dados.append('csrf', campoCsrf.value);
+        dados.append('destino', 'imagem');
+        enviar.forEach(function (a) { dados.append('arquivo[]', a); });
+
+        travarEnvio(true);
+        dizer('Enviando ' + plural(enviar.length, 'foto', 'fotos') + '…', false);
+
+        fetch('/admin/enviar.php', {
+          method: 'POST',
+          body: dados,
+          credentials: 'same-origin'   // a sessão do painel é o que autentica
+        }).then(function (resposta) {
+          // .json() falha sozinho num corpo que não é JSON, mas a mensagem do
+          // navegador não serve para a cliente. Lemos como texto e traduzimos:
+          // sessão expirada devolve a página de login, que é HTML.
+          return resposta.text().then(function (bruto) {
+            try {
+              return JSON.parse(bruto);
+            } catch (e) {
+              throw new Error('resposta-invalida');
+            }
+          });
+        }).then(function (dadosResposta) {
+          var nomes  = Array.isArray(dadosResposta.nomes)  ? dadosResposta.nomes  : [];
+          var erros  = Array.isArray(dadosResposta.erros)  ? dadosResposta.erros  : [];
+          var entraram = 0;
+
+          nomes.forEach(function (nome) {
+            if (typeof nome === 'string' && nome !== '' && inserirArquivo(nome)) entraram++;
+          });
+
+          var partes = [];
+          if (entraram) partes.push(plural(entraram, 'foto entrou', 'fotos entraram') + ' na lista.');
+          // Os erros já vêm do servidor com o nome do arquivo na frente.
+          erros.forEach(function (e2) { if (typeof e2 === 'string' && e2) partes.push(e2); });
+          if (sobraram) {
+            partes.push((sobraram === 1 ? 'Não coube 1 foto' : 'Não couberam ' + sobraram + ' fotos') +
+                        ': a oferta aceita no máximo ' + tetoDaLista(listaImagens) + '.');
+          }
+          if (!partes.length) partes.push('Nada foi enviado. Tente de novo ou use o link de envio abaixo.');
+
+          // Vermelho só quando NADA entrou: sucesso parcial é sucesso, e pintar
+          // de erro a linha que diz "2 fotos entraram" assusta à toa.
+          dizer(partes.join('\n'), entraram === 0);
+        }).catch(function (erro) {
+          dizer(erro && erro.message === 'resposta-invalida'
+            ? 'O servidor respondeu de um jeito inesperado. Sua sessão pode ter expirado: abra o link de envio abaixo numa aba nova e entre de novo.'
+            : 'Não foi possível enviar. Verifique a conexão e tente de novo, ou use o link de envio abaixo.', true);
+        }).then(function () {
+          travarEnvio(false);
+          // Sem isto, escolher a MESMA foto de novo não dispara 'change' e o
+          // botão parece quebrado — o navegador considera que nada mudou.
+          envioCampo.value = '';
+        });
       });
     }
 
@@ -534,7 +567,6 @@
     listaImagens.addEventListener('input', function (evento) {
       if (evento.target.name !== 'imagem_arquivo[]') return;
       atualizarMiniatura(evento.target);
-      marcarUsadas();
     });
 
     // Nome inexistente é o erro mais provável aqui, e é silencioso: sem aviso a
@@ -549,17 +581,7 @@
       if (item) item.classList.add('item-imagem-quebrada');
     }, true);
 
-    // Adicionar ou remover linha não dispara input; o banco precisa saber para
-    // acender ou apagar o ✓. setTimeout porque este ouvinte pode correr antes
-    // do que de fato remove o item do documento.
-    document.addEventListener('click', function (evento) {
-      if (evento.target.closest('[data-adicionar], [data-remover]')) {
-        setTimeout(marcarUsadas, 0);
-      }
-    });
-
     camposArquivo().forEach(atualizarMiniatura);
-    marcarUsadas();
   }
 
   // ---------------------------------------------------------------------------

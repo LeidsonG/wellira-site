@@ -65,6 +65,22 @@ function autenticado(): bool
 }
 
 /**
+ * Sessão parada por muito tempo é sessão esquecida aberta.
+ *
+ * Duas horas cobrem uma tarde de trabalho sem obrigar a relogar a cada oferta.
+ *
+ * Extraída de exigir_login() porque o envio de foto pelo editor (admin/enviar.php)
+ * responde JSON e não pode redirecionar: fetch seguiria o redirecionamento e
+ * receberia o HTML da tela de login, que para o JavaScript é indistinguível de
+ * um erro qualquer. A regra do prazo precisa ser a MESMA nos dois caminhos, e a
+ * única forma de garantir isso é existir num lugar só.
+ */
+function sessao_expirada(): bool
+{
+    return isset($_SESSION['visto_em']) && time() - $_SESSION['visto_em'] > 7200;
+}
+
+/**
  * Exige login. Redireciona para a tela de entrada quando não houver.
  *
  * Guarda o destino pretendido para devolver a pessoa ao lugar certo depois de
@@ -80,9 +96,7 @@ function exigir_login(): void
         exit;
     }
 
-    // Sessão parada por muito tempo é sessão esquecida aberta. Duas horas
-    // cobrem uma tarde de trabalho sem obrigar a relogar a cada oferta.
-    if (isset($_SESSION['visto_em']) && time() - $_SESSION['visto_em'] > 7200) {
+    if (sessao_expirada()) {
         encerrar_sessao();
         header('Location: /admin/login.php?expirou=1');
         exit;
@@ -278,13 +292,27 @@ function csrf_campo(): string
  * hash_equals compara em tempo constante: um == comum vazaria, pela diferença
  * de tempo de resposta, quantos caracteres iniciais do token estavam certos.
  */
-function csrf_validar(): void
+function csrf_ok(): bool
 {
     sessao_iniciar();
     $enviado = (string) ($_POST['csrf'] ?? '');
     $sessao  = (string) ($_SESSION['csrf'] ?? '');
 
-    if ($sessao === '' || !hash_equals($sessao, $enviado)) {
+    return $sessao !== '' && hash_equals($sessao, $enviado);
+}
+
+/**
+ * A conferência acima, na forma que a maioria das telas usa: falhou, morre aqui.
+ *
+ * A verificação foi separada em csrf_ok() para que admin/enviar.php possa
+ * recusar em JSON, sem cuspir texto puro no meio de uma resposta que o
+ * JavaScript vai tentar interpretar. Quem valida continua sendo um código só —
+ * duas conferências de CSRF escritas em lugares diferentes é como uma delas
+ * envelhece e deixa de conferir.
+ */
+function csrf_validar(): void
+{
+    if (!csrf_ok()) {
         http_response_code(400);
         exit('Sessão expirada ou pedido inválido. Volte, recarregue a página e tente de novo.');
     }

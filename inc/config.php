@@ -93,15 +93,6 @@ const MAX_UPLOAD_IMAGEM = 4 * 1024 * 1024;   // 4 MB
  */
 const MAX_IMAGENS = 8;
 
-/**
- * Quantos arquivos já enviados o painel oferece no banco de imagens.
- *
- * A lista sai por data, mais recentes primeiro. Sem teto, uma conta com
- * centenas de uploads antigos faria o editor carregar centenas de miniaturas
- * de uma vez — no celular da cliente, que é onde ela usa o painel.
- */
-const BANCO_IMAGENS_MAX = 60;
-
 // ---------------------------------------------------------------------------
 // Avisos legais
 // ---------------------------------------------------------------------------

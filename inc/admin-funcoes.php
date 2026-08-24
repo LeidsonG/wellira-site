@@ -423,38 +423,6 @@ function tipo_por_assinatura(string $caminho): ?string
 }
 
 /**
- * Nomes das imagens já enviadas, da mais recente para a mais antiga.
- *
- * Alimenta o banco de imagens do editor. Antes disto, incluir uma foto exigia
- * abrir a tela de envio, copiar um nome como "20260824-a1b2c3d4e5f6.jpg" e
- * colar no campo certo — sem errar um caractere, e repetindo para cada imagem
- * do carrossel. É o tipo de tarefa que o computador faz melhor.
- */
-function listar_uploads(): array
-{
-    if (!is_dir(DIR_UPLOADS)) {
-        return [];
-    }
-
-    // scandir em vez de glob com GLOB_BRACE: a flag depende da biblioteca C do
-    // sistema e não existe em toda hospedagem. Quem filtra a extensão é o mesmo
-    // nome_imagem_valido() que a página pública usa, então painel e site nunca
-    // discordam sobre o que é uma imagem aceitável.
-    $arquivos = [];
-    foreach (@scandir(DIR_UPLOADS) ?: [] as $nome) {
-        if (nome_imagem_valido($nome)) {
-            $arquivos[$nome] = @filemtime(DIR_UPLOADS . '/' . $nome) ?: 0;
-        }
-    }
-
-    // Mais recente primeiro: a imagem que ela acabou de enviar é a que ela quer
-    // usar agora.
-    arsort($arquivos);
-
-    return array_slice(array_keys($arquivos), 0, BANCO_IMAGENS_MAX);
-}
-
-/**
  * Recebe vários arquivos de uma vez.
  *
  * O PHP entrega um upload múltiplo "virado do avesso": em vez de uma lista de

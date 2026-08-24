@@ -101,9 +101,6 @@ if (!$selos)      { $selos      = [['icone' => 'escudo', 'titulo' => '', 'texto'
 if (!$faq)        { $faq        = [['pergunta' => '', 'resposta' => '']]; }
 if (!$imagens)    { $imagens    = [['arquivo' => '', 'legenda' => '']]; }
 
-/** Imagens já no servidor, oferecidas para clicar em vez de digitar o nome. */
-$banco = listar_uploads();
-
 /**
  * Endereço para ver a página desta oferta.
  *
@@ -366,20 +363,35 @@ if (!empty($_GET['ok'])) {
       + Adicionar imagem
     </button>
 
+    <?php /* Envio aqui dentro, mas por trás: o arquivo sobe sozinho para
+             admin/enviar.php e o formulário da oferta NÃO é enviado junto.
+             Um <input type="file"> comum dentro deste formulário mandaria a
+             oferta inteira a cada foto — e um envio que falhasse por tamanho ou
+             timeout levaria embora todo o texto de venda ainda não salvo.
+
+             O <input> fica escondido e quem aparece é o <label>: navegador
+             nenhum deixa dar estilo no botão nativo de arquivo, e este é um
+             alvo de toque de celular. Sem JavaScript o rótulo não faz nada, e
+             por isso o link para a tela de upload continua logo abaixo. */ ?>
+    <div class="enviar-fotos" data-enviar>
+      <input type="file" id="enviar-imagem" name="enviar-imagem"
+             accept="image/jpeg,image/png,image/webp" multiple
+             data-enviar-campo hidden>
+      <label class="botao botao-fraco" for="enviar-imagem" data-enviar-botao>Enviar fotos do computador</label>
+      <p class="ajuda" data-enviar-estado role="status"></p>
+    </div>
+
+    <p class="ajuda">
+      JPG, PNG ou WebP, até <?= round(MAX_UPLOAD_IMAGEM / 1048576) ?> MB cada.
+      A foto entra na lista sozinha depois de subir.
+      Se o botão acima não responder, use a
+      <a href="/admin/upload.php?destino=imagem" target="_blank" rel="noopener">tela de envio</a>.
+    </p>
+
     <p class="ajuda">
       A descrição é o que o Google e o leitor de tela enxergam da foto, e é a
       linha impressa embaixo dela. Escreva em inglês, como o resto da página.
-      <a href="/admin/upload.php?destino=imagem" target="_blank" rel="noopener">Enviar imagens</a>
-      — pode mandar várias de uma vez.
     </p>
-
-    <?php /* Só nomes de arquivo, gerados pelo próprio upload e conferidos por
-             nome_imagem_valido(). Não é texto digitado pela cliente. */ ?>
-    <script type="application/json" id="uploads-disponiveis"><?= json_encode($banco, JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) ?></script>
-    <div class="banco" data-banco<?= $banco ? '' : ' hidden' ?>>
-      <p class="ajuda">Clique numa imagem já enviada para incluí-la nesta oferta.</p>
-      <div class="banco-grade" data-banco-grade></div>
-    </div>
 
     <?php exemplo('imagens'); ?>
     </div>
