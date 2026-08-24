@@ -100,6 +100,24 @@ if (!$selos)      { $selos      = [['icone' => 'escudo', 'titulo' => '', 'texto'
 if (!$faq)        { $faq        = [['pergunta' => '', 'resposta' => '']]; }
 
 /**
+ * Endereço para ver a página desta oferta.
+ *
+ * Rascunho não existe em /<slug> — é isso que rascunho quer dizer —, e o cookie
+ * do painel tem path=/admin, então a página pública não tem como abrir exceção
+ * para a cliente logada. Até 24/08/2026 o botão apontava para /<slug> em
+ * qualquer situação, e quem clicava num rascunho recebia "página não
+ * encontrada", sem nada explicando que aquele era o comportamento esperado.
+ * Rascunho agora vai para a prévia do painel; publicada continua indo à página
+ * de verdade, que é o que ela quer conferir quando já está no ar.
+ */
+function endereco_para_ver(array $o, string $slug): string
+{
+    return ($o['status'] ?? 'rascunho') === 'publicado'
+        ? '/' . rawurlencode($slug)
+        : '/admin/previa.php?slug=' . rawurlencode($slug);
+}
+
+/**
  * Previsão de como a seção fica na página.
  *
  * O conteúdo é montado pelo JavaScript a partir dos campos, e acompanha a
@@ -188,7 +206,10 @@ if (!empty($_GET['ok'])) {
       <?= $publicada ? 'No ar' : 'Rascunho' ?>
     </span>
     <?php if (!$novo): ?>
-      <a class="botao botao-fraco" href="/<?= e($slug) ?>" target="_blank" rel="noopener">Ver página ↗</a>
+      <a class="botao botao-fraco" href="<?= e(endereco_para_ver($o, $slug)) ?>"
+         target="_blank" rel="noopener">
+        <?= $publicada ? 'Ver página ↗' : 'Ver prévia ↗' ?>
+      </a>
     <?php endif; ?>
   </div>
 </div>
@@ -572,7 +593,7 @@ if (!empty($_GET['ok'])) {
         <label class="radio">
           <input type="radio" name="status" value="rascunho"
                  <?= ($o['status'] ?? 'rascunho') !== 'publicado' ? 'checked' : '' ?>>
-          <span><strong>Rascunho</strong><br><small>Só você vê. Quem abrir o endereço recebe "página não encontrada".</small></span>
+          <span><strong>Rascunho</strong><br><small>Fora do ar: quem abrir o endereço recebe "página não encontrada". Você confere pelo botão <em>Ver prévia</em>, aqui em cima.</small></span>
         </label>
         <label class="radio">
           <input type="radio" name="status" value="publicado"
@@ -595,7 +616,12 @@ if (!empty($_GET['ok'])) {
   <div class="barra-salvar">
     <button type="submit" name="acao" value="salvar">Salvar</button>
     <?php if (!$novo): ?>
-      <button type="submit" name="acao" value="salvar_ver" class="botao-fraco">Salvar e abrir a página ↗</button>
+      <?php /* O rótulo acompanha a situação da oferta: em rascunho o destino é
+               a prévia do painel, e prometer "abrir a página" levaria de volta
+               ao 404 que esta mudança veio consertar. */ ?>
+      <button type="submit" name="acao" value="salvar_ver" class="botao-fraco">
+        <?= $publicada ? 'Salvar e abrir a página ↗' : 'Salvar e ver a prévia ↗' ?>
+      </button>
     <?php endif; ?>
     <a class="cancelar" href="/admin/">← Voltar para as ofertas</a>
   </div>

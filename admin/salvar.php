@@ -68,8 +68,16 @@ if (($oferta['status'] ?? '') === 'publicado') {
 
 $acao = (string) ($_POST['acao'] ?? '');
 
-if ($acao === 'salvar_ver' && ($oferta['status'] ?? '') === 'publicado') {
-    header('Location: /' . $slug);
+// "Salvar e ver" leva à página quando ela está no ar e à prévia do painel
+// quando é rascunho. Antes, o rascunho caía nesta condição e simplesmente
+// voltava ao formulário: o botão parecia não fazer nada, e quem insistia pela
+// URL recebia um 404. Rascunho não aparece em /<slug>, e o cookie do painel
+// (path=/admin) não acompanha a página pública para abrir exceção.
+if ($acao === 'salvar_ver') {
+    $destino = ($oferta['status'] ?? '') === 'publicado'
+        ? '/' . rawurlencode($slug)
+        : '/admin/previa.php?slug=' . rawurlencode($slug);
+    header('Location: ' . $destino);
     exit;
 }
 

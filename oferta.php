@@ -20,23 +20,47 @@ if ($oferta === null) {
     nao_encontrado();
 }
 
+/**
+ * Prévia do painel.
+ *
+ * Quem define PREVIA_ADMIN é admin/previa.php, que já exigiu login. Este
+ * arquivo não decide nada sobre autenticação: a constante só existe quando a
+ * requisição já passou pela porta do painel.
+ *
+ * A prévia precisa existir porque o cookie da sessão tem path=/admin e nunca
+ * acompanha /<slug> — não há como a página pública reconhecer a cliente
+ * logada. Sem a rota de prévia, o botão "Ver página" de um rascunho caía num
+ * 404 e parecia defeito.
+ */
+$previa = defined('PREVIA_ADMIN');
+
 // Rascunho é invisível ao público: a cliente monta a página com calma e só
-// divulga o link depois de publicar.
-if (($oferta['status'] ?? 'rascunho') !== 'publicado') {
+// divulga o link depois de publicar. Na prévia do painel ele aparece, com
+// tarja e sem chance de ser indexado.
+if (!$previa && ($oferta['status'] ?? 'rascunho') !== 'publicado') {
     nao_encontrado();
 }
 
 $destino = link_seguro((string) ($oferta['link'] ?? ''));
-if ($destino === null) {
+if ($destino === null && !$previa) {
     // Sem destino válido não há oferta — melhor um 404 do que uma página com
     // botão que não leva a lugar nenhum.
+    //
+    // A prévia é a exceção, e de propósito: ela existe para acabar com o 404
+    // que a cliente recebia ao conferir um rascunho, e trocar um motivo de 404
+    // por outro não conserta nada. Lá o botão fica inerte e o aviso na tarja
+    // diz o que falta.
     nao_encontrado();
 }
 
 // Os botões apontam para a saída própria, que conta o clique e só então manda
 // ao fornecedor. O link de afiliado deixa de aparecer no HTML: trocar de
 // fornecedor passa a ser edição do JSON, sem mexer na página.
-$link = '/go/' . $slug;
+//
+// Na prévia o botão vai direto ao fornecedor: /go/<slug> recusa oferta em
+// rascunho (e faria a prévia terminar num 404), e conferir o layout não pode
+// somar clique ao contador da cliente.
+$link = $previa ? ($destino ?? '#') : '/go/' . $slug;
 
 $titulo      = (string) ($oferta['titulo'] ?? '');
 $botao       = (string) ($oferta['botao_texto'] ?? 'See the Official Site');
@@ -49,7 +73,8 @@ $url_canonica = SITE_URL . '/' . $slug;
 // precisa do link para mostrar o layout, mas produto fictício indexado é
 // exatamente o que faz o Google classificar o site como conteúdo enganoso.
 // Ausente = indexável, para que a oferta real não dependa de ninguém lembrar.
-$indexar = ($oferta['indexar'] ?? true) !== false;
+// A prévia nunca é indexável, independente do que a oferta pedir.
+$indexar = !$previa && ($oferta['indexar'] ?? true) !== false;
 
 /** Botão de ação, repetido ao longo da página. */
 function cta(string $link, string $texto, ?string $sub = null): string
@@ -110,8 +135,37 @@ function faixa(): string
 <link rel="stylesheet" href="/assets/css/style.css">
 <script src="/assets/js/ids.js" defer></script>
 <script src="/assets/js/rastreamento.js" defer></script>
+<?php if ($previa): ?>
+<?php /* O estilo da tarja mora aqui, e não em style.css, de propósito: é
+         enfeite exclusivo do painel, e o visitante da página publicada não
+         deve baixar um byte sequer de CSS que nunca vai usar. */ ?>
+<style>
+.tarja-previa {
+  position: sticky; top: 0; z-index: 50;
+  background: #b8431f; color: #fff;
+  font: 600 0.9rem/1.4 system-ui, sans-serif;
+  padding: 0.7rem 1.25rem; text-align: center;
+}
+.tarja-previa a { color: #fff; }
+.tarja-previa span { font-weight: 400; opacity: .9; display: block; }
+</style>
+<?php endif; ?>
 </head>
 <body>
+
+<?php if ($previa): ?>
+<div class="tarja-previa">
+  <?= ($oferta['status'] ?? 'rascunho') === 'publicado'
+      ? 'Prévia de uma oferta que já está no ar'
+      : 'Prévia de rascunho — esta página ainda não está no ar' ?>
+  <?php if ($destino === null): ?>
+    <span>Falta o link do fornecedor: os botões desta página ainda não levam a lugar nenhum.
+      <a href="/admin/editar.php?slug=<?= e($slug) ?>&amp;aba=3">Preencher agora</a></span>
+  <?php else: ?>
+    <span>Só você enxerga esta tela. <a href="/admin/editar.php?slug=<?= e($slug) ?>">Voltar para a edição</a></span>
+  <?php endif; ?>
+</div>
+<?php endif; ?>
 
 <header class="site-head">
   <div class="wrap">

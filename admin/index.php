@@ -94,7 +94,15 @@ painel_aviso('erro', $_GET['erro'] ?? null);
           <td class="num"><?= number_format($o['cliques'], 0, ',', '.') ?></td>
           <td class="acoes">
             <a href="/admin/editar.php?slug=<?= e($o['slug']) ?>">Editar</a>
-            <a href="/<?= e($o['slug']) ?>" target="_blank" rel="noopener">Ver página</a>
+            <?php /* Rascunho não existe em /<slug> e o cookie do painel não
+                     acompanha a página pública: sem a prévia, este link
+                     entregava um 404 para a oferta que a cliente acabou de
+                     escrever, como se o painel estivesse quebrado. */ ?>
+            <?php if ($o['status'] === 'publicado'): ?>
+              <a href="/<?= e($o['slug']) ?>" target="_blank" rel="noopener">Ver página</a>
+            <?php else: ?>
+              <a href="/admin/previa.php?slug=<?= e($o['slug']) ?>" target="_blank" rel="noopener">Ver prévia</a>
+            <?php endif; ?>
             <form method="post" action="/admin/acoes.php" class="em-linha">
               <?= csrf_campo() ?>
               <input type="hidden" name="slug" value="<?= e($o['slug']) ?>">
