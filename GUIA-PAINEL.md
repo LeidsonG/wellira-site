@@ -210,8 +210,8 @@ Duas formas de colocar o vídeo:
 **YouTube** — cole o endereço do vídeo no campo. Qualquer formato serve
 (`youtube.com/watch?v=...`, `youtu.be/...`).
 
-**Arquivo MP4** — clique em *enviar um arquivo MP4*, escolha o arquivo, e
-depois **copie o nome que aparecer** e cole no campo de vídeo da oferta.
+**Arquivo MP4** — clique em *envie um MP4*, escolha o arquivo, e depois
+**copie o nome que aparecer** e cole no campo de vídeo da oferta.
 
 O envio é uma tela separada porque vídeo demora. Assim, se falhar, você não
 perde o texto que já escreveu.
@@ -238,24 +238,36 @@ carrossel é a própria página, pela quantidade que você colocou.
 
 ### Colocar uma foto na oferta
 
-1. Na aba *Imagens*, clique em **Enviar imagens**, que abre a tela de envio
-2. Escolha as fotos — **pode marcar várias de uma vez**
-3. Volte para a aba da oferta e **clique na foto que quiser usar**, no quadro de
-   imagens enviadas
+Na aba *Imagens*, clique em **Enviar fotos do computador**, escolha a foto e
+pronto. Só isso.
 
-O quadro mostra em miniatura tudo o que já foi enviado ao servidor, das mais
-recentes para as mais antigas. É só clicar: o nome do arquivo entra sozinho no
-lugar certo. **Você não precisa mais copiar e colar nome de arquivo nenhum** — e
-quem já está na oferta ganha um ✓ na miniatura, para você não repetir a mesma
-foto sem querer.
+- **Pode marcar várias de uma vez** na janela que abrir
+- As fotos sobem na hora, sem sair da oferta, e **cada uma entra sozinha na
+  lista**, com o nome já preenchido
+- Enquanto sobem, uma linha logo abaixo do botão vai dizendo o que está
+  acontecendo: *"Enviando 3 fotos…"* e, no fim, quantas entraram
 
-Se preferir, dá para digitar o nome do arquivo à mão no campo. Nesse caso,
-confira a miniatura que aparece ao lado: **se ela não aparecer, o nome está
-errado** — a foto ficaria como um quadrado vazio na página publicada.
+**Você não precisa copiar e colar nome de arquivo nenhum**, nem abrir outra
+tela. E o texto que você já escreveu na oferta não corre risco: o envio é da
+foto sozinha, não da oferta inteira.
+
+> **O botão não salva a oferta.** Ele só manda as fotos para o servidor e as põe
+> na lista. Para que elas fiquem valendo na página, clique em **Salvar** como de
+> costume.
+
+Se o botão não responder — acontece em navegador antigo ou com JavaScript
+desligado —, use o link **tela de envio**, logo abaixo dele. É a mesma tela de
+sempre: ela envia as fotos e mostra o nome de cada arquivo, que você cola no
+campo da oferta. **Vídeo é sempre por lá**, nunca por este botão.
 
 Para tirar uma foto da oferta, clique no **×** da linha. Isso remove a foto
-daquela oferta; o arquivo continua no servidor e você pode usá-lo de novo depois.
-Para trocar a ordem, apague e inclua na sequência que quiser.
+daquela oferta; o arquivo continua no servidor e você pode usá-lo de novo depois,
+digitando o nome no campo. Para trocar a ordem, apague e inclua na sequência que
+quiser.
+
+Se digitar o nome à mão, confira a miniatura que aparece ao lado: **se ela não
+aparecer, o nome está errado** — a foto ficaria como um quadrado vazio na página
+publicada.
 
 ### A descrição da foto
 
@@ -272,9 +284,13 @@ foto aparece sem legenda — funciona, mas você perde as duas coisas acima.
 
 ### Limites do envio
 
-- **JPG, PNG ou WebP.** O limite por imagem aparece escrito na tela de envio
-- Há também um teto para o **envio inteiro**, somando tudo, e ele também está
-  escrito lá. Se escolher muitas fotos pesadas de uma vez, mande em duas levas
+- **JPG, PNG ou WebP**, até o tamanho escrito ao lado do botão (4 MB por foto)
+- **No máximo 8 fotos por oferta.** Chegando lá, o botão *+ Adicionar imagem*
+  desliga e explica o motivo. Se você escolher 5 fotos quando só cabem 2, o
+  painel manda as 2 primeiras e avisa que as outras não couberam — de propósito:
+  assim não fica arquivo largado ocupando espaço no servidor à toa
+- Há também um teto para o **envio inteiro**, somando as fotos de uma vez só. Se
+  escolher muitas fotos pesadas juntas, o painel avisa; mande em duas levas
 - Uma foto recusada **não cancela as outras**: as que deram certo entram, e o
   painel diz pelo nome qual não entrou e por quê. O caso mais comum é foto de
   iPhone no formato HEIC — abra e salve como JPG antes de mandar
@@ -417,8 +433,20 @@ como *Rascunho*. Se estiver certo, atualize a página com `Ctrl + F5`.
 
 **Uma foto não aparece na oferta** — o nome do arquivo está errado. Na aba
 *Imagens*, a linha da foto mostra a miniatura: se ela não aparece ali, também
-não vai aparecer na página. Apague a linha e escolha a foto de novo, clicando na
-miniatura do quadro de imagens enviadas.
+não vai aparecer na página. Apague a linha no **×** e envie a foto de novo pelo
+botão.
+
+**Cliquei em "Enviar fotos do computador" e não aconteceu nada** — o botão
+depende de um recurso que o navegador pode não ter. Use o link **tela de envio**,
+logo abaixo dele: envie a foto por lá, copie o nome que aparecer e cole no campo
+da oferta. Se o painel estiver aberto num navegador muito antigo, vale trocar
+para o Chrome ou o Edge.
+
+**"Sua sessão expirou" ao enviar a foto** — a aba ficou parada tempo demais, e
+o painel derrubou a sessão. Recarregar é o único caminho: **antes disso, copie o
+texto que você escreveu e ainda não salvou** (selecione, `Ctrl + C`, e cole num
+bloco de notas). Depois recarregue a página, entre de novo, cole o texto de
+volta e repita o envio.
 
 **Cliquei em Ver prévia e o painel pediu login de novo** — a sessão expirou
 enquanto a aba estava parada. Entre de novo e clique outra vez. É proposital:

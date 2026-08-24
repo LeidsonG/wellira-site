@@ -56,6 +56,7 @@ sitemap.php             Gera /sitemap.xml a partir das ofertas publicadas
 go.php                  Saída /go/<slug>: conta o clique e redireciona
 admin/                  Painel administrativo (PT-BR, usuário + senha)
 admin/previa.php        Prévia autenticada da oferta, inclusive em rascunho
+admin/enviar.php        Envio de foto pelo editor — responde JSON, não redireciona
 404.html                Página de erro
 .htaccess               Roteamento, HTTPS, Options -Indexes, bloqueios
 robots.txt              Aberto aos buscadores; aponta o sitemap
@@ -160,19 +161,25 @@ Controle de carrossel para um item só é enfeite que confunde.
 | Constante (`inc/config.php`) | Valor | Por quê |
 |---|---|---|
 | `MAX_IMAGENS` | 8 por oferta | a galeria fica no alto: cada imagem a mais é peso que o visitante em 4G paga antes de chegar ao botão |
-| `BANCO_IMAGENS_MAX` | 60 miniaturas | teto do banco de imagens do editor, para não carregar centenas de miniaturas no celular |
 | `MAX_UPLOAD_IMAGEM` | 4 MB por arquivo | inalterado |
+
+O teto de 8 é conferido em três alturas, e as três precisam continuar de acordo:
+`MAX_IMAGENS` corta na gravação (`normalizar_oferta()`), `data-max` na lista do
+editor desliga o *+ Adicionar imagem*, e o envio confere as **vagas antes de
+subir** o arquivo (veja abaixo).
 
 ### Onde está o código
 
 | Arquivo | O quê |
 |---|---|
 | `inc/funcoes.php` | `imagens_da_oferta()`, `render_galeria()`, `galeria_img()`, `nome_imagem_valido()` |
-| `inc/admin-funcoes.php` | `listar_uploads()` (banco de imagens) e `receber_uploads()` (envio múltiplo) |
-| `admin/editar.php` | aba **Imagens**, logo após **Vídeo** |
-| `admin/upload.php` | `?destino=imagem` aceita seleção múltipla; vídeo continua um por vez |
+| `inc/admin-funcoes.php` | `receber_uploads()` — envio de vários arquivos |
+| `admin/editar.php` | aba **Imagens**, logo após **Vídeo**, com o botão de envio |
+| `admin/enviar.php` | endpoint JSON do envio feito de dentro do editor |
+| `admin/upload.php` | tela de envio: alternativa sem JavaScript e **único caminho para vídeo** |
+| `assets/js/admin.js` | miniatura viva de cada linha, contagem de vagas e o `fetch` do envio |
 | `assets/css/style.css` | `.galeria*` — trilho com `scroll-snap`, setas, pontinhos |
-| `assets/js/galeria.js` | setas, pontinhos e teclado |
+| `assets/js/galeria.js` | setas, pontinhos e teclado (página pública) |
 
 Decisões que não devem ser desfeitas sem motivo:
 
@@ -188,13 +195,67 @@ Decisões que não devem ser desfeitas sem motivo:
 - A **primeira** imagem sai com `fetchpriority="high"` e sem `lazy` — ela é o LCP
   da página; da segunda em diante, `loading="lazy"`
 
+### Envio de fotos pelo editor (`admin/enviar.php`)
+
+A cliente escolhe as fotos na própria aba *Imagens* e elas sobem na hora, cada
+uma entrando na lista com o nome já preenchido.
+
+**O formulário da oferta não é enviado junto** — é a decisão que sustenta o
+recurso. Um `<input type="file">` comum dentro daquele formulário faria o
+navegador mandar a oferta inteira a cada foto, e um envio que falhasse por
+tamanho ou por timeout levaria embora todo o texto de venda ainda não salvo. É a
+mesma razão pela qual `admin/upload.php` nasceu como tela separada — está escrita
+no cabeçalho dos dois arquivos. A foto sobe sozinha, por `fetch`, e volta só o
+nome gravado.
+
+O que `admin/enviar.php` faz, e por quê:
+
+- Exige login e confere CSRF, mas **responde JSON em vez de redirecionar**: um
+  `fetch` seguiria o `Location` da tela de login e receberia HTML, que para o
+  JavaScript é indistinguível de qualquer outra falha. Devolve **401** com texto
+  em português, que o painel mostra à cliente
+- **Não valida nada por conta própria.** Quem decide o que entra continua sendo
+  `receber_uploads()`, a mesma função da tela de upload, com a checagem por
+  assinatura binária. Um arquivo recusado não derruba os outros do mesmo envio
+- Trata `post_estourou()` **antes** do CSRF: com o corpo acima de
+  `post_max_size` o PHP descarta `$_POST` inteiro, e arquivo grande demais
+  viraria "sessão expirada"
+- **Só imagem.** Vídeo continua exclusivamente pela tela `admin/upload.php` —
+  são dezenas de MB por arquivo, e um envio desses precisa da tela dedicada, com
+  o limite do servidor à vista
+Do lado do editor (`assets/js/admin.js`), o corte pelo teto acontece **antes** do
+envio: escolhendo 5 fotos com 2 vagas livres, sobem as 2 primeiras e a tela
+avisa. Enviar e descartar deixaria arquivo órfão ocupando espaço na hospedagem
+da cliente para sempre, porque ninguém saberia que ele está lá. As vagas somam
+os campos vazios existentes com o espaço que falta para `MAX_IMAGENS` — a lista
+pode estar cheia e ainda ter campo vazio, e preencher campo não a faz crescer.
+
+`admin/upload.php` continua existindo e continua no `GUIA-PAINEL.md`: é a saída
+de quem estiver sem JavaScript, e o editor mantém o link para ela logo abaixo do
+botão.
+
+### Duas funções extraídas de `inc/auth.php`
+
+Sem mudança de comportamento, só para que a regra exista num lugar só:
+
+| Extraída | Quem passou a usar |
+|---|---|
+| `csrf_ok()` — devolve `bool` | `csrf_validar()`, que continua matando a requisição, e `admin/enviar.php`, que recusa em JSON |
+| `sessao_expirada()` — o prazo de 2 h | `exigir_login()`, que redireciona, e `admin/enviar.php`, que devolve 401 |
+
+O motivo é sempre o mesmo: **duas conferências de CSRF escritas em lugares
+diferentes é como uma delas envelhece e deixa de conferir**. O caminho JSON
+precisava recusar sem redirecionar e sem cuspir texto puro no meio de uma
+resposta que o JavaScript vai interpretar — mas não podia reimplementar a regra.
+
 ### Envio múltiplo
 
 `receber_uploads()` desvira as listas paralelas que o PHP entrega num upload
 múltiplo e chama `receber_upload()` para cada arquivo — a validação por
 **magic bytes** continua sendo a mesma, por arquivo. Um recusado não derruba os
-outros: a tela mostra o que entrou e, pelo nome, o que não entrou (HEIC de
-iPhone no meio de cinco fotos é o caso comum, não a exceção).
+outros: a resposta traz o que entrou e, pelo nome, o que não entrou (HEIC de
+iPhone no meio de cinco fotos é o caso comum, não a exceção). Serve aos dois
+caminhos, a tela e o endpoint.
 
 Vídeo continua **um por vez**, de propósito: cada MP4 come dezenas de MB do
 `post_max_size`, e dois num envio só estouram o limite do servidor sem que nada
@@ -298,6 +359,7 @@ As pastas de `dados/` são criadas sozinhas na primeira gravação, desde que
 | Excluir e duplicar só por POST | robô seguindo link |
 | Upload validado por **magic bytes**, extensão vinda da assinatura — inclusive arquivo a arquivo no envio múltiplo | PHP disfarçado de imagem |
 | Prévia servida de dentro de `/admin`, com login, `X-Robots-Tag` e `no-store` | rascunho da cliente visível ao público ou indexado |
+| `admin/enviar.php` exige login e CSRF pelas mesmas funções das outras telas (`csrf_ok()`, `sessao_expirada()`), e responde `nosniff` | endpoint de upload virar a porta dos fundos do painel |
 | `.htaccess` sem execução de PHP nas pastas de upload | o mesmo, em profundidade |
 | Escrita atômica (temporário + `rename`) | arquivo corrompido por timeout |
 | Backup das 10 versões anteriores | erro de edição da cliente |
