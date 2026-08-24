@@ -168,6 +168,118 @@ function render_video(array $oferta): string
 }
 
 /**
+ * O nome é de um arquivo de imagem aceitável?
+ *
+ * Vale para o que o painel gravou e para o que alguém possa ter digitado à mão
+ * no JSON. Sem barra, sem ponto duplo e com extensão de imagem conhecida: o
+ * nome vira caminho de arquivo e URL, então "../../inc/config.php" não pode
+ * passar daqui.
+ */
+function nome_imagem_valido(string $nome): bool
+{
+    return (bool) preg_match('/^[A-Za-z0-9][A-Za-z0-9._-]{0,120}\.(jpe?g|png|webp)$/i', $nome)
+        && strpos($nome, '..') === false;
+}
+
+/**
+ * Lê a lista de imagens da oferta, já limpa e pronta para exibir.
+ *
+ * Aceita tanto o formato do painel (`{"arquivo": ..., "legenda": ...}`) quanto
+ * uma string solta com o nome do arquivo — JSON editado à mão acontece, e a
+ * página não pode quebrar por causa disso.
+ */
+function imagens_da_oferta(array $oferta): array
+{
+    if (($oferta['mostrar_imagens'] ?? true) === false) {
+        return [];
+    }
+
+    $itens = [];
+    foreach ((array) ($oferta['imagens'] ?? []) as $imagem) {
+        if (is_string($imagem)) {
+            $imagem = ['arquivo' => $imagem];
+        }
+        if (!is_array($imagem)) {
+            continue;
+        }
+
+        $arquivo = basename(trim((string) ($imagem['arquivo'] ?? '')));
+        if ($arquivo === '' || !nome_imagem_valido($arquivo)) {
+            continue;
+        }
+
+        $itens[] = [
+            'arquivo' => $arquivo,
+            'legenda' => trim((string) ($imagem['legenda'] ?? '')),
+        ];
+        if (count($itens) >= MAX_IMAGENS) {
+            break;
+        }
+    }
+    return $itens;
+}
+
+/**
+ * Monta a etiqueta <img> de um item da galeria.
+ *
+ * A primeira imagem não é adiada: ela fica no alto da página e costuma ser o
+ * maior elemento visível na abertura — marcá-la como lazy atrasaria justamente
+ * o que o Google mede como LCP. Da segunda em diante, adiar é o certo.
+ */
+function galeria_img(array $item, bool $primeira): string
+{
+    return '<img src="' . e(URL_UPLOADS . '/' . rawurlencode($item['arquivo'])) . '"'
+         . ' alt="' . e($item['legenda']) . '"'
+         . ($primeira ? ' loading="eager" fetchpriority="high"' : ' loading="lazy"')
+         . ' decoding="async">';
+}
+
+/**
+ * Monta o bloco de imagens do produto.
+ *
+ * Ocupa o mesmo lugar do vídeo, dentro do topo da página: há oferta que só tem
+ * vídeo, há oferta que só tem foto, e há a que tem os dois — nesse caso o vídeo
+ * vem primeiro e a galeria logo abaixo.
+ *
+ * Uma imagem sai como figura simples, sem seta nem pontinho: controle de
+ * carrossel para um item só é enfeite que confunde. De duas em diante vira
+ * carrossel, que rola por arrasto mesmo sem JavaScript — quem liga as setas e
+ * os pontinhos é assets/js/galeria.js, carregado só quando existe carrossel.
+ */
+function render_galeria(array $oferta): string
+{
+    $itens = imagens_da_oferta($oferta);
+    if (!$itens) {
+        return '';
+    }
+
+    $figura = function (array $item, bool $primeira, string $classe): string {
+        $html = '<figure class="' . e($classe) . '">' . galeria_img($item, $primeira);
+        if ($item['legenda'] !== '') {
+            $html .= '<figcaption>' . e($item['legenda']) . '</figcaption>';
+        }
+        return $html . '</figure>';
+    };
+
+    if (count($itens) === 1) {
+        return $figura($itens[0], true, 'galeria galeria-unica');
+    }
+
+    $html = '<div class="galeria galeria-carrossel" data-galeria>'
+          . '<div class="galeria-trilho" data-trilho tabindex="0" role="group" aria-label="Product images">';
+    foreach ($itens as $i => $item) {
+        $html .= $figura($item, $i === 0, 'galeria-item');
+    }
+    $html .= '</div>'
+           . '<button class="galeria-seta galeria-anterior" type="button" data-ir="-1" aria-label="Previous image"></button>'
+           . '<button class="galeria-seta galeria-proxima" type="button" data-ir="1" aria-label="Next image"></button>'
+           . '<div class="galeria-pontos" data-pontos></div>'
+           . '</div>';
+
+    return $html;
+}
+
+/**
  * Transforma o texto livre digitado no painel em HTML.
  *
  * Regras deliberadamente mínimas, para que a cliente não precise aprender

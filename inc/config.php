@@ -83,6 +83,25 @@ define('ARQUIVO_SENHA', DIR_DADOS . '/senha.php');
 const MAX_UPLOAD_VIDEO  = 128 * 1024 * 1024; // 128 MB
 const MAX_UPLOAD_IMAGEM = 4 * 1024 * 1024;   // 4 MB
 
+/**
+ * Quantas imagens uma oferta pode exibir na galeria.
+ *
+ * O teto não é arbitrário: a galeria fica no alto da página, e cada imagem
+ * além das primeiras é peso que o visitante em 4G paga antes de chegar ao
+ * botão. Oito já é mais foto de produto do que qualquer página de venda
+ * precisa mostrar.
+ */
+const MAX_IMAGENS = 8;
+
+/**
+ * Quantos arquivos já enviados o painel oferece no banco de imagens.
+ *
+ * A lista sai por data, mais recentes primeiro. Sem teto, uma conta com
+ * centenas de uploads antigos faria o editor carregar centenas de miniaturas
+ * de uma vez — no celular da cliente, que é onde ela usa o painel.
+ */
+const BANCO_IMAGENS_MAX = 60;
+
 // ---------------------------------------------------------------------------
 // Avisos legais
 // ---------------------------------------------------------------------------

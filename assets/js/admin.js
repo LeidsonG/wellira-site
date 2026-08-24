@@ -15,6 +15,35 @@
   'use strict';
 
   // ---------------------------------------------------------------------------
+  // Ajudantes
+  // ---------------------------------------------------------------------------
+  //
+  // Ficam aqui, no topo do IIFE, porque são usados por mais de um bloco (o banco
+  // de imagens e a prévia). Antes o el() morava dentro do bloco da prévia; com
+  // 'use strict' uma função declarada dentro de um bloco não sai dele, e
+  // duplicar a mesma função em dois lugares é o começo de duas versões dela.
+
+  /** Cria um elemento com texto seguro — textContent, nunca innerHTML. */
+  function el(tag, classe, texto) {
+    var n = document.createElement(tag);
+    if (classe) n.className = classe;
+    if (texto !== undefined && texto !== null) n.textContent = texto;
+    return n;
+  }
+
+  /**
+   * Endereço público de um arquivo enviado pelo painel.
+   *
+   * O nome vem de um campo de texto: a cliente digita, cola, ou copia de um
+   * e-mail. encodeURIComponent garante que espaço, acento ou "&" no nome virem
+   * um caminho válido em vez de quebrarem a URL — e impede que ".." ou "/"
+   * colados no campo escapem da pasta de uploads.
+   */
+  function urlUpload(nome) {
+    return '/assets/img/uploads/' + encodeURIComponent(nome);
+  }
+
+  // ---------------------------------------------------------------------------
   // Abas
   // ---------------------------------------------------------------------------
 
@@ -109,12 +138,18 @@
       var molde = document.getElementById(add.getAttribute('data-molde'));
       if (!lista || !molde) return;
 
+      // O botão já fica desabilitado ao encher, e navegador não dispara clique
+      // em botão desabilitado. Esta guarda é o cinto do suspensório: cobre o
+      // clique que escapa entre encher a lista e o botão ser repintado.
+      if (listaCheia(lista)) { atualizarTeto(lista); return; }
+
       var novo = molde.content.cloneNode(true);
       lista.appendChild(novo);
 
       var campo = lista.lastElementChild.querySelector('input, textarea, select');
       if (campo) campo.focus();
       renumerar(lista);
+      atualizarTeto(lista);
       return;
     }
 
@@ -125,6 +160,7 @@
       var pai = item.parentElement;
       item.remove();
       renumerar(pai);
+      atualizarTeto(pai);
     }
   });
 
@@ -135,6 +171,97 @@
       el.textContent = String(i + 1);
     });
   }
+
+  // ---------------------------------------------------------------------------
+  // Teto de itens (data-max)
+  // ---------------------------------------------------------------------------
+  //
+  // Só vale para a lista que DECLARA o teto. O PHP publica data-max a partir de
+  // uma constante (hoje MAX_IMAGENS, em inc/config.php) e o salvar corta o que
+  // passar disso — silenciosamente. Sem aviso na tela, a cliente escolheria a
+  // nona foto, salvaria, e ela simplesmente não estaria lá.
+  //
+  // As outras listas repetíveis (selos, FAQ, "não é para você") não declaram
+  // data-max e continuam crescendo sem limite, exatamente como antes.
+
+  /**
+   * O teto da lista, ou null quando não há.
+   *
+   * Atributo ausente, vazio, "oito" ou "8 fotos" viram null — "sem limite" —
+   * em vez de um número chutado: travar a lista num valor inventado esconderia
+   * conteúdo da cliente por causa de um erro de digitação no PHP.
+   */
+  function tetoDaLista(lista) {
+    if (!lista) return null;
+    var bruto = lista.getAttribute('data-max');
+    if (bruto === null || !/^\d+$/.test(bruto.trim())) return null;
+    var n = parseInt(bruto, 10);
+    return n > 0 ? n : null;
+  }
+
+  function listaCheia(lista) {
+    var teto = tetoDaLista(lista);
+    return teto !== null && lista.querySelectorAll('[data-item]').length >= teto;
+  }
+
+  /**
+   * Como chamar o que a lista guarda, na mensagem do teto.
+   *
+   * Sai do rótulo da aba que contém a lista ("Imagens" -> "imagens"), para o
+   * aviso não ficar preso a esta lista específica. data-max-rotulo tem
+   * precedência, se um dia o PHP precisar de uma palavra diferente da aba.
+   */
+  function rotuloDaLista(lista) {
+    var proprio = lista.getAttribute('data-max-rotulo');
+    if (proprio) return proprio;
+    var secao = lista.closest('[data-secao]');
+    var nome = secao ? secao.getAttribute('data-secao') : '';
+    return nome ? nome.toLowerCase() : 'itens';
+  }
+
+  /** O botão "+ Adicionar" que aponta para esta lista. */
+  function botaoDaLista(lista) {
+    var achado = null;
+    Array.prototype.forEach.call(document.querySelectorAll('[data-adicionar]'), function (b) {
+      if (b.getAttribute('data-adicionar') === lista.id) achado = b;
+    });
+    return achado;
+  }
+
+  /**
+   * Liga ou desliga o botão de adicionar conforme o teto, e explica por quê.
+   *
+   * Desabilitar sem dizer nada transforma o teto em bug aos olhos de quem usa:
+   * o botão continua ali e simplesmente para de responder.
+   */
+  function atualizarTeto(lista) {
+    var teto = tetoDaLista(lista);
+    if (teto === null) return;          // lista sem teto: nada muda
+
+    var botao = botaoDaLista(lista);
+    if (!botao) return;
+
+    var cheia = lista.querySelectorAll('[data-item]').length >= teto;
+    botao.disabled = cheia;
+
+    var aviso = botao.nextElementSibling;
+    if (!aviso || !aviso.classList.contains('teto-aviso')) {
+      aviso = el('p', 'teto-aviso');
+      // role=status: a mensagem nasce vazia e o CSS a esconde enquanto estiver
+      // assim. O leitor de tela só anuncia mudança de região viva que já
+      // existia — criá-la junto com o texto não anunciaria nada.
+      aviso.setAttribute('role', 'status');
+      botao.parentNode.insertBefore(aviso, botao.nextSibling);
+    }
+    aviso.textContent = cheia
+      ? 'Máximo de ' + teto + ' ' + rotuloDaLista(lista) + '. Remova uma para acrescentar outra.'
+      : '';
+  }
+
+  Array.prototype.forEach.call(document.querySelectorAll('[data-adicionar]'), function (b) {
+    var lista = document.getElementById(b.getAttribute('data-adicionar'));
+    if (lista) atualizarTeto(lista);
+  });
 
   // ---------------------------------------------------------------------------
   // Copiar o prompt do ChatGPT
@@ -184,6 +311,258 @@
   });
 
   // ---------------------------------------------------------------------------
+  // Imagens da oferta — miniatura viva e banco do que já foi enviado
+  // ---------------------------------------------------------------------------
+  //
+  // A lista de imagens é uma lista repetível como as outras, mas o campo guarda
+  // o NOME DO ARQUIVO — e nome de arquivo é a coisa mais fácil de errar do
+  // painel inteiro (um dígito trocado, a extensão .jpeg no lugar de .jpg). Sem
+  // retorno na tela, o erro só aparece quando a página publicada mostra um
+  // quadrado vazio. Por isso duas coisas: cada linha mostra a imagem que o nome
+  // aponta, e existe um banco com o que já está no servidor, para ela escolher
+  // clicando em vez de digitar.
+
+  var listaImagens = document.getElementById('lista-imagens');
+
+  if (listaImagens) {
+    var bancoCaixa = document.querySelector('[data-banco]');
+    var bancoGrade = document.querySelector('[data-banco-grade]');
+
+    // Região viva criada já no começo e sempre vazia: o CSS a esconde enquanto
+    // não tem texto, e é o texto entrando que faz o leitor de tela anunciar.
+    var bancoAviso = null;
+    var relogioAviso = null;
+
+    if (bancoCaixa) {
+      bancoAviso = el('p', 'banco-aviso');
+      bancoAviso.setAttribute('role', 'status');
+      bancoCaixa.insertBefore(bancoAviso, bancoCaixa.firstChild);
+    }
+
+    /**
+     * Diz por que o clique no banco não fez nada.
+     *
+     * Some sozinho depois de alguns segundos: é um recado sobre o clique que
+     * acabou de acontecer, não um estado da tela — quem descreve o estado é o
+     * aviso fixo embaixo do botão de adicionar.
+     */
+    function avisarBancoCheio() {
+      if (!bancoAviso) return;
+      var teto = tetoDaLista(listaImagens);
+      bancoAviso.textContent = 'A oferta já está no máximo de ' + teto +
+        ' imagens. Remova uma da lista acima para pôr esta no lugar.';
+      if (relogioAviso) clearTimeout(relogioAviso);
+      relogioAviso = setTimeout(function () { bancoAviso.textContent = ''; }, 6000);
+    }
+
+    /** Todos os campos de nome de arquivo, na ordem em que aparecem na tela. */
+    function camposArquivo() {
+      return Array.prototype.slice.call(
+        listaImagens.querySelectorAll('input[name="imagem_arquivo[]"]')
+      );
+    }
+
+    /**
+     * Põe (ou tira) a imagem que o campo aponta na miniatura da linha.
+     *
+     * O src só é reatribuído quando o endereço muda de verdade: cada
+     * atribuição dispara um pedido novo ao servidor, e a cliente digita o nome
+     * caractere por caractere — sem esta guarda seriam ~25 pedidos por nome,
+     * todos com 404, e a miniatura piscaria a cada tecla.
+     */
+    function atualizarMiniatura(campo) {
+      var item = campo.closest('[data-item]');
+      if (!item) return;
+      var img = item.querySelector('[data-miniatura]');
+      if (!img) return;
+
+      var nome = campo.value.trim();
+      var url  = nome === '' ? '' : urlUpload(nome);
+
+      if (img.getAttribute('data-atual') === url) return;
+      img.setAttribute('data-atual', url);
+
+      // O aviso de arquivo quebrado se refere ao endereço anterior: como o
+      // endereço mudou, ele volta a valer só se o novo também falhar.
+      item.classList.remove('item-imagem-quebrada');
+
+      if (url === '') {
+        img.hidden = true;
+        img.removeAttribute('src');
+        return;
+      }
+      img.hidden = false;
+      img.src = url;
+    }
+
+    /**
+     * Marca no banco as imagens que já estão nesta oferta.
+     *
+     * Sem isto, a mesma foto entra duas vezes com facilidade — a grade é uma
+     * parede de miniaturas parecidas e nada distingue a que já foi escolhida.
+     */
+    function marcarUsadas() {
+      if (!bancoGrade) return;
+
+      // Object.create(null): as chaves são nomes de arquivo vindos do
+      // formulário, e um arquivo chamado "constructor" não pode virar um
+      // acerto falso contra o protótipo de Object.
+      var usados = Object.create(null);
+      camposArquivo().forEach(function (c) {
+        var v = c.value.trim();
+        if (v !== '') usados[v] = true;
+      });
+
+      Array.prototype.forEach.call(bancoGrade.querySelectorAll('[data-arquivo]'), function (b) {
+        var nome = b.getAttribute('data-arquivo');
+        var usada = usados[nome] === true;
+        b.classList.toggle('usada', usada);
+        // O ✓ é desenhado pelo CSS; o title diz o mesmo para quem usa leitor
+        // de tela, que não lê conteúdo gerado.
+        b.title = usada ? nome + ' — já está nesta oferta' : nome;
+      });
+    }
+
+    /**
+     * Põe um arquivo do banco na lista: no primeiro campo vazio, ou numa linha
+     * nova se todos já estiverem preenchidos.
+     */
+    function inserirArquivo(nome) {
+      var campos = camposArquivo();
+      var alvo = null;
+
+      for (var i = 0; i < campos.length; i++) {
+        if (campos[i].value.trim() === '') { alvo = campos[i]; break; }
+      }
+
+      if (!alvo) {
+        // Lista cheia e nenhum campo livre. Criar a linha aqui furaria o teto
+        // que o botão "+ Adicionar imagem" respeita — e o salvar cortaria a
+        // sobra depois, sem avisar. Note que a lista pode estar CHEIA e ainda
+        // ter campo vazio: nesse caso o clique acima já preencheu, porque
+        // preencher não faz a lista crescer.
+        if (listaCheia(listaImagens)) { avisarBancoCheio(); return; }
+
+        var molde = document.getElementById('molde-imagens');
+        if (!molde) return;
+        listaImagens.appendChild(molde.content.cloneNode(true));
+        renumerar(listaImagens);
+        var novos = camposArquivo();
+        alvo = novos[novos.length - 1];
+        if (!alvo) return;
+      }
+
+      alvo.value = nome;
+      atualizarMiniatura(alvo);
+      marcarUsadas();
+      atualizarTeto(listaImagens);
+      if (bancoAviso) bancoAviso.textContent = '';   // deu certo: recado antigo sai
+
+      // Um evento 'input' sintético faz o resto do painel reagir como se ela
+      // tivesse digitado: a bolinha da aba e a prévia "Como fica na página"
+      // já escutam input no documento. Chamar desenhar() daqui exigiria
+      // alcançar uma função que só existe quando há [data-previa] na tela —
+      // acoplaria este bloco a um que pode não ter carregado.
+      alvo.dispatchEvent(new Event('input', { bubbles: true }));
+
+      // Rola até a linha preenchida. Quando a lista é longa, o banco fica
+      // abaixo dela e o campo que acabou de receber o nome está fora da tela:
+      // sem o rolar, o clique parece não ter feito nada.
+      var item = alvo.closest('[data-item]');
+      if (item && item.scrollIntoView) {
+        item.scrollIntoView({ block: 'center', behavior: 'smooth' });
+      }
+      // Não damos foco de propósito: no celular o foco abre o teclado, que
+      // cobre justamente a grade de onde ela costuma escolher a próxima.
+    }
+
+    // ---- Banco: monta a grade a partir do JSON publicado pelo PHP ----
+
+    var UPLOADS = (function () {
+      var tag = document.getElementById('uploads-disponiveis');
+      try {
+        var lista = tag ? JSON.parse(tag.textContent) : [];
+        return Array.isArray(lista) ? lista : [];
+      } catch (e) {
+        return [];
+      }
+    })();
+
+    if (bancoCaixa && bancoGrade && !UPLOADS.length) {
+      // O PHP já imprime o bloco com hidden quando não há uploads. Repetir a
+      // decisão aqui cobre o caso em que o JSON existe mas não pôde ser lido:
+      // sem isto restaria uma moldura vazia convidando a clicar no nada.
+      bancoCaixa.hidden = true;
+    }
+
+    if (bancoCaixa && bancoGrade && UPLOADS.length) {
+      UPLOADS.forEach(function (nome) {
+        if (typeof nome !== 'string' || nome === '') return;
+
+        var botao = document.createElement('button');
+        botao.type = 'button';             // dentro de <form>: sem type ele envia
+        botao.className = 'banco-item';
+        botao.setAttribute('data-arquivo', nome);
+        botao.title = nome;
+
+        var img = document.createElement('img');
+        img.src = urlUpload(nome);
+        img.alt = '';                      // decorativa: o nome ao lado já diz qual é
+        img.loading = 'lazy';              // são até 60 arquivos
+        botao.appendChild(img);
+
+        // O nome fica à vista: dois envios do mesmo dia só se distinguem por
+        // ele, e é ele que vai parar no campo.
+        botao.appendChild(el('span', 'banco-nome', nome));
+
+        bancoGrade.appendChild(botao);
+      });
+
+      // Só revela o bloco quando há o que mostrar — uma moldura vazia com o
+      // texto "clique numa imagem" seria uma promessa sem conteúdo.
+      bancoCaixa.hidden = false;
+
+      bancoGrade.addEventListener('click', function (evento) {
+        var botao = evento.target.closest('[data-arquivo]');
+        if (!botao) return;
+        inserirArquivo(botao.getAttribute('data-arquivo'));
+      });
+    }
+
+    // ---- Ligações ----
+
+    listaImagens.addEventListener('input', function (evento) {
+      if (evento.target.name !== 'imagem_arquivo[]') return;
+      atualizarMiniatura(evento.target);
+      marcarUsadas();
+    });
+
+    // Nome inexistente é o erro mais provável aqui, e é silencioso: sem aviso a
+    // cliente só descobriria abrindo a página publicada. O evento 'error' de
+    // <img> não borbulha, então é preciso ouvi-lo na fase de captura — o que
+    // tem a vantagem de já valer para as linhas clonadas do <template>.
+    document.addEventListener('error', function (evento) {
+      var img = evento.target;
+      if (!img || !img.hasAttribute || !img.hasAttribute('data-miniatura')) return;
+      img.hidden = true;
+      var item = img.closest('[data-item]');
+      if (item) item.classList.add('item-imagem-quebrada');
+    }, true);
+
+    // Adicionar ou remover linha não dispara input; o banco precisa saber para
+    // acender ou apagar o ✓. setTimeout porque este ouvinte pode correr antes
+    // do que de fato remove o item do documento.
+    document.addEventListener('click', function (evento) {
+      if (evento.target.closest('[data-adicionar], [data-remover]')) {
+        setTimeout(marcarUsadas, 0);
+      }
+    });
+
+    camposArquivo().forEach(atualizarMiniatura);
+    marcarUsadas();
+  }
+
+  // ---------------------------------------------------------------------------
   // Previsão de como a seção fica na página
   // ---------------------------------------------------------------------------
   //
@@ -210,14 +589,6 @@
     function ligado(nome) {
       var c = document.querySelector('input[name="mostrar_' + nome + '"]');
       return !c || c.checked;
-    }
-
-    /** Cria um elemento com texto seguro. */
-    function el(tag, classe, texto) {
-      var n = document.createElement(tag);
-      if (classe) n.className = classe;
-      if (texto !== undefined && texto !== null) n.textContent = texto;
-      return n;
     }
 
     /** Traçados dos ícones, publicados pelo PHP a partir da constante ICONES. */
@@ -400,8 +771,77 @@
           lista.appendChild(item);
         });
         caixa.appendChild(lista);
+      },
+
+      imagens: function (caixa) {
+        if (!ligado('imagens')) { caixa.appendChild(vazio('Seção desligada: não aparece')); return; }
+
+        // Arquivo e legenda são lidos juntos, pelo índice. valores() descarta
+        // os vazios e serviria para o arquivo, mas aplicá-lo à legenda
+        // desalinharia o par assim que uma imagem ficasse sem legenda.
+        var arquivos = Array.prototype.map.call(document.getElementsByName('imagem_arquivo[]'),
+                                                function (e2) { return e2.value.trim(); });
+        var legendas = Array.prototype.map.call(document.getElementsByName('imagem_legenda[]'),
+                                                function (e2) { return e2.value.trim(); });
+
+        var itens = [];
+        arquivos.forEach(function (nome, i) {
+          if (nome !== '') itens.push({ arquivo: nome, legenda: legendas[i] || '' });
+        });
+
+        if (!itens.length) { caixa.appendChild(vazio('Sem imagens: o bloco não aparece')); return; }
+
+        if (itens.length === 1) {
+          caixa.appendChild(figura(itens[0], 'previa-imagem-unica'));
+          // A regra "1 sozinha, 2+ carrossel" é do template, não do painel: sem
+          // esta linha ela não teria como saber por que as setas sumiram ao
+          // apagar a segunda imagem.
+          caixa.appendChild(el('p', 'previa-nota-imagens', '1 imagem: aparece sozinha, sem setas'));
+          return;
+        }
+
+        var palco = el('div', 'previa-carrossel');
+        palco.appendChild(el('span', 'previa-seta', '‹'));
+
+        var fileira = el('div', 'previa-carrossel-fileira');
+        itens.forEach(function (it) { fileira.appendChild(figura(it, 'previa-slide')); });
+        palco.appendChild(fileira);
+
+        palco.appendChild(el('span', 'previa-seta', '›'));
+        caixa.appendChild(palco);
+
+        var pontos = el('div', 'previa-pontos');
+        itens.forEach(function (_, i) {
+          pontos.appendChild(el('span', i === 0 ? 'previa-ponto ativo' : 'previa-ponto'));
+        });
+        caixa.appendChild(pontos);
+
+        caixa.appendChild(el('p', 'previa-nota-imagens',
+          itens.length + ' imagens: vira carrossel com setas e pontinhos'));
       }
     };
+
+    /** Uma imagem da prévia, com a legenda por baixo como na página. */
+    function figura(item, classe) {
+      var fig = el('figure', classe);
+
+      var img = document.createElement('img');
+      img.className = 'previa-imagem';
+      img.src = urlUpload(item.arquivo);
+      img.alt = '';
+      img.loading = 'lazy';
+
+      // Deixar o ícone de imagem quebrada do navegador aqui seria ambíguo:
+      // pode ser nome errado ou upload ainda não feito. O texto tira a dúvida.
+      img.onerror = function () {
+        if (!img.parentNode) return;
+        img.parentNode.replaceChild(el('span', 'previa-imagem-falta', 'arquivo não encontrado'), img);
+      };
+      fig.appendChild(img);
+
+      if (item.legenda) fig.appendChild(el('figcaption', 'previa-legenda', item.legenda));
+      return fig;
+    }
 
     function desenhar() {
       previas.forEach(function (caixa) {

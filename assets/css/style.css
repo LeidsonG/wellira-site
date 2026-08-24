@@ -208,6 +208,159 @@ p  { margin: 0 0 1.1rem; text-wrap: pretty; /* evita palavra órfã no fim do pa
   width: 100%; height: 100%; border: 0; display: block;
 }
 
+/* ---------- Galeria de imagens ----------
+   Fica dentro do hero, no mesmo lugar do vídeo (logo abaixo dele quando os dois
+   existem, sozinha quando não há vídeo). Uma foto vira figura simples; duas ou
+   mais viram carrossel.
+
+   MELHORIA PROGRESSIVA: o carrossel é rolagem nativa com scroll-snap, então
+   arrastar com o dedo já funciona sem JavaScript nenhum. O galeria.js só
+   acrescenta setas, pontinhos e teclado — por isso as setas nascem escondidas e
+   só aparecem quando o script marca a galeria como pronta: seta morta na tela é
+   pior do que seta nenhuma. */
+
+.galeria {
+  /* As fotos da cliente chegam em proporções imprevisíveis (retrato, quadrado,
+     paisagem) e recortar a foto dela não é opção. Então quem tem altura fixa é
+     a moldura: a imagem entra inteira (object-fit: contain) sobre um fundo
+     suave. Assim a página não muda de altura ao trocar de slide.
+
+     --galeria-meio é METADE dessa altura, escrita em % da LARGURA do container.
+     É o que centraliza as setas na foto e não na caixa inteira (a legenda e os
+     pontinhos ficam abaixo): percentual de margin resolve pela largura do
+     container, nunca pela altura. Os dois valores descrevem a MESMA proporção —
+     ao mexer em um, mexa no outro. */
+  --galeria-proporcao: 4 / 3;
+  --galeria-meio: 37.5%;
+
+  margin: 1.5rem 0;   /* figure traz margem própria do navegador — zerar é obrigatório */
+}
+
+@media (min-width: 600px) {
+  /* Em tela larga a foto quadrada já cabe folgada; alongar a moldura aproveita
+     melhor a largura do .wrap sem espremer o resto do hero. */
+  .galeria { --galeria-proporcao: 3 / 2; --galeria-meio: 33.34%; }
+}
+
+.galeria img {
+  width: 100%;
+  aspect-ratio: var(--galeria-proporcao);
+  object-fit: contain;
+  background: var(--bg-soft);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);   /* mesmo raio do .video, que fica logo acima */
+}
+
+.galeria figcaption {
+  margin-top: 0.55rem;
+  font-size: 0.85rem; line-height: 1.45;
+  color: var(--ink-soft); text-align: center;
+}
+
+/* ---- Carrossel (2 imagens ou mais) ---- */
+
+.galeria-carrossel { position: relative; }
+
+.galeria-trilho {
+  display: flex; gap: 0.6rem;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;   /* arrastar o último slide não navega para trás */
+  scroll-snap-type: x mandatory;
+  /* Barra de rolagem escondida: ela apareceria entre a foto e a legenda, e o
+     gesto aqui é arrastar — ninguém rola galeria pela barra. Os pontinhos já
+     dizem quantas fotos existem. */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.galeria-trilho::-webkit-scrollbar { display: none; }
+
+.galeria-item {
+  flex: 0 0 100%; min-width: 0; margin: 0;
+  scroll-snap-align: center;
+}
+
+/* ---- Setas ---- */
+
+.galeria-seta {
+  position: absolute; z-index: 2;
+  top: 0; margin-top: var(--galeria-meio); transform: translateY(-50%);
+  width: 2.75rem; height: 2.75rem;   /* 44px: alvo mínimo de toque */
+  padding: 0; border: 1px solid var(--line); border-radius: 50%;
+  /* Branco quase opaco com sombra: legível tanto sobre foto clara quanto sobre
+     foto escura, e a borda o separa do fundo suave das laterais em retrato. */
+  background: rgba(255,255,255,.92);
+  color: var(--ink);
+  box-shadow: 0 2px 10px rgba(0,0,0,.22);
+  cursor: pointer;
+  display: none;   /* ver nota de melhoria progressiva acima */
+  place-items: center;
+  transition: background .15s ease, opacity .15s ease;
+}
+.galeria-pronta .galeria-seta { display: grid; }
+.galeria .galeria-seta[hidden] { display: none; }
+.galeria-seta:hover { background: #fff; }
+
+.galeria-anterior { left: 0.5rem; }
+.galeria-proxima  { right: 0.5rem; }
+
+/* Chevron desenhado com duas bordas giradas — evita SVG externo (requisição a
+   mais) e emoji (que muda de desenho a cada sistema). */
+.galeria-seta::before {
+  content: "";
+  width: 0.6rem; height: 0.6rem;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+}
+.galeria-anterior::before { transform: rotate(135deg); margin-left: 4px; }
+.galeria-proxima::before  { transform: rotate(-45deg); margin-right: 4px; }
+
+/* Ponta do trilho: o JS esconde a seta que não leva a lugar nenhum. Some por
+   visibility, e não por display, para a lateral da foto não "pular" quando ela
+   volta — e mesmo invisível ela já sai do foco e do leitor de tela. */
+.galeria-seta-oculta { opacity: 0; visibility: hidden; pointer-events: none; }
+
+/* ---- Pontinhos ---- */
+
+.galeria-pontos {
+  display: flex; justify-content: center; align-items: center;
+  gap: 0.1rem; margin-top: 0.5rem;
+}
+/* Sem JavaScript a caixa chega e continua vazia — não reserve espaço por ela. */
+.galeria-pontos:empty { display: none; }
+
+.galeria-ponto {
+  /* O botão é grande para o dedo; o ponto visível é o ::before. */
+  width: 1.75rem; height: 1.75rem;
+  padding: 0; border: 0; background: none; cursor: pointer;
+  display: grid; place-items: center;
+}
+.galeria-ponto::before {
+  content: "";
+  width: 0.5rem; height: 0.5rem; border-radius: 999px;
+  background: var(--ink-faint); opacity: .4;
+  transition: width .15s ease, opacity .15s ease, background .15s ease;
+}
+.galeria-ponto:hover::before { opacity: .7; }
+.galeria-ponto.ativo::before {
+  width: 1.15rem; background: var(--brand); opacity: 1;
+}
+
+/* ---- Acessibilidade ---- */
+
+.galeria-trilho:focus-visible,
+.galeria-seta:focus-visible,
+.galeria-ponto:focus-visible {
+  outline: 2px solid var(--brand); outline-offset: 2px;
+}
+/* O trilho recebe foco de teclado (tabindex="0") porque é uma área rolável:
+   sem isso, quem não usa mouse não alcança as fotos seguintes. */
+.galeria-trilho:focus-visible { border-radius: var(--radius); outline-offset: 3px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .galeria-seta, .galeria-ponto::before { transition: none; }
+  .galeria-trilho { scroll-behavior: auto; }
+}
+
 /* Observação logo abaixo de uma lista, dentro da mesma seção. */
 .nota-apos-lista { margin-top: 1.2rem; font-size: 0.95rem; }
 

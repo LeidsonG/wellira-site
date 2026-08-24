@@ -76,6 +76,12 @@ $url_canonica = SITE_URL . '/' . $slug;
 // A prévia nunca é indexável, independente do que a oferta pedir.
 $indexar = !$previa && ($oferta['indexar'] ?? true) !== false;
 
+// A galeria é montada antes do <head> porque o script do carrossel só é
+// carregado quando existe carrossel — oferta com uma foto só, ou sem foto
+// nenhuma, não paga uma requisição por um comportamento que não vai usar.
+$galeria     = render_galeria($oferta);
+$tem_carrossel = strpos($galeria, 'galeria-carrossel') !== false;
+
 /** Botão de ação, repetido ao longo da página. */
 function cta(string $link, string $texto, ?string $sub = null): string
 {
@@ -135,6 +141,9 @@ function faixa(): string
 <link rel="stylesheet" href="/assets/css/style.css">
 <script src="/assets/js/ids.js" defer></script>
 <script src="/assets/js/rastreamento.js" defer></script>
+<?php if ($tem_carrossel): ?>
+<script src="/assets/js/galeria.js" defer></script>
+<?php endif; ?>
 <?php if ($previa): ?>
 <?php /* O estilo da tarja mora aqui, e não em style.css, de propósito: é
          enfeite exclusivo do painel, e o visitante da página publicada não
@@ -188,6 +197,10 @@ function faixa(): string
       <?php endif; ?>
 
       <?= render_video($oferta) ?>
+
+      <?php /* Vídeo e galeria dividem o mesmo lugar. Oferta com os dois mostra
+               o vídeo primeiro; oferta só com foto usa este espaço sozinha. */ ?>
+      <?= $galeria ?>
 
       <?= cta($link, $botao, $oferta['botao_sub'] ?? null) ?>
     </div>

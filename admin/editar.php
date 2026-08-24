@@ -92,12 +92,17 @@ function interruptor(array $o, string $secao, string $alvo): void
 $linhas_nao = array_values((array) ($o['nao_e_para_voce'] ?? []));
 $selos      = array_values((array) ($o['selos'] ?? []));
 $faq        = array_values((array) ($o['faq'] ?? []));
+$imagens    = array_values((array) ($o['imagens'] ?? []));
 
 // Oferta nova começa com uma linha de cada lista, só para não abrir vazia.
 // As demais a cliente acrescenta no botão — não há mais limite de uma por vez.
 if (!$linhas_nao) { $linhas_nao = ['']; }
 if (!$selos)      { $selos      = [['icone' => 'escudo', 'titulo' => '', 'texto' => '']]; }
 if (!$faq)        { $faq        = [['pergunta' => '', 'resposta' => '']]; }
+if (!$imagens)    { $imagens    = [['arquivo' => '', 'legenda' => '']]; }
+
+/** Imagens já no servidor, oferecidas para clicar em vez de digitar o nome. */
+$banco = listar_uploads();
 
 /**
  * Endereço para ver a página desta oferta.
@@ -304,7 +309,83 @@ if (!empty($_GET['ok'])) {
     <?php exemplo('video'); ?>
   </section>
 
-  <!-- ==================== 4. Botão ==================== -->
+  <!-- ==================== 4. Imagens ==================== -->
+  <?php /* Fica logo depois do vídeo porque ocupa o MESMO lugar na página: há
+           oferta que só tem vídeo, há a que só tem foto, e há a que tem os
+           dois. Vizinhas no editor, as duas abas contam essa história sozinhas. */ ?>
+  <section id="sec-imagens" data-secao="Imagens" hidden>
+    <?php interruptor($o, 'imagens', 'grupo-imagens'); ?>
+    <div id="grupo-imagens" class="grupo-alternavel<?= ligada($o, 'imagens') ? '' : ' desligado' ?>">
+    <p class="ajuda ajuda-topo">
+      As fotos aparecem no mesmo lugar do vídeo, no alto da página. Se a oferta
+      tiver vídeo e fotos, o vídeo vem primeiro.
+      <strong>Uma foto aparece sozinha; duas ou mais viram um carrossel</strong>
+      que o visitante arrasta para o lado. No máximo <?= MAX_IMAGENS ?>.
+    </p>
+
+    <?php /* O teto sai do PHP para o HTML porque quem corta de verdade é o
+             salvar (array_slice em normalizar_oferta). Sem o JS conhecer o
+             número, a cliente acrescentaria a nona foto, salvaria, e ela
+             sumiria sem que nada na tela explicasse por quê. */ ?>
+    <div id="lista-imagens" class="repetivel" data-max="<?= MAX_IMAGENS ?>">
+      <?php foreach ($imagens as $imagem):
+        // JSON antigo ou editado à mão pode trazer só o nome do arquivo.
+        if (is_string($imagem)) { $imagem = ['arquivo' => $imagem]; }
+      ?>
+        <div class="item item-bloco item-imagem" data-item>
+          <span class="item-num"><span data-numero>1</span></span>
+          <img class="item-miniatura" data-miniatura alt="" hidden>
+          <div class="item-campos empilhado">
+            <input type="text" name="imagem_arquivo[]" value="<?= e((string) ($imagem['arquivo'] ?? '')) ?>"
+                   maxlength="200" placeholder="20260824-a1b2c3.jpg" aria-label="Nome do arquivo">
+            <input type="text" name="imagem_legenda[]" value="<?= e((string) ($imagem['legenda'] ?? '')) ?>"
+                   maxlength="150" placeholder="Descrição em inglês (aparece sob a imagem)"
+                   aria-label="Descrição da imagem">
+          </div>
+          <button type="button" class="remover" data-remover title="Remover esta imagem">×</button>
+        </div>
+      <?php endforeach; ?>
+    </div>
+
+    <template id="molde-imagens">
+      <div class="item item-bloco item-imagem" data-item>
+        <span class="item-num"><span data-numero>1</span></span>
+        <img class="item-miniatura" data-miniatura alt="" hidden>
+        <div class="item-campos empilhado">
+          <input type="text" name="imagem_arquivo[]" maxlength="200"
+                 placeholder="20260824-a1b2c3.jpg" aria-label="Nome do arquivo">
+          <input type="text" name="imagem_legenda[]" maxlength="150"
+                 placeholder="Descrição em inglês (aparece sob a imagem)"
+                 aria-label="Descrição da imagem">
+        </div>
+        <button type="button" class="remover" data-remover title="Remover esta imagem">×</button>
+      </div>
+    </template>
+
+    <button type="button" class="adicionar" data-adicionar="lista-imagens" data-molde="molde-imagens">
+      + Adicionar imagem
+    </button>
+
+    <p class="ajuda">
+      A descrição é o que o Google e o leitor de tela enxergam da foto, e é a
+      linha impressa embaixo dela. Escreva em inglês, como o resto da página.
+      <a href="/admin/upload.php?destino=imagem" target="_blank" rel="noopener">Enviar imagens</a>
+      — pode mandar várias de uma vez.
+    </p>
+
+    <?php /* Só nomes de arquivo, gerados pelo próprio upload e conferidos por
+             nome_imagem_valido(). Não é texto digitado pela cliente. */ ?>
+    <script type="application/json" id="uploads-disponiveis"><?= json_encode($banco, JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) ?></script>
+    <div class="banco" data-banco<?= $banco ? '' : ' hidden' ?>>
+      <p class="ajuda">Clique numa imagem já enviada para incluí-la nesta oferta.</p>
+      <div class="banco-grade" data-banco-grade></div>
+    </div>
+
+    <?php exemplo('imagens'); ?>
+    </div>
+  </section>
+
+  <!-- ==================== 5. Botão ==================== -->
   <section id="sec-botao" data-secao="Botão" hidden>
     <div class="campo">
       <label for="link">Link do fornecedor <span class="obrig">obrigatório</span></label>
@@ -331,7 +412,7 @@ if (!empty($_GET['ok'])) {
     <?php exemplo('botao'); ?>
   </section>
 
-  <!-- ==================== 5. Texto ==================== -->
+  <!-- ==================== 6. Texto ==================== -->
   <section id="sec-texto" data-secao="Texto" hidden>
     <div class="campo">
       <label for="texto_titulo">Título da seção</label>
@@ -585,7 +666,7 @@ if (!empty($_GET['ok'])) {
            que faziam quase a mesma coisa com nomes parecidos — e o primeiro
            jogava de volta para a lista no meio da escrita. Agora salvar
            mantém a cliente onde ela está, que é o que um editor deve fazer. */ ?>
-  <!-- ==================== 10. Publicação ==================== -->
+  <!-- ==================== 12. Publicação ==================== -->
   <section id="sec-publicacao" data-secao="Publicação" hidden>
     <div class="campo">
       <label>Situação</label>

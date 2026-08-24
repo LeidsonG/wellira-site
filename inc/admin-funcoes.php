@@ -114,7 +114,7 @@ function normalizar_oferta(array $post): array
     // atrás custava redigitar tudo. O interruptor separa "não quero mostrar" de
     // "não tenho o que mostrar": o texto continua gravado, apenas não é
     // impresso. Ausente vale true, para que oferta antiga não perca seção.
-    foreach (['autor', 'nao_e_para_voce', 'selos', 'faq'] as $secao) {
+    foreach (['imagens', 'autor', 'nao_e_para_voce', 'selos', 'faq'] as $secao) {
         $o['mostrar_' . $secao] = !empty($post['mostrar_' . $secao]);
     }
 
@@ -155,6 +155,29 @@ function normalizar_oferta(array $post): array
         if ($valor !== '') {
             $o[$campo] = $valor;
         }
+    }
+
+    // --- Imagens ------------------------------------------------------------
+    //
+    // O nome do arquivo é conferido contra o formato que o upload gera, e não
+    // apenas limpo: ele vira caminho de arquivo e URL na página pública. A
+    // legenda é opcional e faz dois trabalhos ao mesmo tempo — é o texto
+    // alternativo da imagem (leitor de tela e Google) e a linha impressa sob
+    // ela. Um campo só, porque dois campos dizendo quase a mesma coisa é o que
+    // faz a cliente deixar os dois em branco.
+    $imagens = [];
+    foreach ((array) ($post['imagem_arquivo'] ?? []) as $i => $arquivo) {
+        $arquivo = basename(limpar_linha($arquivo, 200));
+        if ($arquivo === '' || !nome_imagem_valido($arquivo)) {
+            continue;
+        }
+        $imagens[] = [
+            'arquivo' => $arquivo,
+            'legenda' => limpar_linha($post['imagem_legenda'][$i] ?? '', 150),
+        ];
+    }
+    if ($imagens) {
+        $o['imagens'] = array_slice($imagens, 0, MAX_IMAGENS);
     }
 
     // --- Autor --------------------------------------------------------------
@@ -397,6 +420,93 @@ function tipo_por_assinatura(string $caminho): ?string
     }
 
     return null;
+}
+
+/**
+ * Nomes das imagens já enviadas, da mais recente para a mais antiga.
+ *
+ * Alimenta o banco de imagens do editor. Antes disto, incluir uma foto exigia
+ * abrir a tela de envio, copiar um nome como "20260824-a1b2c3d4e5f6.jpg" e
+ * colar no campo certo — sem errar um caractere, e repetindo para cada imagem
+ * do carrossel. É o tipo de tarefa que o computador faz melhor.
+ */
+function listar_uploads(): array
+{
+    if (!is_dir(DIR_UPLOADS)) {
+        return [];
+    }
+
+    // scandir em vez de glob com GLOB_BRACE: a flag depende da biblioteca C do
+    // sistema e não existe em toda hospedagem. Quem filtra a extensão é o mesmo
+    // nome_imagem_valido() que a página pública usa, então painel e site nunca
+    // discordam sobre o que é uma imagem aceitável.
+    $arquivos = [];
+    foreach (@scandir(DIR_UPLOADS) ?: [] as $nome) {
+        if (nome_imagem_valido($nome)) {
+            $arquivos[$nome] = @filemtime(DIR_UPLOADS . '/' . $nome) ?: 0;
+        }
+    }
+
+    // Mais recente primeiro: a imagem que ela acabou de enviar é a que ela quer
+    // usar agora.
+    arsort($arquivos);
+
+    return array_slice(array_keys($arquivos), 0, BANCO_IMAGENS_MAX);
+}
+
+/**
+ * Recebe vários arquivos de uma vez.
+ *
+ * O PHP entrega um upload múltiplo "virado do avesso": em vez de uma lista de
+ * arquivos, chegam listas paralelas de nome, tipo, erro e tamanho. Esta função
+ * desvira e chama receber_upload() para cada um, que é quem continua decidindo
+ * o que entra — a validação por assinatura binária segue idêntica.
+ *
+ * Devolve ['nomes' => [...], 'erros' => [...]]: um arquivo recusado não pode
+ * derrubar os outros, porque a cliente seleciona cinco fotos de uma vez e uma
+ * delas ser um HEIC do iPhone é o caso comum, não a exceção.
+ */
+function receber_uploads(array $campo, string $genero): array
+{
+    $nomes = [];
+    $erros = [];
+
+    // Envio de arquivo único chega com 'name' string; o múltiplo, com array.
+    if (!is_array($campo['name'] ?? null)) {
+        $resultado = receber_upload($campo, $genero);
+        if (isset($resultado['erro'])) {
+            return ['nomes' => [], 'erros' => [$resultado['erro']]];
+        }
+        return ['nomes' => [$resultado['nome']], 'erros' => []];
+    }
+
+    foreach (array_keys($campo['name']) as $i) {
+        $arquivo = [];
+        foreach (['name', 'type', 'tmp_name', 'error', 'size'] as $chave) {
+            $arquivo[$chave] = $campo[$chave][$i] ?? null;
+        }
+        // Campo múltiplo vazio vem com uma entrada sem arquivo; ignorar em
+        // silêncio evita "Nenhum arquivo enviado" para quem enviou quatro.
+        if (($arquivo['error'] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_NO_FILE) {
+            continue;
+        }
+
+        $resultado = receber_upload($arquivo, $genero);
+        if (isset($resultado['erro'])) {
+            // O nome que veio do navegador só aparece na mensagem de erro, e
+            // escapado na impressão: serve para ela saber QUAL das cinco fotos
+            // foi recusada.
+            $erros[] = limpar_linha((string) ($arquivo['name'] ?? 'arquivo'), 80)
+                     . ': ' . $resultado['erro'];
+            continue;
+        }
+        $nomes[] = $resultado['nome'];
+    }
+
+    if (!$nomes && !$erros) {
+        $erros[] = 'Nenhum arquivo enviado.';
+    }
+    return ['nomes' => $nomes, 'erros' => $erros];
 }
 
 /**
