@@ -159,7 +159,6 @@ FORMAT (very important):
 - Plain text only. No markdown, no bold, no italics, no bullet lists.
 - Separate paragraphs with one blank line.
 - To create a subheading, start the line with "## " followed by the text.
-- Use 3 to 5 subheadings across the piece.
 
 LANGUAGE:
 - US English, written for an American reader.
@@ -173,15 +172,10 @@ WHAT YOU MUST NEVER WRITE:
 - No step-by-step "how it works" section.
 - No medical claims. Do not say the product treats, cures or prevents anything.
 
-TONE THAT WORKS HERE:
-- Honest about limitations. Say who the product is NOT for.
-- Mention the drawbacks you would tell a friend about.
-- The reader should feel informed, not pushed.
-
 THE PRODUCT:
-[describe the product here: what it is, who it is for, what the supplier says]
+[DEIXE A DESCRIÇÃO OU TEXTO DO PRODUTO AQUI]
 
-Length: 600 to 900 words.
+Length: 300 to 900 words.
 TXT;
 
 painel_topo($novo ? 'Nova oferta' : 'Editar oferta', true, true);
@@ -237,7 +231,7 @@ if (!empty($_GET['ok'])) {
       <label for="titulo">Título <span class="obrig">obrigatório</span></label>
       <input type="text" id="titulo" name="titulo" value="<?= v($o, 'titulo') ?>"
              maxlength="200" required>
-      <p class="ajuda">A frase grande no alto. É o que mais influencia o clique.</p>
+      <p class="ajuda">Frase grande no alto.</p>
     </div>
 
     <div class="campo">
