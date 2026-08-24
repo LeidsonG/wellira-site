@@ -39,7 +39,7 @@ O formulário é dividido em abas, na mesma ordem em que os blocos aparecem na
 página final:
 
 ```
-Topo · Vídeo · Botão · Texto · Autor · Não é para você · Selos · FAQ · Busca · Publicação
+Topo · Vídeo · Imagens · Botão · Texto · Não é para você · Selos · FAQ · Autor · Busca · Publicação
 ```
 
 Clique numa aba para ir direto nela. **A aba com uma bolinha verde já tem
@@ -47,6 +47,12 @@ conteúdo** — assim você vê num relance o que está preenchido sem abrir uma
 uma. No celular, arraste a barra de abas para o lado para ver as demais.
 
 Você troca de aba à vontade: nada se perde antes de salvar.
+
+Duas observações sobre essa ordem: **Vídeo e Imagens ocupam o mesmo espaço** no
+alto da página, por isso ficam lado a lado; e a **assinatura (aba Autor) fecha a
+página**, depois das perguntas frequentes — quem escreveu é o que se lê no fim,
+não uma interrupção no meio do texto de venda. As duas últimas abas, *Busca* e
+*Publicação*, não geram bloco nenhum: são ajustes da oferta.
 
 ### Como fica na página
 
@@ -58,8 +64,8 @@ Serve para conferir sem abrir a página numa outra janela. Se ela avisar
 
 ### Mostrar ou esconder uma seção
 
-As seções **Autor**, **Não é para você**, **Selos** e **FAQ** têm um
-interruptor no topo: **"Mostrar esta seção na página"**.
+As seções **Imagens**, **Não é para você**, **Selos**, **FAQ** e **Autor** têm
+um interruptor no topo: **"Mostrar esta seção na página"**.
 
 - **Ligado** — a seção aparece para o visitante
 - **Desligado** — a caixa escurece com o aviso *"Não aparece na página"*, mas
@@ -86,11 +92,46 @@ incompleto quantas vezes quiser.
 
 ### Rascunho ou publicada?
 
-- **Rascunho** — só você vê. Quem abrir o endereço recebe "página não
-  encontrada". Use enquanto estiver escrevendo.
+- **Rascunho** — fora do ar. Quem abrir o endereço recebe "página não
+  encontrada", e o Google não encontra nada. Use enquanto estiver escrevendo.
 - **Publicada** — no ar. Qualquer pessoa com o link acessa.
 
 Comece sempre como rascunho e só publique quando estiver satisfeita.
+
+### Ver o rascunho antes de publicar: a prévia
+
+Rascunho estar fora do ar é o que a palavra "rascunho" significa — mas isso não
+quer dizer que você fique no escuro. Existe a **prévia**: a página montada
+exatamente como vai ficar, aberta dentro do painel, só para você.
+
+Onde ela aparece:
+
+| Onde você está | O que clicar |
+|---|---|
+| Lista de ofertas | o link **Ver prévia** na linha da oferta |
+| Editando a oferta | o botão **Ver prévia ↗**, no alto |
+| Terminando de escrever | **Salvar e ver a prévia ↗**, na barra de baixo |
+
+Os três abrem numa aba nova. Quando a oferta **já está publicada**, os mesmos
+lugares dizem **Ver página** e abrem a página de verdade — o painel troca o
+rótulo sozinho, conforme a situação da oferta.
+
+Na prévia, uma **tarja laranja no alto** avisa que aquilo ainda não está no ar.
+A tarja existe só na prévia: ela não aparece para o visitante, e some assim que
+você publica.
+
+Três coisas que vale saber:
+
+- **Ninguém mais enxerga essa tela.** Ela pede o login do painel, e fica fora do
+  alcance do Google — mandar esse endereço para alguém não adianta, a pessoa cai
+  na tela de entrar
+- **Não é uma imitação da página**: é a página, com o mesmo layout, o mesmo
+  texto e as mesmas fotos que o visitante vai ver
+- **Clicar no botão na prévia não conta clique.** Ele leva direto ao site do
+  fornecedor, e a coluna *Cliques* continua mostrando só o que o público fez
+
+> Se você não gostar do que viu, volte para a aba de edição, ajuste e salve de
+> novo. A prévia acompanha: é só recarregar.
 
 ---
 
@@ -160,7 +201,11 @@ O endereço é a parte final do link: em `wellira.online/vitalane`, o endereço 
 
 ## Vídeo
 
-Duas formas:
+Vídeo **não é obrigatório** e não é a única mídia possível: a oferta pode ter só
+vídeo, só fotos (aba *Imagens*, logo ao lado), ou os dois. Com os dois, o vídeo
+aparece primeiro e as fotos logo abaixo.
+
+Duas formas de colocar o vídeo:
 
 **YouTube** — cole o endereço do vídeo no campo. Qualquer formato serve
 (`youtube.com/watch?v=...`, `youtu.be/...`).
@@ -171,8 +216,68 @@ depois **copie o nome que aparecer** e cole no campo de vídeo da oferta.
 O envio é uma tela separada porque vídeo demora. Assim, se falhar, você não
 perde o texto que já escreveu.
 
+> Vídeo vai **um de cada vez**, diferente das imagens. Cada MP4 pesa dezenas de
+> megabytes, e dois no mesmo envio estouram o limite do servidor.
+
 > A legenda do vídeo geralmente traz a duração. Confira antes de escrever: uma
 > duração errada logo no topo da página quebra a confiança de quem chegou.
+
+---
+
+## Imagens
+
+As fotos do produto aparecem **no mesmo lugar do vídeo**, no alto da página,
+logo abaixo dele quando a oferta tem os dois.
+
+- **Uma foto** aparece sozinha, grande.
+- **Duas ou mais** viram um carrossel: o visitante arrasta para o lado com o
+  dedo, e aparecem setas e pontinhos. O máximo é **8**.
+
+Não precisa decidir nada para isso acontecer — quem escolhe entre foto sozinha e
+carrossel é a própria página, pela quantidade que você colocou.
+
+### Colocar uma foto na oferta
+
+1. Na aba *Imagens*, clique em **Enviar imagens**, que abre a tela de envio
+2. Escolha as fotos — **pode marcar várias de uma vez**
+3. Volte para a aba da oferta e **clique na foto que quiser usar**, no quadro de
+   imagens enviadas
+
+O quadro mostra em miniatura tudo o que já foi enviado ao servidor, das mais
+recentes para as mais antigas. É só clicar: o nome do arquivo entra sozinho no
+lugar certo. **Você não precisa mais copiar e colar nome de arquivo nenhum** — e
+quem já está na oferta ganha um ✓ na miniatura, para você não repetir a mesma
+foto sem querer.
+
+Se preferir, dá para digitar o nome do arquivo à mão no campo. Nesse caso,
+confira a miniatura que aparece ao lado: **se ela não aparecer, o nome está
+errado** — a foto ficaria como um quadrado vazio na página publicada.
+
+Para tirar uma foto da oferta, clique no **×** da linha. Isso remove a foto
+daquela oferta; o arquivo continua no servidor e você pode usá-lo de novo depois.
+Para trocar a ordem, apague e inclua na sequência que quiser.
+
+### A descrição da foto
+
+Cada foto tem um campo de **descrição, em inglês**. É opcional, mas vale a pena:
+esse mesmo texto faz duas coisas ao mesmo tempo.
+
+- É a **linha impressa embaixo da foto**, que o visitante lê
+- É o que o **Google e os leitores de tela** (usados por pessoas cegas)
+  enxergam da imagem, já que eles não veem foto nenhuma
+
+Descreva o que está na foto, do jeito que você explicaria por telefone:
+*"The 60-capsule bottle, about the size of a coffee mug"*. Deixando vazio, a
+foto aparece sem legenda — funciona, mas você perde as duas coisas acima.
+
+### Limites do envio
+
+- **JPG, PNG ou WebP.** O limite por imagem aparece escrito na tela de envio
+- Há também um teto para o **envio inteiro**, somando tudo, e ele também está
+  escrito lá. Se escolher muitas fotos pesadas de uma vez, mande em duas levas
+- Uma foto recusada **não cancela as outras**: as que deram certo entram, e o
+  painel diz pelo nome qual não entrou e por quê. O caso mais comum é foto de
+  iPhone no formato HEIC — abra e salve como JPG antes de mandar
 
 ---
 
@@ -246,8 +351,11 @@ atenção do botão.
 O botão **Salvar** grava e **mantém você no formulário**, na mesma aba. Salve
 quantas vezes quiser enquanto escreve.
 
-**Salvar e abrir a página ↗** grava e abre a página numa aba nova, para você ver
-o resultado.
+O segundo botão grava e **abre o resultado numa aba nova**. O que ele diz
+depende da situação da oferta:
+
+- **Salvar e ver a prévia ↗** — a oferta está em rascunho, e abre a prévia
+- **Salvar e abrir a página ↗** — a oferta está no ar, e abre a página de verdade
 
 O aviso de status no alto da tela mostra **Rascunho** ou **No ar**, então você
 sempre sabe se aquilo está publicado.
@@ -257,14 +365,15 @@ sempre sabe se aquilo está publicado.
 ## Duplicar uma oferta
 
 Este é o botão que você mais vai usar. Ele copia tudo — texto, botão, FAQ,
-selos — e cria uma oferta nova.
+selos, vídeo e fotos — e cria uma oferta nova.
 
 **A cópia nasce sempre como rascunho**, com "Cópia de" no título. Isso é de
 propósito: se ela nascesse publicada, colocaria no ar uma página com o texto e o
 link do produto errado.
 
 Depois de duplicar: abra, troque o título, **troque o link do fornecedor**,
-ajuste o texto e só então publique.
+ajuste o texto e **troque as fotos e o vídeo** — a cópia veio com os do outro
+produto. Só então publique.
 
 ---
 
@@ -305,3 +414,12 @@ nada: é preciso salvar no formato certo pelo programa que criou o arquivo.
 
 **Publiquei e a página não mudou** — confira se salvou como *Publicada* e não
 como *Rascunho*. Se estiver certo, atualize a página com `Ctrl + F5`.
+
+**Uma foto não aparece na oferta** — o nome do arquivo está errado. Na aba
+*Imagens*, a linha da foto mostra a miniatura: se ela não aparece ali, também
+não vai aparecer na página. Apague a linha e escolha a foto de novo, clicando na
+miniatura do quadro de imagens enviadas.
+
+**Cliquei em Ver prévia e o painel pediu login de novo** — a sessão expirou
+enquanto a aba estava parada. Entre de novo e clique outra vez. É proposital:
+sem login, ninguém vê rascunho.
