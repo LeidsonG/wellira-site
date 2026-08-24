@@ -168,38 +168,6 @@ function faixa(): string
   </section>
   <?php endif; ?>
 
-  <?php if (($oferta['mostrar_autor'] ?? true) !== false && !empty($oferta['autor']['texto'])): $a = $oferta['autor']; ?>
-  <section<?= faixa() ?>>
-    <div class="wrap">
-      <h2><?= e($oferta['autor_titulo'] ?? "Why I'm sharing this") ?></h2>
-      <div class="author">
-        <?php if (!empty($a['foto'])):
-          // Caminho começando com "/" é arquivo do projeto (a foto padrão da
-          // assinatura). Qualquer outra coisa é nome de arquivo enviado pelo
-          // painel, e aí só o basename entra — o resto viraria path traversal.
-          $foto = $a['foto'][0] === '/'
-                ? $a['foto']
-                : URL_UPLOADS . '/' . rawurlencode(basename($a['foto']));
-        ?>
-          <img class="author-photo" src="<?= e($foto) ?>"
-               alt="<?= e($a['nome'] ?? '') ?>" width="88" height="88">
-        <?php else: ?>
-          <div class="author-photo" aria-hidden="true"><?= e(substr((string) ($a['nome'] ?? 'W'), 0, 1)) ?></div>
-        <?php endif; ?>
-        <div>
-          <?php if (!empty($a['nome'])): ?>
-            <div class="author-name"><?= e($a['nome']) ?></div>
-          <?php endif; ?>
-          <?php if (!empty($a['cargo'])): ?>
-            <div class="author-role"><?= e($a['cargo']) ?></div>
-          <?php endif; ?>
-          <?= paragrafos((string) $a['texto']) ?>
-        </div>
-      </div>
-    </div>
-  </section>
-  <?php endif; ?>
-
   <?php if (($oferta['mostrar_nao_e_para_voce'] ?? true) !== false && !empty($oferta['nao_e_para_voce'])): ?>
   <section<?= faixa() ?>>
     <div class="wrap">
@@ -250,6 +218,43 @@ function faixa(): string
       </div>
 
       <?= cta($link, $botao, $oferta['botao_sub'] ?? null) ?>
+    </div>
+  </section>
+  <?php endif; ?>
+
+  <?php /* A assinatura fecha a página, depois do FAQ.
+           Quem assina o texto é a última coisa que se lê: colocada no meio,
+           ela interrompia o argumento de venda para falar de quem escreveu.
+           No fim, funciona como o que de fato é — a pessoa se apresentando
+           depois de já ter dito tudo o que tinha a dizer. */ ?>
+  <?php if (($oferta['mostrar_autor'] ?? true) !== false && !empty($oferta['autor']['texto'])): $a = $oferta['autor']; ?>
+  <section<?= faixa() ?>>
+    <div class="wrap">
+      <h2><?= e($oferta['autor_titulo'] ?? "Why I'm sharing this") ?></h2>
+      <div class="author">
+        <?php if (!empty($a['foto'])):
+          // Caminho começando com "/" é arquivo do projeto (a foto padrão da
+          // assinatura). Qualquer outra coisa é nome de arquivo enviado pelo
+          // painel, e aí só o basename entra — o resto viraria path traversal.
+          $foto = $a['foto'][0] === '/'
+                ? $a['foto']
+                : URL_UPLOADS . '/' . rawurlencode(basename($a['foto']));
+        ?>
+          <img class="author-photo" src="<?= e($foto) ?>"
+               alt="<?= e($a['nome'] ?? '') ?>" width="88" height="88">
+        <?php else: ?>
+          <div class="author-photo" aria-hidden="true"><?= e(substr((string) ($a['nome'] ?? 'W'), 0, 1)) ?></div>
+        <?php endif; ?>
+        <div>
+          <?php if (!empty($a['nome'])): ?>
+            <div class="author-name"><?= e($a['nome']) ?></div>
+          <?php endif; ?>
+          <?php if (!empty($a['cargo'])): ?>
+            <div class="author-role"><?= e($a['cargo']) ?></div>
+          <?php endif; ?>
+          <?= paragrafos((string) $a['texto']) ?>
+        </div>
+      </div>
     </div>
   </section>
   <?php endif; ?>

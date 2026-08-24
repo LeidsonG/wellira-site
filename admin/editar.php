@@ -339,53 +339,6 @@ if (!empty($_GET['ok'])) {
     <?php exemplo('texto'); ?>
   </section>
 
-  <!-- ==================== 6. Autor ==================== -->
-  <section id="sec-autor" data-secao="Autor" hidden>
-    <?php interruptor($o, 'autor', 'grupo-autor'); ?>
-    <div id="grupo-autor" class="grupo-alternavel<?= ligada($o, 'autor') ? '' : ' desligado' ?>">
-    <p class="ajuda ajuda-topo">
-      Preenchido com a assinatura padrão da Wellira. Edite se precisar, ou
-      desligue no interruptor acima para esta oferta específica.
-    </p>
-
-    <div class="dupla">
-      <div class="campo">
-        <label for="autor_nome">Nome</label>
-        <input type="text" id="autor_nome" name="autor_nome"
-               value="<?= e((string) ($autor['nome'] ?? '')) ?>" maxlength="80">
-      </div>
-      <div class="campo">
-        <label for="autor_cargo">Cargo</label>
-        <input type="text" id="autor_cargo" name="autor_cargo"
-               value="<?= e((string) ($autor['cargo'] ?? '')) ?>" maxlength="80">
-      </div>
-    </div>
-
-    <div class="campo">
-      <label for="autor_texto">Texto</label>
-      <textarea id="autor_texto" name="autor_texto" rows="6"><?= e((string) ($autor['texto'] ?? '')) ?></textarea>
-    </div>
-
-    <div class="dupla">
-      <div class="campo">
-        <label for="autor_foto">Foto</label>
-        <input type="text" id="autor_foto" name="autor_foto"
-               value="<?= e((string) ($autor['foto'] ?? '')) ?>" maxlength="200">
-        <p class="ajuda">
-          <a href="/admin/upload.php?destino=imagem" target="_blank" rel="noopener">Enviar imagem</a>.
-          Vazio: aparece a inicial do nome.
-        </p>
-      </div>
-      <div class="campo">
-        <label for="autor_titulo">Título da seção</label>
-        <input type="text" id="autor_titulo" name="autor_titulo"
-               value="<?= v($o, 'autor_titulo', AUTOR_TITULO_PADRAO) ?>" maxlength="120">
-      </div>
-    </div>
-    <?php exemplo('autor'); ?>
-    </div>
-  </section>
-
   <!-- ==================== 7. Não é para você ==================== -->
   <section id="sec-nao" data-secao="Não é para você" hidden>
     <?php interruptor($o, 'nao_e_para_voce', 'grupo-nao'); ?>
@@ -532,7 +485,61 @@ if (!empty($_GET['ok'])) {
     </div>
   </section>
 
-  <!-- ==================== 10. Busca ==================== -->
+  <!-- ==================== 10. Autor ==================== -->
+  <?php /* Última seção com conteúdo da página, e por isso última aba de
+           conteúdo aqui: as abas seguem a ordem em que os blocos aparecem para
+           o visitante, e essa correspondência é o que permite à cliente
+           conferir a página sem abrir a página. A assinatura passou para o fim
+           em 24/08/2026 — quem escreveu o texto é o que se lê depois de tudo,
+           não uma interrupção no meio do argumento de venda. */ ?>
+  <section id="sec-autor" data-secao="Autor" hidden>
+    <?php interruptor($o, 'autor', 'grupo-autor'); ?>
+    <div id="grupo-autor" class="grupo-alternavel<?= ligada($o, 'autor') ? '' : ' desligado' ?>">
+    <p class="ajuda ajuda-topo">
+      Preenchido com a assinatura padrão da Wellira. Edite se precisar, ou
+      desligue no interruptor acima para esta oferta específica.
+      Aparece no fim da página, depois das perguntas frequentes.
+    </p>
+
+    <div class="dupla">
+      <div class="campo">
+        <label for="autor_nome">Nome</label>
+        <input type="text" id="autor_nome" name="autor_nome"
+               value="<?= e((string) ($autor['nome'] ?? '')) ?>" maxlength="80">
+      </div>
+      <div class="campo">
+        <label for="autor_cargo">Cargo</label>
+        <input type="text" id="autor_cargo" name="autor_cargo"
+               value="<?= e((string) ($autor['cargo'] ?? '')) ?>" maxlength="80">
+      </div>
+    </div>
+
+    <div class="campo">
+      <label for="autor_texto">Texto</label>
+      <textarea id="autor_texto" name="autor_texto" rows="6"><?= e((string) ($autor['texto'] ?? '')) ?></textarea>
+    </div>
+
+    <div class="dupla">
+      <div class="campo">
+        <label for="autor_foto">Foto</label>
+        <input type="text" id="autor_foto" name="autor_foto"
+               value="<?= e((string) ($autor['foto'] ?? '')) ?>" maxlength="200">
+        <p class="ajuda">
+          <a href="/admin/upload.php?destino=imagem" target="_blank" rel="noopener">Enviar imagem</a>.
+          Vazio: aparece a inicial do nome.
+        </p>
+      </div>
+      <div class="campo">
+        <label for="autor_titulo">Título da seção</label>
+        <input type="text" id="autor_titulo" name="autor_titulo"
+               value="<?= v($o, 'autor_titulo', AUTOR_TITULO_PADRAO) ?>" maxlength="120">
+      </div>
+    </div>
+    <?php exemplo('autor'); ?>
+    </div>
+  </section>
+
+  <!-- ==================== 11. Busca ==================== -->
   <section id="sec-busca" data-secao="Busca" hidden>
     <div class="campo">
       <label for="titulo_aba">Título na aba do navegador</label>
