@@ -854,9 +854,31 @@ button[type="submit"]:hover, .botao:hover { background: var(--marca-escura); bor
   .interruptor { padding: 1rem; }
   .previa { max-width: 100%; }
 
-  /* Moldura menor: no celular a linha é estreita, e 72px empurrariam a legenda
-     para uma coluna de poucos caracteres. */
-  .foto-lugar { width: 60px; height: 60px; }
+  /* Moldura menor: no celular a linha é estreita, e 72px roubariam espaço da
+     faixa de cima, onde ficam também o botão e o ×. A altura sai do
+     aspect-ratio da regra base, não é repetida aqui. */
+  .foto-lugar { width: 60px; }
+
+  /* No celular a linha vira DUAS faixas, com ordem diferente da do computador:
+
+       [n] [foto]        [Enviar foto] [×]
+       [ descrição em largura inteira        ]
+
+     No computador a descrição divide a faixa com o botão e sobra espaço para
+     todos. Aqui não sobra: repartindo a mesma faixa entre quatro coisas, o
+     campo de texto fica com uns poucos caracteres visíveis, e é justamente o
+     campo em que ela DIGITA uma frase e precisa reler o que escreveu. Os
+     controles (enviar, remover) não precisam de largura, o texto precisa.
+
+     Feito com order, e não mudando o HTML: no computador a ordem visual tem de
+     continuar sendo a de leitura (foto, descrição, ações), e uma ordem só no
+     HTML não serve às duas telas. Como a ordem de foco segue o HTML, o campo de
+     descrição continua sendo alcançado depois da foto pelo teclado, que é a
+     sequência que faz sentido nas duas. */
+  .item-imagem .foto-envio { order: 2; }
+  .item-imagem .remover    { order: 3; }
+  .item-imagem .item-campos { order: 4; flex: 1 1 100%; }
+  .item-imagem .foto-estado { order: 5; }
 
   .lista, .lista thead, .lista tbody, .lista tr, .lista td { display: block; width: 100%; }
   .lista thead { display: none; }
