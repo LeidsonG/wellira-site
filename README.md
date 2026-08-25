@@ -152,7 +152,11 @@ Controle de carrossel para um item só é enfeite que confunde.
   leitor de tela) e o `<figcaption>` impresso sob ela. Um campo só, porque dois
   campos dizendo quase a mesma coisa é o que faz a cliente deixar os dois vazios
 - `mostrar_imagens: false` esconde o bloco sem apagar a lista, como nas demais
-  seções. Ausente vale `true`
+  seções. **Ausente vale `true`** — é o que impede uma oferta antiga, gravada
+  antes dos interruptores, de perder seção. Não confunda com o padrão do
+  formulário: oferta *nova* nasce com `imagens`, `nao_e_para_voce`, `selos` e
+  `faq` desligados (`admin/editar.php`, bloco `if ($novo)`), e o que a cliente
+  vê marcado no editor é o que vai para o JSON no primeiro salvamento
 - Uma string solta no lugar do objeto é aceita na leitura (JSON editado à mão),
   e tratada como `{"arquivo": "..."}`
 

@@ -26,11 +26,22 @@ $erros = [];
 if ($novo) {
     // Oferta nova já nasce com a assinatura preenchida: é sempre a mesma
     // pessoa, e obrigar a redigitar produz divergência entre páginas.
+    //
+    // As seções opcionais, ao contrário, nascem DESLIGADAS. Ligadas por padrão
+    // elas prometiam na prévia um bloco que a cliente ainda não tinha escrito:
+    // ou ela preenchia os quatro para a página não sair capenga, ou desligava
+    // um a um o que não ia usar. Desligadas, a oferta mínima é só topo, vídeo,
+    // botão e texto — e cada bloco extra é uma escolha, não uma pendência.
+    // (Autor fica de fora: vem preenchido, então não há o que pendurar.)
     $o = [
-        'status'       => 'rascunho',
-        'indexar'      => true,
-        'autor'        => AUTOR_PADRAO,
-        'autor_titulo' => AUTOR_TITULO_PADRAO,
+        'status'                   => 'rascunho',
+        'indexar'                  => true,
+        'autor'                    => AUTOR_PADRAO,
+        'autor_titulo'             => AUTOR_TITULO_PADRAO,
+        'mostrar_imagens'          => false,
+        'mostrar_nao_e_para_voce'  => false,
+        'mostrar_selos'            => false,
+        'mostrar_faq'              => false,
     ];
 } else {
     $o = carregar_oferta($slug);

@@ -74,6 +74,11 @@ um interruptor no topo: **"Mostrar esta seção na página"**.
 Isso é melhor do que apagar: se mudar de ideia, é só religar. Você não perde
 nada.
 
+**Numa oferta nova, Imagens, Não é para você, Selos e FAQ já vêm desligadas.**
+Assim a página começa com o essencial — título, vídeo, botão e texto —, e cada
+bloco a mais é uma escolha sua: escreveu o conteúdo, liga o interruptor.
+(Autor vem ligada, porque já chega preenchida.)
+
 ### Listas que crescem
 
 Em "Não é para você", "Selos" e "FAQ", use o botão **+ Adicionar** para incluir
