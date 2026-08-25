@@ -83,7 +83,13 @@ body.largo .wrap { width: min(100% - 2rem, 1080px); }
   font-style: normal; font-weight: 500; color: var(--tinta-tenue);
   font-size: 0.8rem; margin-left: 0.2rem;
 }
-.topo nav { display: flex; gap: 0.35rem; align-items: center; flex-wrap: wrap; }
+/* margin-left: auto empurra o nav para a direita consumindo o espaço livre da
+   PRÓPRIA linha em que ele está — diferente de justify-content no .wrap, que
+   com só um item na linha (nav sozinho, depois de quebrar no celular) não tem
+   contra quem "espalhar" o espaço e deixa o item colado à esquerda, embaixo da
+   marca. Com a margem automática, o nav vai para a direita tanto numa linha só
+   (desktop) quanto na própria linha depois de quebrar (celular). */
+.topo nav { display: flex; gap: 0.35rem; align-items: center; flex-wrap: wrap; margin-left: auto; }
 .topo nav a {
   color: var(--tinta-fraca); text-decoration: none; font-size: 0.9rem; font-weight: 500;
   padding: 0.4rem 0.7rem; border-radius: 7px;
