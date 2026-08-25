@@ -89,6 +89,11 @@ EXCLUIR=(
   --exclude-glob '.git/'
   --exclude-glob '.gitignore'
 
+  # Configuração local do Claude Code. Apareceu numa simulação indo para o
+  # servidor: não faz nada em produção, e pasta oculta com nome de ferramenta é
+  # exatamente o tipo de coisa que um scanner procura.
+  --exclude-glob '.claude/'
+
   # --- Não pertence a produção ---
   --exclude-glob 'scripts/'
   --exclude-glob 'tools/'
