@@ -6,7 +6,7 @@
 
    Prioridades, nesta ordem: clareza do que está preenchido, alvo de toque
    grande (ela usa no celular) e rolagem curta. A versão anterior era um
-   formulário único de mais de vinte campos — abrir o FAQ depois de mexer no
+   formulário único de mais de vinte campos, abrir o FAQ depois de mexer no
    título exigia atravessar a tela inteira.
    ========================================================================== */
 
@@ -75,7 +75,7 @@ body.largo .wrap { width: min(100% - 2rem, 1080px); }
 .marca span { color: var(--marca); }
 
 /* O espaçamento vem da margem do ícone, nunca de gap no container.
-   Com gap, o flex separaria também "Well" do <span>ira</span> — são dois itens
+   Com gap, o flex separaria também "Well" do <span>ira</span>: são dois itens
    distintos para ele, e o nome apareceria partido no meio. Foi o que aconteceu
    na tela de login antes desta correção. */
 .marca-icone { flex: 0 0 auto; margin-right: 0.5rem; border-radius: 6px; }
@@ -84,7 +84,7 @@ body.largo .wrap { width: min(100% - 2rem, 1080px); }
   font-size: 0.8rem; margin-left: 0.2rem;
 }
 /* margin-left: auto empurra o nav para a direita consumindo o espaço livre da
-   PRÓPRIA linha em que ele está — diferente de justify-content no .wrap, que
+   PRÓPRIA linha em que ele está, diferente de justify-content no .wrap, que
    com só um item na linha (nav sozinho, depois de quebrar no celular) não tem
    contra quem "espalhar" o espaço e deixa o item colado à esquerda, embaixo da
    marca. Com a margem automática, o nav vai para a direita tanto numa linha só
@@ -213,7 +213,7 @@ body.entrada main { padding: 1.5rem; width: 100%; }
 /* Ações da linha, em grade 2x2.
    Eram quatro links em fila: a fila quebrava onde coubesse, e "Excluir" mudava
    de lugar conforme a largura do título ao lado. Em grade cada ação tem posição
-   fixa — editar e ver em cima, duplicar e excluir embaixo —, e a cliente
+   fixa, editar e ver em cima, duplicar e excluir embaixo, e a cliente
    aprende o lugar em vez de reler os quatro toda vez.
    O <form> é o próprio item da grade: assim duplicar e excluir ficam alinhados
    com os dois de cima sem precisar de display:contents. */
@@ -226,7 +226,7 @@ body.entrada main { padding: 1.5rem; width: 100%; }
 .acoes-grade .larga { grid-column: 1 / -1; }
 
 /* Especificidade acima de button[type="submit"], que por padrão pinta o botão
-   com a cor da marca — aqui as quatro ações têm o mesmo peso visual. */
+   com a cor da marca, aqui as quatro ações têm o mesmo peso visual. */
 .acoes-grade .botao,
 .acoes-grade button[type="submit"] {
   display: block; width: 100%; padding: 0.45rem 0.7rem;
@@ -386,7 +386,7 @@ textarea { resize: vertical; line-height: 1.6; }
 .interruptor-texto strong { display: block; font-size: 0.89rem; }
 .interruptor-texto small { color: var(--tinta-fraca); font-size: 0.81rem; }
 
-/* Seção desligada: escurece e avisa, mas os campos continuam editáveis — ela
+/* Seção desligada: escurece e avisa, mas os campos continuam editáveis, ela
    pode preparar o conteúdo antes de ligar. */
 .grupo-alternavel { transition: opacity .15s; }
 .grupo-alternavel.desligado {
@@ -417,8 +417,16 @@ textarea { resize: vertical; line-height: 1.6; }
   font-size: 0.76rem; font-weight: 700;
   display: grid; place-items: center;
 }
-.item > input { flex: 1 1 auto; }
-.item-campos { flex: 1 1 auto; display: grid; gap: 0.5rem; }
+.item > input { flex: 1 1 auto; min-width: 0; }
+
+/* min-width: 0 é o que permite a linha encolher.
+   Item de flex nasce com min-width: auto, que é a largura mínima do CONTEÚDO:
+   o placeholder "Descrição em inglês (aparece sob a imagem)" fixava um piso
+   maior que a tela do celular, a linha não cabia e a página inteira ganhava
+   rolagem lateral. Vale para o campo também, que é item de grid pelo mesmo
+   motivo. */
+.item-campos { flex: 1 1 auto; min-width: 0; display: grid; gap: 0.5rem; }
+.item-campos > * { min-width: 0; }
 @media (min-width: 700px) {
   .item-campos:not(.empilhado) { grid-template-columns: 130px 1fr 1fr; }
 }
@@ -432,6 +440,13 @@ textarea { resize: vertical; line-height: 1.6; }
 }
 .remover:hover { border-color: var(--erro); color: var(--erro); background: var(--erro-fundo); }
 
+/* Vermelho desde parado, e não só no hover: é a única ação da linha que
+   descarta trabalho, e no celular não existe hover para avisar antes. */
+.remover.perigo { color: var(--erro); border-color: #e8b4b0; }
+.remover.perigo:hover { background: var(--erro-fundo); border-color: var(--erro); }
+.remover:disabled { opacity: .45; cursor: not-allowed; }
+.remover:disabled:hover { background: #fff; border-color: #e8b4b0; }
+
 .adicionar {
   margin-top: 0.7rem; width: 100%;
   background: #fff; border: 1px dashed var(--linha-forte); color: var(--marca);
@@ -443,7 +458,7 @@ textarea { resize: vertical; line-height: 1.6; }
 /* Lista no teto (data-max). O botão continua na tela, apagado, em vez de
    sumir: o lugar dele é a referência que ela usa para achar a lista, e um
    controle que desaparece parece defeito. O porquê vem no .teto-aviso logo
-   abaixo — botão morto sem explicação é indistinguível de bug. */
+   abaixo, botão morto sem explicação é indistinguível de bug. */
 .adicionar:disabled {
   color: var(--tinta-tenue); border-style: solid; border-color: var(--linha);
   background: #fafbfc; cursor: not-allowed;
@@ -461,30 +476,46 @@ textarea { resize: vertical; line-height: 1.6; }
 /* ---------- Lista de imagens ---------- */
 /* Cada linha é uma foto e envia a sua própria: o botão de envio mora dentro
    dela, e a linha inteira aceita o arquivo arrastado. O envio era um botão
-   único no fim da aba, e a foto caía "no primeiro campo vazio" — a cliente
+   único no fim da aba, e a foto caía "no primeiro campo vazio", a cliente
    escolhia o arquivo sem poder dizer em que posição ele devia entrar. */
 
-/* A linha quebra em duas: o aviso de estado e o de arquivo quebrado precisam de
-   uma faixa inteira embaixo, senão viram uma coluna espremida entre a moldura
-   e o botão de remover. */
-.item-imagem { flex-wrap: wrap; position: relative; }
+/* Uma linha só, na ordem em que ela lê: número, foto, descrição, enviar, ×.
+   O wrap existe para duas coisas: os avisos (estado do envio, arquivo ausente)
+   ocupam uma faixa inteira embaixo, e no celular o botão e o × descem juntos
+   para a segunda faixa em vez de espremer a descrição a três caracteres. */
+.item-imagem { flex-wrap: wrap; align-items: center; position: relative; }
+.item-imagem .item-num { margin-top: 0; }
+
+/* Base de 12rem: acima disso a descrição divide a linha com o botão; abaixo,
+   o flex-wrap manda o botão para baixo em vez de estrangular o campo. */
+.item-imagem .item-campos { flex: 1 1 12rem; }
+
+/* margin-left: auto mantém o par "enviar + ×" encostado à direita mesmo depois
+   de cair para a segunda faixa no celular. Sem isso eles ficam colados embaixo
+   do número, e a linha perde a leitura de fileira que tem no computador. */
+.foto-envio { flex: 0 0 auto; margin-left: auto; }
 
 /* Moldura da foto: miniatura quando há arquivo, "+" quando está vazia.
    Quadrado cinza sem nada dentro não se anuncia como lugar onde cabe algo. */
 .foto-lugar {
   flex: 0 0 auto; position: relative;
-  width: 72px; height: 72px; border-radius: 8px;
+  width: 72px; aspect-ratio: 1; border-radius: 8px;
   border: 1px solid var(--linha-forte); background: #eef1f4;
-  display: grid; place-items: center; overflow: hidden;
+  overflow: hidden;
 }
+
+/* Preenche a moldura por posicionamento, não por porcentagem.
+   A versão anterior centrava a imagem numa moldura grid e pedia height: 100%:
+   num item de grid centralizado a altura percentual fica indefinida, o
+   navegador volta a usar a proporção original do arquivo, e uma foto em pé
+   virava 58x87 dentro de um quadrado de 60 (medido). Com inset: 0 a altura
+   passa a ser a da moldura, e o object-fit recorta como deve. */
 .item-miniatura {
+  position: absolute; inset: 0; z-index: 1;
   width: 100%; height: 100%; object-fit: cover; display: block;
-  /* Acima do "+", que é irmão posicionado depois dele. Sem isto, a foto
-     carregada apareceria com o sinal de vazio desenhado por cima. */
-  position: relative; z-index: 1;
 }
 /* Uma regra de autor com display: block venceria o [hidden] do navegador, que
-   é folha de usuário-agente — a miniatura escondida pelo JS continuaria
+   é folha de usuário-agente: a miniatura escondida pelo JS continuaria
    ocupando a moldura, como retângulo de imagem quebrada. */
 .item-miniatura[hidden] { display: none; }
 
@@ -494,7 +525,7 @@ textarea { resize: vertical; line-height: 1.6; }
 }
 /* Com foto, o "+" sai da frente. :has evita sincronizar mais uma classe pelo
    JavaScript; onde ele não existir, a miniatura é opaca, ocupa a moldura
-   inteira e tem z-index maior — o "+" fica coberto do mesmo jeito. */
+   inteira e tem z-index maior, o "+" fica coberto do mesmo jeito. */
 .foto-lugar:has(img:not([hidden])) .foto-vazia { display: none; }
 
 .foto-envio { display: none; }          /* sem JS não há envio por fetch */
@@ -504,9 +535,12 @@ textarea { resize: vertical; line-height: 1.6; }
    e por isso ele existe sempre no HTML. */
 .js .campo-arquivo { display: none; }
 
-.foto-botao { display: block; width: 100%; }
+/* Largura pelo texto, não pela coluna: o botão fica à direita da descrição, e
+   esticá-lo daria ao "Enviar foto" o mesmo peso do campo que ela precisa
+   preencher. O nowrap impede que vire duas linhas e desalinhe a fileira. */
+.foto-botao { display: block; white-space: nowrap; }
 
-/* Enquanto sobe. O clique já está impedido pelo botão desabilitado — isto é só
+/* Enquanto sobe. O clique já está impedido pelo botão desabilitado: isto é só
    a aparência disso, senão ele continua convidando a clicar de novo e a mesma
    foto sobe duas vezes. */
 .foto-botao.enviando { opacity: .6; cursor: progress; }
@@ -536,7 +570,7 @@ textarea { resize: vertical; line-height: 1.6; }
 .enviar-estado-erro { color: var(--erro); font-weight: 600; }
 
 /* Arquivo que não está mais no servidor. Não dá nenhum sinal por conta
-   própria — a página publicada é que mostraria o buraco. */
+   própria, a página publicada é que mostraria o buraco. */
 .item-imagem-quebrada {
   border-color: var(--erro);
   background: var(--erro-fundo);
@@ -567,7 +601,7 @@ textarea { resize: vertical; line-height: 1.6; }
    Previsão de como a seção fica na página
    =============================================================================
    Miniatura do bloco real, com o texto que ela acabou de digitar. A primeira
-   versão eram formas cinzas fixas: mostravam o formato, não a oferta — e por
+   versão eram formas cinzas fixas: mostravam o formato, não a oferta, e por
    isso não ajudavam a decidir se o texto estava bom. */
 
 .exemplo {
@@ -648,7 +682,7 @@ textarea { resize: vertical; line-height: 1.6; }
 
 /* Reproduz o bloco real: moldura com a borda esquerda laranja e um × antes de
    cada linha. As cores são as do site (--cta e --brand em style.css), não as do
-   painel — a prévia só serve se parecer com a página. */
+   painel, a prévia só serve se parecer com a página. */
 .previa-nao {
   border: 1px solid var(--linha); border-left: 4px solid #d9552b;
   border-radius: 8px; background: #fff; padding: 0.75rem 0.9rem;
@@ -732,7 +766,7 @@ textarea { resize: vertical; line-height: 1.6; }
 
 /* Alinhado pelo TOPO, não pelo centro: só alguns slides têm legenda, e com
    align-items:center as imagens ficariam em alturas diferentes conforme a
-   cliente escreve — o que parece defeito do carrossel, não da legenda.
+   cliente escreve: o que parece defeito do carrossel, não da legenda.
    A seta desce os 24px que a centralizam sobre a imagem, de altura fixa. */
 .previa-carrossel { display: flex; align-items: flex-start; gap: 0.35rem; }
 .previa-seta {

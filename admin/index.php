@@ -1,6 +1,6 @@
 <?php
 /**
- * Lista das ofertas — a tela em que a cliente passa a maior parte do tempo.
+ * Lista das ofertas, a tela em que a cliente passa a maior parte do tempo.
  *
  * Prioriza as três ações que ela repete: abrir para editar, duplicar e ver a
  * página no ar.
@@ -119,7 +119,7 @@ painel_aviso('erro', $_GET['erro'] ?? null);
               </form>
               <?php /* A mensagem vai num data-attribute, não em JS embutido: título
                        com apóstrofo ("Here's what changed") fechava a string do
-                       confirm() e o handler morria com erro de sintaxe — o
+                       confirm() e o handler morria com erro de sintaxe, o
                        formulário então enviava SEM perguntar nada.
 
                        O name="confirmado" é a segunda tranca, do lado do servidor:

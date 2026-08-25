@@ -3,7 +3,7 @@
  * Ações de uma linha da lista: duplicar e excluir.
  *
  * Só aceita POST com token. Se fossem links GET, bastaria a cliente abrir uma
- * página maliciosa — ou um robô seguir um link — para apagar uma oferta.
+ * página maliciosa, ou um robô seguir um link, para apagar uma oferta.
  */
 
 require_once __DIR__ . '/../inc/admin-funcoes.php';
@@ -48,9 +48,9 @@ switch ($acao) {
     case 'excluir':
         // Segunda tranca contra clique acidental. O campo "confirmado" não sai
         // do HTML: quem o cria é o próprio confirm() do navegador, depois do
-        // sim. Sem ele, o pedido chegou sem ninguém ter respondido nada — JS
+        // sim. Sem ele, o pedido chegou sem ninguém ter respondido nada, JS
         // desligado, script quebrado por um erro anterior na página, ou POST
-        // forjado — e aí a pergunta é refeita aqui, no servidor.
+        // forjado, e aí a pergunta é refeita aqui, no servidor.
         //
         // Perguntar de novo em vez de recusar não é preciosismo: recusar seco
         // deixaria a cliente sem nenhuma forma de excluir uma oferta no dia em
@@ -75,7 +75,7 @@ exit;
  * Tela de "tem certeza?", usada quando a confirmação do navegador não veio.
  *
  * É um POST que devolve HTML de propósito: repetir o pedido num link GET
- * colocaria "apagar oferta" num endereço que basta abrir — que é exatamente o
+ * colocaria "apagar oferta" num endereço que basta abrir, que é exatamente o
  * que a regra de ação destrutiva só por POST existe para impedir.
  */
 function confirmar_exclusao(string $slug): void

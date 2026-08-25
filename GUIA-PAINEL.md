@@ -1,4 +1,4 @@
-# Guia do Painel — Wellira
+# Guia do Painel Wellira
 
 Este guia é para quem cria e edita as páginas de oferta. Não é preciso saber
 nada de programação.
@@ -24,7 +24,7 @@ segura e mais fácil do que uma palavra curta complicada.
 
 > **A sessão expira depois de 2 horas paradas.** Se você deixar a página aberta
 > e voltar no dia seguinte, vai precisar entrar de novo. O que estiver salvo não
-> se perde — mas o que estiver escrito e **não** salvo, sim. Salve antes de sair
+> se perde, mas o que estiver escrito e **não** salvo, sim. Salve antes de sair
 > do computador.
 
 ---
@@ -43,14 +43,14 @@ Topo · Vídeo · Imagens · Botão · Texto · Não é para você · Selos · F
 ```
 
 Clique numa aba para ir direto nela. **A aba com uma bolinha verde já tem
-conteúdo** — assim você vê num relance o que está preenchido sem abrir uma por
+conteúdo**, assim você vê num relance o que está preenchido sem abrir uma por
 uma. No celular, arraste a barra de abas para o lado para ver as demais.
 
 Você troca de aba à vontade: nada se perde antes de salvar.
 
 Duas observações sobre essa ordem: **Vídeo e Imagens ocupam o mesmo espaço** no
 alto da página, por isso ficam lado a lado; e a **assinatura (aba Autor) fecha a
-página**, depois das perguntas frequentes — quem escreveu é o que se lê no fim,
+página**, depois das perguntas frequentes: quem escreveu é o que se lê no fim,
 não uma interrupção no meio do texto de venda. As duas últimas abas, *Busca* e
 *Publicação*, não geram bloco nenhum: são ajustes da oferta.
 
@@ -67,15 +67,15 @@ Serve para conferir sem abrir a página numa outra janela. Se ela avisar
 As seções **Imagens**, **Não é para você**, **Selos**, **FAQ** e **Autor** têm
 um interruptor no topo: **"Mostrar esta seção na página"**.
 
-- **Ligado** — a seção aparece para o visitante
-- **Desligado** — a caixa escurece com o aviso *"Não aparece na página"*, mas
+- **Ligado**: a seção aparece para o visitante
+- **Desligado**: a caixa escurece com o aviso *"Não aparece na página"*, mas
   **o texto continua guardado**
 
 Isso é melhor do que apagar: se mudar de ideia, é só religar. Você não perde
 nada.
 
 **Numa oferta nova, Imagens, Não é para você, Selos e FAQ já vêm desligadas.**
-Assim a página começa com o essencial — título, vídeo, botão e texto —, e cada
+Assim a página começa com o essencial (título, vídeo, botão e texto) e cada
 bloco a mais é uma escolha sua: escreveu o conteúdo, liga o interruptor.
 (Autor vem ligada, porque já chega preenchida.)
 
@@ -97,15 +97,15 @@ incompleto quantas vezes quiser.
 
 ### Rascunho ou publicada?
 
-- **Rascunho** — fora do ar. Quem abrir o endereço recebe "página não
+- **Rascunho**: fora do ar. Quem abrir o endereço recebe "página não
   encontrada", e o Google não encontra nada. Use enquanto estiver escrevendo.
-- **Publicada** — no ar. Qualquer pessoa com o link acessa.
+- **Publicada**: no ar. Qualquer pessoa com o link acessa.
 
 Comece sempre como rascunho e só publique quando estiver satisfeita.
 
 ### Ver o rascunho antes de publicar: a prévia
 
-Rascunho estar fora do ar é o que a palavra "rascunho" significa — mas isso não
+Rascunho estar fora do ar é o que a palavra "rascunho" significa, mas isso não
 quer dizer que você fique no escuro. Existe a **prévia**: a página montada
 exatamente como vai ficar, aberta dentro do painel, só para você.
 
@@ -118,7 +118,7 @@ Onde ela aparece:
 | Terminando de escrever | **Salvar e ver a prévia ↗**, na barra de baixo |
 
 Os três abrem numa aba nova. Quando a oferta **já está publicada**, os mesmos
-lugares dizem **Ver página** e abrem a página de verdade — o painel troca o
+lugares dizem **Ver página** e abrem a página de verdade, o painel troca o
 rótulo sozinho, conforme a situação da oferta.
 
 Na prévia, uma **tarja laranja no alto** avisa que aquilo ainda não está no ar.
@@ -128,7 +128,7 @@ você publica.
 Três coisas que vale saber:
 
 - **Ninguém mais enxerga essa tela.** Ela pede o login do painel, e fica fora do
-  alcance do Google — mandar esse endereço para alguém não adianta, a pessoa cai
+  alcance do Google, mandar esse endereço para alguém não adianta, a pessoa cai
   na tela de entrar
 - **Não é uma imitação da página**: é a página, com o mesmo layout, o mesmo
   texto e as mesmas fotos que o visitante vai ver
@@ -212,10 +212,10 @@ aparece primeiro e as fotos logo abaixo.
 
 Duas formas de colocar o vídeo:
 
-**YouTube** — cole o endereço do vídeo no campo. Qualquer formato serve
+**YouTube**, cole o endereço do vídeo no campo. Qualquer formato serve
 (`youtube.com/watch?v=...`, `youtu.be/...`).
 
-**Arquivo MP4** — clique em *envie um MP4*, escolha o arquivo, e depois
+**Arquivo MP4**, clique em *envie um MP4*, escolha o arquivo, e depois
 **copie o nome que aparecer** e cole no campo de vídeo da oferta.
 
 O envio é uma tela separada porque vídeo demora. Assim, se falhar, você não
@@ -238,7 +238,7 @@ logo abaixo dele quando a oferta tem os dois.
 - **Duas ou mais** viram um carrossel: o visitante arrasta para o lado com o
   dedo, e aparecem setas e pontinhos. O máximo é **8**.
 
-Não precisa decidir nada para isso acontecer — quem escolhe entre foto sozinha e
+Não precisa decidir nada para isso acontecer: quem escolhe entre foto sozinha e
 carrossel é a própria página, pela quantidade que você colocou.
 
 ### Colocar uma foto na oferta
@@ -255,7 +255,7 @@ cair.
   antes de enviar
 - **Pode marcar várias de uma vez** na janela que abrir: a primeira fica na
   linha de onde você clicou e as demais entram nas linhas **abaixo** dela
-- Se a linha já tiver foto, o botão diz **Trocar foto** — enviar por ali
+- Se a linha já tiver foto, o botão diz **Trocar foto**, enviar por ali
   substitui a imagem daquela posição
 - Enquanto sobe, a própria linha vai dizendo o que está acontecendo:
   *"Enviando 3 fotos…"* e, no fim, quantas entraram
@@ -270,15 +270,15 @@ foto sozinha, não da oferta inteira.
 > linha. Para que ela fique valendo na página, clique em **Salvar** como de
 > costume.
 
-Se os botões não responderem — acontece em navegador antigo ou com JavaScript
-desligado —, cada linha volta a mostrar um campo de texto para o nome do
+Se os botões não responderem, acontece em navegador antigo ou com JavaScript
+desligado, cada linha volta a mostrar um campo de texto para o nome do
 arquivo, e o link **tela de envio** aparece no fim da aba. Envie a foto por lá,
 copie o nome que aparecer e cole no campo da linha. **Vídeo é sempre por lá**,
 nunca pelo botão da linha.
 
 Para tirar uma foto da oferta, clique no **×** da linha. Isso remove a foto
 daquela oferta; o arquivo continua no servidor. Para trocar a ordem, envie de
-novo na ordem que quiser — o botão *Trocar foto* de cada linha resolve sem
+novo na ordem que quiser, o botão *Trocar foto* de cada linha resolve sem
 apagar nada.
 
 ### A descrição da foto
@@ -292,20 +292,20 @@ esse mesmo texto faz duas coisas ao mesmo tempo.
 
 Descreva o que está na foto, do jeito que você explicaria por telefone:
 *"The 60-capsule bottle, about the size of a coffee mug"*. Deixando vazio, a
-foto aparece sem legenda — funciona, mas você perde as duas coisas acima.
+foto aparece sem legenda, funciona, mas você perde as duas coisas acima.
 
 ### Limites do envio
 
 - **JPG, PNG ou WebP**, até o tamanho escrito no fim da aba (8 MB por foto)
 - **No máximo 8 fotos por oferta.** Chegando lá, o botão *+ Adicionar imagem*
   desliga e explica o motivo. Se você escolher 5 fotos quando só cabem 2, o
-  painel manda as 2 primeiras e avisa que as outras não couberam — de propósito:
+  painel manda as 2 primeiras e avisa que as outras não couberam, de propósito:
   assim não fica arquivo largado ocupando espaço no servidor à toa
 - Há também um teto para o **envio inteiro**, somando as fotos de uma vez só. Se
   escolher muitas fotos pesadas juntas, o painel avisa; mande em duas levas
 - Uma foto recusada **não cancela as outras**: as que deram certo entram, e o
   painel diz pelo nome qual não entrou e por quê. O caso mais comum é foto de
-  iPhone no formato HEIC — abra e salve como JPG antes de mandar
+  iPhone no formato HEIC, abra e salve como JPG antes de mandar
 
 ---
 
@@ -341,7 +341,7 @@ Dois campos que **não aparecem na página**, mas importam.
 ### Descrição para o Google
 
 É o trechinho cinza embaixo do título no resultado de busca. Escreva em inglês,
-150 a 160 caracteres, pensando em fazer a pessoa **clicar** — não em descrever
+150 a 160 caracteres, pensando em fazer a pessoa **clicar**: não em descrever
 tudo.
 
 Um modelo que funciona:
@@ -369,7 +369,7 @@ Só preencha quando **alguém exigir** um texto específico:
 - **Suplemento**, quando o fornecedor pede o aviso da FDA
 
 A pergunta que resolve: *"alguém me obrigou a escrever isso?"* Se ninguém
-obrigou, vazio é a resposta certa — texto legal a mais no rodapé só rouba
+obrigou, vazio é a resposta certa, texto legal a mais no rodapé só rouba
 atenção do botão.
 
 ---
@@ -382,8 +382,8 @@ quantas vezes quiser enquanto escreve.
 O segundo botão grava e **abre o resultado numa aba nova**. O que ele diz
 depende da situação da oferta:
 
-- **Salvar e ver a prévia ↗** — a oferta está em rascunho, e abre a prévia
-- **Salvar e abrir a página ↗** — a oferta está no ar, e abre a página de verdade
+- **Salvar e ver a prévia ↗**, a oferta está em rascunho, e abre a prévia
+- **Salvar e abrir a página ↗**, a oferta está no ar, e abre a página de verdade
 
 O aviso de status no alto da tela mostra **Rascunho** ou **No ar**, então você
 sempre sabe se aquilo está publicado.
@@ -392,15 +392,15 @@ sempre sabe se aquilo está publicado.
 
 ## Duplicar uma oferta
 
-Este é o botão que você mais vai usar. Ele copia tudo — texto, botão, FAQ,
-selos, vídeo e fotos — e cria uma oferta nova.
+Este é o botão que você mais vai usar. Ele copia tudo, texto, botão, FAQ,
+selos, vídeo e fotos, e cria uma oferta nova.
 
 **A cópia nasce sempre como rascunho**, com "Cópia de" no título. Isso é de
 propósito: se ela nascesse publicada, colocaria no ar uma página com o texto e o
 link do produto errado.
 
 Depois de duplicar: abra, troque o título, **troque o link do fornecedor**,
-ajuste o texto e **troque as fotos e o vídeo** — a cópia veio com os do outro
+ajuste o texto e **troque as fotos e o vídeo**, a cópia veio com os do outro
 produto. Só então publique.
 
 ---
@@ -411,19 +411,19 @@ A coluna **Cliques** na lista mostra quantas vezes o botão daquela oferta foi
 clicado. É a forma mais direta de saber o que funciona.
 
 O que olhar: se uma página recebe visita mas quase ninguém clica, o problema
-está no título ou no texto — não na divulgação.
+está no título ou no texto: não na divulgação.
 
 ---
 
 ## Excluir
 
 Excluir tira a página do ar na hora. Uma cópia de segurança fica guardada no
-servidor, então dá para recuperar — mas só com ajuda técnica. Antes de excluir,
+servidor, então dá para recuperar, mas só com ajuda técnica. Antes de excluir,
 considere apenas voltar para **rascunho**: tira do ar do mesmo jeito e você
 continua com o conteúdo à mão.
 
 **Clique sem querer não apaga nada.** O botão *Excluir* sempre pergunta antes,
-com o nome da oferta na pergunta — ou numa caixinha do navegador, ou numa tela
+com o nome da oferta na pergunta, ou numa caixinha do navegador, ou numa tela
 de *"Excluir esta oferta?"* com os botões **Cancelar** e **Sim, excluir**. A
 oferta só some depois que você responde que sim.
 
@@ -431,45 +431,45 @@ oferta só some depois que você responde que sim.
 
 ## Se algo der errado
 
-**"Sessão expirada ou pedido inválido"** — a página ficou aberta tempo demais.
+**"Sessão expirada ou pedido inválido"**, a página ficou aberta tempo demais.
 Volte, recarregue e tente de novo.
 
-**Uma oferta aparece como "arquivo com defeito"** — o arquivo dela foi
+**Uma oferta aparece como "arquivo com defeito"**, o arquivo dela foi
 corrompido. Não tente consertar pelo painel; avise o suporte técnico, que existe
 backup.
 
-**O upload falha sempre** — veja o limite escrito na própria tela de envio, que
+**O upload falha sempre**, veja o limite escrito na própria tela de envio, que
 mostra o número real do servidor. Se passar, comprima o arquivo antes.
 
-**"Formato não reconhecido"** — o arquivo não é de verdade do tipo que o nome
+**"Formato não reconhecido"**, o arquivo não é de verdade do tipo que o nome
 diz. Trocar o final do nome (de `.avi` para `.mp4`, por exemplo) não converte
 nada: é preciso salvar no formato certo pelo programa que criou o arquivo.
 
-**Publiquei e a página não mudou** — confira se salvou como *Publicada* e não
+**Publiquei e a página não mudou**, confira se salvou como *Publicada* e não
 como *Rascunho*. Se estiver certo, atualize a página com `Ctrl + F5`.
 
-**Uma foto não aparece na oferta** — o arquivo saiu do servidor. Na aba
+**Uma foto não aparece na oferta**, o arquivo saiu do servidor. Na aba
 *Imagens*, a linha fica vermelha e avisa: *"Esta foto não está mais no
 servidor"*. Clique em **Enviar foto** naquela mesma linha e mande o arquivo de
-novo — não precisa apagar a linha nem mexer na descrição que você já escreveu.
+novo: não precisa apagar a linha nem mexer na descrição que você já escreveu.
 
-**Cliquei em "Enviar foto" e não aconteceu nada** — o botão depende de um
+**Cliquei em "Enviar foto" e não aconteceu nada**, o botão depende de um
 recurso que o navegador pode não ter. Nesse caso cada linha mostra um campo de
 texto para o nome do arquivo, e o link **tela de envio** aparece no fim da aba:
 envie a foto por lá, copie o nome e cole no campo da linha. Se o painel estiver
 aberto num navegador muito antigo, vale trocar para o Chrome ou o Edge.
 
-**Arrastei a foto e não aconteceu nada** — ela foi solta fora de uma linha. O
+**Arrastei a foto e não aconteceu nada**, ela foi solta fora de uma linha. O
 painel ignora de propósito o arquivo solto em qualquer outro lugar: sem isso, o
 navegador abriria a imagem no lugar do painel e levaria junto o texto que você
 ainda não salvou. Solte em cima da linha, **quando ela acender**.
 
-**"Sua sessão expirou" ao enviar a foto** — a aba ficou parada tempo demais, e
+**"Sua sessão expirou" ao enviar a foto**, a aba ficou parada tempo demais, e
 o painel derrubou a sessão. Recarregar é o único caminho: **antes disso, copie o
 texto que você escreveu e ainda não salvou** (selecione, `Ctrl + C`, e cole num
 bloco de notas). Depois recarregue a página, entre de novo, cole o texto de
 volta e repita o envio.
 
-**Cliquei em Ver prévia e o painel pediu login de novo** — a sessão expirou
+**Cliquei em Ver prévia e o painel pediu login de novo**, a sessão expirou
 enquanto a aba estava parada. Entre de novo e clique outra vez. É proposital:
 sem login, ninguém vê rascunho.

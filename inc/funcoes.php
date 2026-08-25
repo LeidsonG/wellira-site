@@ -2,7 +2,7 @@
 /**
  * Funções de apoio ao roteamento e à renderização das ofertas.
  *
- * Compatível com PHP 8.0+ e sem depender de mbstring — a versão do PHP na
+ * Compatível com PHP 8.0+ e sem depender de mbstring, a versão do PHP na
  * hospedagem compartilhada pode ser trocada pelo cPanel a qualquer momento, e
  * nem todo plano traz a extensão habilitada.
  */
@@ -53,7 +53,7 @@ function gerar_slug(string $titulo): string
  * Lê uma oferta do disco.
  *
  * Devolve null quando o slug é inválido, o arquivo não existe ou o JSON está
- * corrompido — nunca lança exceção, porque qualquer um desses casos deve
+ * corrompido, nunca lança exceção, porque qualquer um desses casos deve
  * resultar simplesmente num 404, não num erro exposto ao visitante.
  */
 function carregar_oferta(string $slug): ?array
@@ -145,7 +145,7 @@ function render_video(array $oferta): string
     $estilo = '';
     if ($poster !== '') {
         // A capa é enviada pela tela de IMAGEM do painel e mora em
-        // assets/img/uploads — não na pasta de vídeos. Este código apontava
+        // assets/img/uploads, não na pasta de vídeos. Este código apontava
         // para URL_VIDEOS e toda capa saía 404, silenciosamente: o botão
         // ficava só com o fundo escuro e ninguém via erro nenhum.
         // O fallback para a pasta de vídeos cobre pôster antigo enviado por lá.
@@ -185,7 +185,7 @@ function nome_imagem_valido(string $nome): bool
  * Lê a lista de imagens da oferta, já limpa e pronta para exibir.
  *
  * Aceita tanto o formato do painel (`{"arquivo": ..., "legenda": ...}`) quanto
- * uma string solta com o nome do arquivo — JSON editado à mão acontece, e a
+ * uma string solta com o nome do arquivo, JSON editado à mão acontece, e a
  * página não pode quebrar por causa disso.
  */
 function imagens_da_oferta(array $oferta): array
@@ -223,7 +223,7 @@ function imagens_da_oferta(array $oferta): array
  * Monta a etiqueta <img> de um item da galeria.
  *
  * A primeira imagem não é adiada: ela fica no alto da página e costuma ser o
- * maior elemento visível na abertura — marcá-la como lazy atrasaria justamente
+ * maior elemento visível na abertura, marcá-la como lazy atrasaria justamente
  * o que o Google mede como LCP. Da segunda em diante, adiar é o certo.
  */
 function galeria_img(array $item, bool $primeira): string
@@ -238,12 +238,12 @@ function galeria_img(array $item, bool $primeira): string
  * Monta o bloco de imagens do produto.
  *
  * Ocupa o mesmo lugar do vídeo, dentro do topo da página: há oferta que só tem
- * vídeo, há oferta que só tem foto, e há a que tem os dois — nesse caso o vídeo
+ * vídeo, há oferta que só tem foto, e há a que tem os dois, nesse caso o vídeo
  * vem primeiro e a galeria logo abaixo.
  *
  * Uma imagem sai como figura simples, sem seta nem pontinho: controle de
  * carrossel para um item só é enfeite que confunde. De duas em diante vira
- * carrossel, que rola por arrasto mesmo sem JavaScript — quem liga as setas e
+ * carrossel, que rola por arrasto mesmo sem JavaScript: quem liga as setas e
  * os pontinhos é assets/js/galeria.js, carregado só quando existe carrossel.
  */
 function render_galeria(array $oferta): string

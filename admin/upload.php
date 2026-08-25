@@ -4,7 +4,7 @@
  *
  * Tela separada de propósito: o formulário da oferta é longo, e juntar upload
  * com ele faria a cliente perder tudo o que digitou se o envio falhasse por
- * tamanho ou timeout — o que, com vídeo em conexão doméstica, acontece.
+ * tamanho ou timeout: o que, com vídeo em conexão doméstica, acontece.
  *
  * Aqui ela envia, copia o nome gerado e cola no campo da oferta.
  */
@@ -32,7 +32,7 @@ if (post_estourou()) {
 
     // Vários de uma vez: a galeria de uma oferta tem três, quatro fotos, e
     // enviar uma por vez significava repetir o formulário inteiro a cada foto.
-    // Um arquivo recusado não cancela os outros — a lista de erros sai ao lado
+    // Um arquivo recusado não cancela os outros, a lista de erros sai ao lado
     // da lista do que entrou.
     $resultado = receber_uploads($_FILES['arquivo'] ?? [], $destino);
     $enviados  = $resultado['nomes'];
@@ -63,7 +63,7 @@ if ($enviados) {
         // que aparece no campo depois e porque o painel não deve esconder da
         // cliente o que gravou no servidor dela.
         echo '<p>Volte para a oferta, abra a aba <strong>Imagens</strong> e clique '
-           . 'na foto que quiser usar — ela já aparece lá.</p>';
+           . 'na foto que quiser usar, ela já aparece lá.</p>';
     } else {
         echo '<p>Copie o nome acima e cole no campo de vídeo da oferta.</p>';
     }
@@ -83,7 +83,7 @@ if ($enviados) {
       <?php /* Imagem aceita seleção múltipla; vídeo não. Não é falta de
                simetria: cada MP4 come dezenas de MB do post_max_size, e dois
                num envio só estouram o limite do servidor sem que nada explique
-               por quê. Foto de produto tem alguns KB — a galeria inteira cabe
+               por quê. Foto de produto tem alguns KB, a galeria inteira cabe
                numa seleção. */ ?>
       <input type="file" id="arquivo" name="arquivo<?= $destino === 'imagem' ? '[]' : '' ?>" required
              <?= $destino === 'imagem' ? 'multiple' : '' ?>

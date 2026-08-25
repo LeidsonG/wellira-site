@@ -1,4 +1,4 @@
-# Wellira — site de landing pages
+# Wellira, site de landing pages
 
 Site de páginas de produto para a Wellira. Cada oferta vive em `/<slug>` e reúne
 título, vídeo e/ou galeria de fotos, texto e botões que levam ao site do
@@ -9,7 +9,7 @@ erro.
 Hospedagem: HostGator (plano compartilhado, cPanel). Deploy por SFTP com chave SSH.
 
 > **Este repositório é público.** Nada de credencial, chave, ID de medição ou
-> caminho de servidor entra aqui — nem em código, nem em documentação, nem em
+> caminho de servidor entra aqui: nem em código, nem em documentação, nem em
 > mensagem de commit. O que é segredo vive só no servidor e no `.gitignore`:
 > `deploy.conf`, `dados/senha.php` e `assets/js/ids.js`.
 
@@ -37,34 +37,34 @@ Aberto por padrão. Fica fora do índice:
 | `404.html` | `meta robots` na página |
 | `/go/<slug>` | `robots.txt` + `X-Robots-Tag` |
 
-Oferta sem o campo `indexar` **é indexável** — o padrão favorece a oferta real.
+Oferta sem o campo `indexar` **é indexável**, o padrão favorece a oferta real.
 O `sitemap.xml` é gerado por `sitemap.php` a partir dos mesmos critérios.
 
 ---
 
 ## Estrutura
 
-A raiz do repositório **é** a raiz do site — o que a hospedagem serve a partir de
+A raiz do repositório **é** a raiz do site: o que a hospedagem serve a partir de
 `public_html`. Isso mantém o deploy trivial e é o que o GitHub Pages
 exige para a prévia. O que não é público fica separado por pasta:
 
 ```
 ─ Servido pela web ────────────────────────────────────────────
 index.html              Página institucional (a "raiz segura")
-oferta.php              Template das ofertas — recebe /<slug> do .htaccess
+oferta.php              Template das ofertas, recebe /<slug> do .htaccess
 sitemap.php             Gera /sitemap.xml a partir das ofertas publicadas
 go.php                  Saída /go/<slug>: conta o clique e redireciona
 admin/                  Painel administrativo (PT-BR, usuário + senha)
 admin/previa.php        Prévia autenticada da oferta, inclusive em rascunho
-admin/enviar.php        Envio de foto pelo editor — responde JSON, não redireciona
+admin/enviar.php        Envio de foto pelo editor, responde JSON, não redireciona
 404.html                Página de erro
 .htaccess               Roteamento, HTTPS, Options -Indexes, bloqueios
 robots.txt              Aberto aos buscadores; aponta o sitemap
 assets/css/             Folha de estilo do site e do painel
-assets/js/galeria.js       Carrossel da galeria — só carrega com 2+ imagens
+assets/js/galeria.js       Carrossel da galeria: só carrega com 2+ imagens
 assets/js/rastreamento.js  Meta Pixel + GA4 (IDs vêm de ids.js, fora do repo)
-assets/js/ids.js           IDs de medição — FORA do repositório
-assets/img/favicon.png  Marca — favicon e ícone do cabeçalho
+assets/js/ids.js           IDs de medição, FORA do repositório
+assets/img/favicon.png  Marca, favicon e ícone do cabeçalho
 assets/videos/          Vídeos enviados pela cliente (fora do repositório)
 assets/img/uploads/     Imagens enviadas pela cliente (fora do repositório)
 privacy-policy/  ┐
@@ -76,7 +76,7 @@ inc/config.php          Aviso base, ícones dos selos, caminhos, limites
 inc/funcoes.php         Carregamento, escape, vídeo, galeria, validações
 inc/auth.php            Sessão, login, CSRF, limite de tentativas
 inc/admin-funcoes.php   Normalização, gravação atômica, backup, uploads
-dados/senha.php         Usuário + hash — FORA do repositório, gravável pelo painel
+dados/senha.php         Usuário + hash, FORA do repositório, gravável pelo painel
 dados/ofertas/          Uma oferta por arquivo JSON (fora do repositório)
 dados/backups/          Versões anteriores de cada oferta (fora do repositório)
 dados/cliques/          Contador por oferta (fora do repositório)
@@ -108,7 +108,7 @@ eletrodoméstico, sem que nenhuma página nasça com seção vazia.
 ## Ordem das seções da oferta
 
 Desde **24/08/2026** a assinatura ("Why I'm sharing this") é a **última** seção
-da página, depois do FAQ — antes era a terceira. Quem escreve o texto é o que se
+da página, depois do FAQ, antes era a terceira. Quem escreve o texto é o que se
 lê depois do argumento, não uma interrupção no meio dele.
 
 ```
@@ -121,7 +121,7 @@ Três lugares repetem essa ordem e **precisam mudar juntos**:
 | Onde | O quê |
 |---|---|
 | `oferta.php` | a página real |
-| `admin/editar.php` | as abas do editor seguem a ordem dos blocos — é o que permite à cliente conferir a página sem abri-la |
+| `admin/editar.php` | as abas do editor seguem a ordem dos blocos: é o que permite à cliente conferir a página sem abri-la |
 | `vitalane.html` | o gêmeo estático da prévia do GitHub Pages |
 
 ---
@@ -129,7 +129,7 @@ Três lugares repetem essa ordem e **precisam mudar juntos**:
 ## Galeria de imagens
 
 Introduzida em **24/08/2026**. Ocupa o **mesmo lugar do vídeo**, dentro do topo:
-a oferta pode ter só vídeo, só imagens ou os dois — com os dois, o vídeo vem
+a oferta pode ter só vídeo, só imagens ou os dois: com os dois, o vídeo vem
 primeiro e a galeria logo abaixo.
 
 **Uma imagem** sai como `<figure>` simples; **duas ou mais** viram carrossel.
@@ -152,7 +152,7 @@ Controle de carrossel para um item só é enfeite que confunde.
   leitor de tela) e o `<figcaption>` impresso sob ela. Um campo só, porque dois
   campos dizendo quase a mesma coisa é o que faz a cliente deixar os dois vazios
 - `mostrar_imagens: false` esconde o bloco sem apagar a lista, como nas demais
-  seções. **Ausente vale `true`** — é o que impede uma oferta antiga, gravada
+  seções. **Ausente vale `true`**: é o que impede uma oferta antiga, gravada
   antes dos interruptores, de perder seção. Não confunda com o padrão do
   formulário: oferta *nova* nasce com `imagens`, `nao_e_para_voce`, `selos` e
   `faq` desligados (`admin/editar.php`, bloco `if ($novo)`), e o que a cliente
@@ -177,12 +177,12 @@ subir** o arquivo (veja abaixo).
 | Arquivo | O quê |
 |---|---|
 | `inc/funcoes.php` | `imagens_da_oferta()`, `render_galeria()`, `galeria_img()`, `nome_imagem_valido()` |
-| `inc/admin-funcoes.php` | `receber_uploads()` — envio de vários arquivos |
+| `inc/admin-funcoes.php` | `receber_uploads()`, envio de vários arquivos |
 | `admin/editar.php` | aba **Imagens**, logo após **Vídeo**; `linha_imagem()` desenha a linha gravada e o `<template>` |
 | `admin/enviar.php` | endpoint JSON do envio feito de dentro do editor |
 | `admin/upload.php` | tela de envio: alternativa sem JavaScript e **único caminho para vídeo** |
 | `assets/js/admin.js` | miniatura viva de cada linha, contagem de vagas e o `fetch` do envio |
-| `assets/css/style.css` | `.galeria*` — trilho com `scroll-snap`, setas, pontinhos |
+| `assets/css/style.css` | `.galeria*`, trilho com `scroll-snap`, setas, pontinhos |
 | `assets/js/galeria.js` | setas, pontinhos e teclado (página pública) |
 
 Decisões que não devem ser desfeitas sem motivo:
@@ -190,13 +190,13 @@ Decisões que não devem ser desfeitas sem motivo:
 - **O carrossel funciona sem JavaScript.** O trilho é área de rolagem nativa com
   `scroll-snap`; o arrasto com o dedo já funciona com `galeria.js` ausente ou
   quebrado. O script marca `.galeria-pronta`, e é essa classe que revela as
-  setas — que nascem escondidas no CSS
+  setas, que nascem escondidas no CSS
 - **O índice atual sai da posição de rolagem**, nunca de um contador interno:
   o visitante também arrasta, e um contador próprio mentiria no primeiro swipe
 - `oferta.php` monta a galeria **antes do `<head>`** só para decidir se carrega
   `galeria.js`: oferta com uma foto ou nenhuma não paga uma requisição por um
   comportamento que não vai usar
-- A **primeira** imagem sai com `fetchpriority="high"` e sem `lazy` — ela é o LCP
+- A **primeira** imagem sai com `fetchpriority="high"` e sem `lazy`, ela é o LCP
   da página; da segunda em diante, `loading="lazy"`
 
 ### Envio de fotos pelo editor (`admin/enviar.php`)
@@ -204,11 +204,11 @@ Decisões que não devem ser desfeitas sem motivo:
 A cliente escolhe as fotos na própria aba *Imagens* e elas sobem na hora, cada
 uma entrando na lista com o nome já preenchido.
 
-**Cada linha envia a sua foto** — pelo botão dentro dela ou arrastando o arquivo
+**Cada linha envia a sua foto**, pelo botão dentro dela ou arrastando o arquivo
 em cima dela. Até 25/08/2026 havia um botão único no fim da aba, e a foto caía
 "no primeiro campo vazio": a cliente escolhia o arquivo sem poder dizer em que
 posição ele devia entrar, e descobria o lugar só depois de subir. Com o botão na
-linha, a posição é escolhida antes — que é como ela pensa a página ("esta foto é
+linha, a posição é escolhida antes, que é como ela pensa a página ("esta foto é
 a primeira"). Escolher várias fotos numa linha continua funcionando: a primeira
 fica ali e as demais seguem para os campos vazios **abaixo** dela, criando linha
 enquanto couber no teto.
@@ -218,13 +218,13 @@ Consequências desse desenho, todas em `assets/js/admin.js`:
 - **Tudo por delegação** no `#lista-imagens`: as linhas nascem de um `<template>`
   clonado, e ouvinte pendurado em cada linha teria de ser rependurado a cada
   clone. `linha_imagem()` em `admin/editar.php` desenha a linha gravada **e** o
-  molde, pelo mesmo motivo — eram dois blocos de HTML quase iguais, e todo campo
+  molde, pelo mesmo motivo, eram dois blocos de HTML quase iguais, e todo campo
   novo precisava ser lembrado nos dois
 - **Soltar fora de uma linha não faz nada.** Um `drop` sem `preventDefault` faz
   o navegador abrir o arquivo no lugar da página, e a oferta ainda não salva iria
   embora junto. Há um guarda no `document` só para isso
 - **O × trava durante o envio**, e a resposta confere `item.isConnected`: apagar
-  a linha no meio do envio deixaria o arquivo já subido sem lugar para onde ir —
+  a linha no meio do envio deixaria o arquivo já subido sem lugar para onde ir,
   órfão que ninguém apaga depois, porque ninguém sabe que existe
 - O campo com o **nome do arquivo continua no HTML**, escondido pela regra `.js`
   do CSS. É a única forma de apontar um arquivo já enviado quando o JavaScript
@@ -232,11 +232,11 @@ Consequências desse desenho, todas em `assets/js/admin.js`:
   porque `admin.js` é `defer` e os campos apareceriam por um instante antes de
   sumir
 
-**O formulário da oferta não é enviado junto** — é a decisão que sustenta o
+**O formulário da oferta não é enviado junto**: é a decisão que sustenta o
 recurso. Um `<input type="file">` comum dentro daquele formulário faria o
 navegador mandar a oferta inteira a cada foto, e um envio que falhasse por
 tamanho ou por timeout levaria embora todo o texto de venda ainda não salvo. É a
-mesma razão pela qual `admin/upload.php` nasceu como tela separada — está escrita
+mesma razão pela qual `admin/upload.php` nasceu como tela separada, está escrita
 no cabeçalho dos dois arquivos. A foto sobe sozinha, por `fetch`, e volta só o
 nome gravado.
 
@@ -252,14 +252,14 @@ O que `admin/enviar.php` faz, e por quê:
 - Trata `post_estourou()` **antes** do CSRF: com o corpo acima de
   `post_max_size` o PHP descarta `$_POST` inteiro, e arquivo grande demais
   viraria "sessão expirada"
-- **Só imagem.** Vídeo continua exclusivamente pela tela `admin/upload.php` —
+- **Só imagem.** Vídeo continua exclusivamente pela tela `admin/upload.php`,
   são dezenas de MB por arquivo, e um envio desses precisa da tela dedicada, com
   o limite do servidor à vista
 Do lado do editor (`assets/js/admin.js`), o corte pelo teto acontece **antes** do
 envio: escolhendo 5 fotos com 2 vagas livres, sobem as 2 primeiras e a tela
 avisa. Enviar e descartar deixaria arquivo órfão ocupando espaço na hospedagem
 da cliente para sempre, porque ninguém saberia que ele está lá. As vagas somam
-os campos vazios existentes com o espaço que falta para `MAX_IMAGENS` — a lista
+os campos vazios existentes com o espaço que falta para `MAX_IMAGENS`, a lista
 pode estar cheia e ainda ter campo vazio, e preencher campo não a faz crescer.
 
 `admin/upload.php` continua existindo e continua no `GUIA-PAINEL.md`: é a saída
@@ -272,18 +272,18 @@ Sem mudança de comportamento, só para que a regra exista num lugar só:
 
 | Extraída | Quem passou a usar |
 |---|---|
-| `csrf_ok()` — devolve `bool` | `csrf_validar()`, que continua matando a requisição, e `admin/enviar.php`, que recusa em JSON |
-| `sessao_expirada()` — o prazo de 2 h | `exigir_login()`, que redireciona, e `admin/enviar.php`, que devolve 401 |
+| `csrf_ok()`, devolve `bool` | `csrf_validar()`, que continua matando a requisição, e `admin/enviar.php`, que recusa em JSON |
+| `sessao_expirada()`, o prazo de 2 h | `exigir_login()`, que redireciona, e `admin/enviar.php`, que devolve 401 |
 
 O motivo é sempre o mesmo: **duas conferências de CSRF escritas em lugares
 diferentes é como uma delas envelhece e deixa de conferir**. O caminho JSON
 precisava recusar sem redirecionar e sem cuspir texto puro no meio de uma
-resposta que o JavaScript vai interpretar — mas não podia reimplementar a regra.
+resposta que o JavaScript vai interpretar, mas não podia reimplementar a regra.
 
 ### Envio múltiplo
 
 `receber_uploads()` desvira as listas paralelas que o PHP entrega num upload
-múltiplo e chama `receber_upload()` para cada arquivo — a validação por
+múltiplo e chama `receber_upload()` para cada arquivo, a validação por
 **magic bytes** continua sendo a mesma, por arquivo. Um recusado não derruba os
 outros: a resposta traz o que entrou e, pelo nome, o que não entrou (HEIC de
 iPhone no meio de cinco fotos é o caso comum, não a exceção). Serve aos dois
@@ -297,7 +297,7 @@ explique por quê.
 
 ## Prévia do painel (`admin/previa.php`)
 
-Rascunho não aparece em `/<slug>` — é o que rascunho significa. Mas o botão
+Rascunho não aparece em `/<slug>`: é o que rascunho significa. Mas o botão
 *Ver página* de um rascunho caía num **404**: correto para o visitante,
 indistinguível de um defeito para quem acabou de escrever a oferta.
 
@@ -305,7 +305,7 @@ indistinguível de um defeito para quem acabou de escrever a oferta.
 cookie da sessão tem `path=/admin` (`inc/auth.php`), então a página pública
 **nunca** recebe a sessão e não teria como reconhecer a cliente logada. Afrouxar
 o `path` para poder abrir a exceção espalharia o cookie de sessão por todo o
-site, inclusive nas páginas que o público acessa — o oposto do que se quer.
+site, inclusive nas páginas que o público acessa, o oposto do que se quer.
 
 `admin/previa.php` exige login, define a constante `PREVIA_ADMIN` e faz
 `require` do **mesmo `oferta.php`**. Não existe um segundo caminho de
@@ -324,7 +324,7 @@ Os botões apontam direto ao fornecedor porque `/go/<slug>` **recusa rascunho**
 (a prévia terminaria no mesmo 404), e porque conferir o layout não pode somar
 clique ao contador da cliente. Contra indexação são três camadas: o `.htaccess`
 de `admin/`, o `X-Robots-Tag` enviado pela própria `previa.php` e a meta
-`robots` da página — rascunho vazado sai do índice muito mais devagar do que
+`robots` da página, rascunho vazado sai do índice muito mais devagar do que
 entrou.
 
 Onde o painel leva à prévia (sempre conforme o status da oferta):
@@ -345,7 +345,7 @@ dela: `GUIA-PAINEL.md`.
 
 ### Instalar o acesso
 
-Não há página de instalação de propósito — página de setup é porta que alguém
+Não há página de instalação de propósito, página de setup é porta que alguém
 esquece aberta. As credenciais são geradas na linha de comando:
 
 ```bash
@@ -389,8 +389,8 @@ As pastas de `dados/` são criadas sozinhas na primeira gravação, desde que
 | `session_regenerate_id()` no login | session fixation |
 | Token CSRF em todo POST, via `hash_equals` | ação forjada por outra aba |
 | Excluir e duplicar só por POST | robô seguindo link |
-| Excluir exige `confirmado`, campo que só o `confirm()` do navegador cria — sem ele, `acoes.php` devolve a tela de "tem certeza?" em vez de apagar | clique acidental na lista, e exclusão disparada com o JS fora do ar |
-| Upload validado por **magic bytes**, extensão vinda da assinatura — inclusive arquivo a arquivo no envio múltiplo | PHP disfarçado de imagem |
+| Excluir exige `confirmado`, campo que só o `confirm()` do navegador cria: sem ele, `acoes.php` devolve a tela de "tem certeza?" em vez de apagar | clique acidental na lista, e exclusão disparada com o JS fora do ar |
+| Upload validado por **magic bytes**, extensão vinda da assinatura, inclusive arquivo a arquivo no envio múltiplo | PHP disfarçado de imagem |
 | Prévia servida de dentro de `/admin`, com login, `X-Robots-Tag` e `no-store` | rascunho da cliente visível ao público ou indexado |
 | `admin/enviar.php` exige login e CSRF pelas mesmas funções das outras telas (`csrf_ok()`, `sessao_expirada()`), e responde `nosniff` | endpoint de upload virar a porta dos fundos do painel |
 | `.htaccess` sem execução de PHP nas pastas de upload | o mesmo, em profundidade |
@@ -403,12 +403,12 @@ As pastas de `dados/` são criadas sozinhas na primeira gravação, desde que
 
 Por **SFTP com chave SSH**, usando `lftp` (`sudo apt install lftp`).
 
-A conta não tem shell — `rsync` precisa executar um processo do outro lado e
+A conta não tem shell, `rsync` precisa executar um processo do outro lado e
 não serve. O SFTP autentica com a mesma chave, e o `mirror` do lftp já compara
 tamanho e data, enviando só o que mudou.
 
 ```bash
-./scripts/deploy.sh              # simulação — mostra o que iria, sem enviar
+./scripts/deploy.sh              # simulação, mostra o que iria, sem enviar
 ./scripts/deploy.sh --real       # envia
 ./scripts/deploy.sh --real --limpar   # remove também o que não existe mais aqui
 ```
@@ -421,7 +421,7 @@ Configuração em `deploy.conf` na raiz (modelo em `scripts/deploy.conf.exemplo`
 > existe só no servidor e não tem outra cópia. As exclusões valem inclusive com
 > `--limpar`.
 
-O `lftp` sai com código 0 mesmo quando o espelhamento aborta no meio — já
+O `lftp` sai com código 0 mesmo quando o espelhamento aborta no meio, já
 aconteceu, e o site ficou fora do ar com o WordPress pela metade. Por isso o
 script lê a saída e falha explicitamente quando remove arquivos sem enviar
 nenhum.
@@ -431,7 +431,7 @@ nenhum.
 ```bash
 git checkout staging                          # 1. sempre em staging
 
-php -S localhost:8000 tools/dev-router.php    # 2. validar no navegador
+./scripts/dev.sh                              # 2. validar no navegador
 
 git add <arquivos> && git commit              # 3. commitar
 git push origin staging                       #    (atualiza a prévia do Pages)
@@ -439,14 +439,14 @@ git push origin staging                       #    (atualiza a prévia do Pages)
 git checkout main && git merge staging        # 4. promover
 git push origin main
 
-./scripts/deploy.sh                           # 5. simulação — conferir a lista
+./scripts/deploy.sh                           # 5. simulação, conferir a lista
 ./scripts/deploy.sh --real                    # 6. enviar
 
 git checkout staging                          # 7. voltar para o trabalho
 ```
 
 **Quando usar `--limpar`:** só quando você APAGOU um arquivo do projeto e ele
-precisa sumir do servidor. No dia a dia não é necessário — o envio normal
+precisa sumir do servidor. No dia a dia não é necessário, o envio normal
 sobrescreve o que mudou e ignora o resto.
 
 **O que a cliente cria nunca é tocado.** Pode subir quantas vezes quiser: as
@@ -457,12 +457,21 @@ ofertas, os vídeos, as imagens e as credenciais dela ficam onde estão.
 Com PHP, para testar o roteamento das ofertas e o painel:
 
 ```bash
-php -S localhost:8000 tools/dev-router.php
+./scripts/dev.sh          # porta 8000; ./scripts/dev.sh 8080 para outra
 ```
 
-O `tools/dev-router.php` existe porque o servidor embutido do PHP não lê `.htaccess`.
-Ele reproduz a reescrita `/<slug>` → `oferta.php` e os bloqueios de acesso, para
-que o comportamento local seja o mesmo da HostGator. **Não vai para produção.**
+O script existe porque o servidor embutido do PHP ignora dois arquivos que valem
+em produção, e cada um produz um sintoma diferente:
+
+| Ignora | Reposto por | Se faltar |
+|---|---|---|
+| `.htaccess` | `tools/dev-router.php` | nenhuma rota `/<slug>` funciona |
+| `.user.ini` | `-d upload_max_filesize` / `-d post_max_size` | o PHP local cai nos 2M padrão e a aba *Imagens* anuncia "até 2 MB cada" |
+
+O segundo caso confunde de verdade: o painel mostra sempre o limite **real**, o
+menor entre o teto do código (8 MB por foto) e o do servidor. Ver "Limites de
+upload" acima. **Nada disso vai para produção**: o deploy exclui `scripts/` e
+`tools/`.
 
 As ofertas ficam em `dados/ofertas/*.json`, fora do repositório. Para popular um
 ambiente novo:
@@ -480,7 +489,7 @@ python3 -m http.server 8000
 ```
 
 Para ver o comportamento mobile (CTA fixo no rodapé, cards em coluna única),
-abra o DevTools e ative o modo dispositivo — `F12`, depois `Ctrl+Shift+M`.
+abra o DevTools e ative o modo dispositivo, `F12`, depois `Ctrl+Shift+M`.
 
 ## Convenções
 

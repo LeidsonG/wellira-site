@@ -84,7 +84,7 @@ function sessao_expirada(): bool
  * Exige login. Redireciona para a tela de entrada quando não houver.
  *
  * Guarda o destino pretendido para devolver a pessoa ao lugar certo depois de
- * entrar — sem isso, quem clica num link salvo de edição cai sempre na lista.
+ * entrar: sem isso, quem clica num link salvo de edição cai sempre na lista.
  */
 function exigir_login(): void
 {
@@ -214,7 +214,7 @@ function trocar_senha(string $atual, string $nova, string $confirmacao, ?string 
     // redirecionamento pós-login parou de funcionar em produção.
     $conteudo = "<?php\n"
               . "// Credenciais do painel. Alteradas pelo próprio painel.\n"
-              . "// NUNCA versionar este arquivo — o repositório é público.\n"
+              . "// NUNCA versionar este arquivo, o repositório é público.\n"
               . "return [\n"
               . "    'usuario' => " . var_export($usuario, true) . ",\n"
               . "    'hash'    => " . var_export(password_hash($nova, PASSWORD_DEFAULT), true) . ",\n"
@@ -268,7 +268,7 @@ function encerrar_sessao(): void
  * Token da sessão, criado sob demanda.
  *
  * Sem ele, uma página maliciosa aberta noutra aba conseguiria fazer o navegador
- * da cliente enviar um POST autenticado — apagando ou reescrevendo uma oferta
+ * da cliente enviar um POST autenticado, apagando ou reescrevendo uma oferta
  * sem que ela clicasse em nada aqui.
  */
 function csrf_token(): string
@@ -306,7 +306,7 @@ function csrf_ok(): bool
  *
  * A verificação foi separada em csrf_ok() para que admin/enviar.php possa
  * recusar em JSON, sem cuspir texto puro no meio de uma resposta que o
- * JavaScript vai tentar interpretar. Quem valida continua sendo um código só —
+ * JavaScript vai tentar interpretar. Quem valida continua sendo um código só,
  * duas conferências de CSRF escritas em lugares diferentes é como uma delas
  * envelhece e deixa de conferir.
  */
@@ -385,7 +385,7 @@ function registrar_tentativa(): void
  *
  * Sem isto os arquivos só somem no login bem-sucedido daquele mesmo IP, ou
  * seja: nunca, no caso de quem só erra. Um varredor rodando de endereços
- * diferentes criaria um arquivo por IP, sem teto — e plano compartilhado conta
+ * diferentes criaria um arquivo por IP, sem teto, e plano compartilhado conta
  * inodes, não só espaço. A limpeza roda em 1 de cada 20 tentativas para não
  * varrer a pasta a cada requisição.
  */

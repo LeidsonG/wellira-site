@@ -6,7 +6,7 @@
  * que o rascunho significa), e o cookie da sessão do painel tem path=/admin,
  * então a página pública não tem como reconhecer a cliente logada nem abrir
  * exceção para ela. O resultado era o botão "Ver página" de um rascunho cair
- * num 404 — comportamento correto para o visitante, e indistinguível de um
+ * num 404, comportamento correto para o visitante, e indistinguível de um
  * defeito para quem acabou de escrever a oferta.
  *
  * A saída é servir a MESMA página, com o MESMO template, de dentro do painel.

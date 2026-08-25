@@ -110,7 +110,7 @@ function normalizar_oferta(array $post): array
 
     // Interruptores das seções opcionais.
     //
-    // Antes, esconder um bloco significava apagar o conteúdo dele — e voltar
+    // Antes, esconder um bloco significava apagar o conteúdo dele, e voltar
     // atrás custava redigitar tudo. O interruptor separa "não quero mostrar" de
     // "não tenho o que mostrar": o texto continua gravado, apenas não é
     // impresso. Ausente vale true, para que oferta antiga não perca seção.
@@ -161,7 +161,7 @@ function normalizar_oferta(array $post): array
     //
     // O nome do arquivo é conferido contra o formato que o upload gera, e não
     // apenas limpo: ele vira caminho de arquivo e URL na página pública. A
-    // legenda é opcional e faz dois trabalhos ao mesmo tempo — é o texto
+    // legenda é opcional e faz dois trabalhos ao mesmo tempo: é o texto
     // alternativo da imagem (leitor de tela e Google) e a linha impressa sob
     // ela. Um campo só, porque dois campos dizendo quase a mesma coisa é o que
     // faz a cliente deixar os dois em branco.
@@ -245,7 +245,7 @@ function normalizar_oferta(array $post): array
  * O que impede a oferta de ser publicada.
  *
  * Devolve lista de mensagens, vazia quando está tudo certo. Rascunho pode ficar
- * incompleto — só a publicação exige o mínimo, porque é ela que expõe a página.
+ * incompleto, só a publicação exige o mínimo, porque é ela que expõe a página.
  */
 function validar_oferta(array $o, string $slug, bool $novo): array
 {
@@ -341,7 +341,7 @@ function ini_bytes(string $valor): int
  *
  * O teto que vale é o MENOR entre o nosso e os dois do PHP. A hospedagem
  * compartilhada costuma vir com upload_max_filesize de 2M e post_max_size de
- * 8M, muito abaixo dos 64 MB que queríamos para vídeo — anunciar o nosso número
+ * 8M, muito abaixo dos 64 MB que queríamos para vídeo, anunciar o nosso número
  * faria a cliente tentar de novo e de novo um envio que nunca ia passar.
  */
 function limite_upload(string $genero): int
@@ -363,7 +363,7 @@ function limite_upload(string $genero): int
  *
  * Quando o corpo passa de post_max_size, o PHP descarta tudo: $_POST e $_FILES
  * voltam vazios. Sem detectar isso aqui, a validação de CSRF é a primeira a
- * falhar e a cliente recebe "Sessão expirada" ao enviar um vídeo grande — uma
+ * falhar e a cliente recebe "Sessão expirada" ao enviar um vídeo grande, uma
  * mensagem que não tem nada a ver com o que aconteceu e que ela não tem como
  * decifrar.
  */
@@ -386,7 +386,7 @@ function post_estourou(): bool
  *
  * A extensão do nome não vale nada: qualquer pessoa renomeia um .php para .mp4
  * antes de enviar. E a pasta de destino é servida publicamente. Isto lê a
- * assinatura binária real e é o que decide a extensão gravada no disco — o nome
+ * assinatura binária real e é o que decide a extensão gravada no disco, o nome
  * que veio do navegador é descartado inteiro.
  *
  * Complementa, e não substitui, o bloqueio de execução de PHP no .htaccess das
@@ -428,7 +428,7 @@ function tipo_por_assinatura(string $caminho): ?string
  * O PHP entrega um upload múltiplo "virado do avesso": em vez de uma lista de
  * arquivos, chegam listas paralelas de nome, tipo, erro e tamanho. Esta função
  * desvira e chama receber_upload() para cada um, que é quem continua decidindo
- * o que entra — a validação por assinatura binária segue idêntica.
+ * o que entra, a validação por assinatura binária segue idêntica.
  *
  * Devolve ['nomes' => [...], 'erros' => [...]]: um arquivo recusado não pode
  * derrubar os outros, porque a cliente seleciona cinco fotos de uma vez e uma

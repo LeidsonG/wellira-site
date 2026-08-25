@@ -1,12 +1,12 @@
 /* =============================================================================
-   Painel — abas, campos repetíveis e atalhos
+   Painel, abas, campos repetíveis e atalhos
    =============================================================================
    Sem framework, como o resto do projeto. São três comportamentos pequenos e
    independentes; nenhum deles é pré-requisito do outro.
 
    MELHORIA PROGRESSIVA: o formulário nasce inteiro visível no HTML. É o
    JavaScript que esconde as seções e liga as abas. Se ele falhar ou demorar, a
-   cliente vê um formulário longo — que é exatamente o que existia antes — em
+   cliente vê um formulário longo, que é exatamente o que existia antes, em
    vez de uma tela com campos inacessíveis e um botão de salvar que envia
    metade da oferta.
    ========================================================================== */
@@ -23,7 +23,7 @@
   // 'use strict' uma função declarada dentro de um bloco não sai dele, e
   // duplicar a mesma função em dois lugares é o começo de duas versões dela.
 
-  /** Cria um elemento com texto seguro — textContent, nunca innerHTML. */
+  /** Cria um elemento com texto seguro, textContent, nunca innerHTML. */
   function el(tag, classe, texto) {
     var n = document.createElement(tag);
     if (classe) n.className = classe;
@@ -36,7 +36,7 @@
    *
    * O nome vem de um campo de texto: a cliente digita, cola, ou copia de um
    * e-mail. encodeURIComponent garante que espaço, acento ou "&" no nome virem
-   * um caminho válido em vez de quebrarem a URL — e impede que ".." ou "/"
+   * um caminho válido em vez de quebrarem a URL, e impede que ".." ou "/"
    * colados no campo escapem da pasta de uploads.
    */
   function urlUpload(nome) {
@@ -87,7 +87,7 @@
        *
        * A regra do template é "campo vazio = bloco some da página". Sem um
        * sinal na aba, descobrir quais seções vão aparecer exige abrir uma por
-       * uma — que é justamente o trabalho que as abas vieram evitar.
+       * uma, que é justamente o trabalho que as abas vieram evitar.
        */
       function marcarPreenchidas() {
         secoes.forEach(function (secao, i) {
@@ -172,13 +172,20 @@
     });
   }
 
+  // Numera também ao ABRIR a página. O PHP imprime "1" em todas as linhas, de
+  // todas as listas, porque o mesmo trecho de HTML serve às linhas gravadas e ao
+  // <template> que este arquivo clona. Sem esta passada, uma oferta com três
+  // fotos exibia "1 1 1" até a cliente adicionar ou remover alguma, e o número
+  // é justamente o que diz em que ordem elas vão aparecer na página.
+  Array.prototype.forEach.call(document.querySelectorAll('.repetivel'), renumerar);
+
   // ---------------------------------------------------------------------------
   // Teto de itens (data-max)
   // ---------------------------------------------------------------------------
   //
   // Só vale para a lista que DECLARA o teto. O PHP publica data-max a partir de
   // uma constante (hoje MAX_IMAGENS, em inc/config.php) e o salvar corta o que
-  // passar disso — silenciosamente. Sem aviso na tela, a cliente escolheria a
+  // passar disso, silenciosamente. Sem aviso na tela, a cliente escolheria a
   // nona foto, salvaria, e ela simplesmente não estaria lá.
   //
   // As outras listas repetíveis (selos, FAQ, "não é para você") não declaram
@@ -187,7 +194,7 @@
   /**
    * O teto da lista, ou null quando não há.
    *
-   * Atributo ausente, vazio, "oito" ou "8 fotos" viram null — "sem limite" —
+   * Atributo ausente, vazio, "oito" ou "8 fotos" viram null, "sem limite",
    * em vez de um número chutado: travar a lista num valor inventado esconderia
    * conteúdo da cliente por causa de um erro de digitação no PHP.
    */
@@ -249,7 +256,7 @@
       aviso = el('p', 'teto-aviso');
       // role=status: a mensagem nasce vazia e o CSS a esconde enquanto estiver
       // assim. O leitor de tela só anuncia mudança de região viva que já
-      // existia — criá-la junto com o texto não anunciaria nada.
+      // existia, criá-la junto com o texto não anunciaria nada.
       aviso.setAttribute('role', 'status');
       botao.parentNode.insertBefore(aviso, botao.nextSibling);
     }
@@ -311,11 +318,11 @@
   });
 
   // ---------------------------------------------------------------------------
-  // Imagens da oferta — miniatura viva e envio por trás
+  // Imagens da oferta, miniatura viva e envio por trás
   // ---------------------------------------------------------------------------
   //
   // A lista de imagens é uma lista repetível como as outras, mas o campo guarda
-  // o NOME DO ARQUIVO — e nome de arquivo é a coisa mais fácil de errar do
+  // o NOME DO ARQUIVO, e nome de arquivo é a coisa mais fácil de errar do
   // painel inteiro (um dígito trocado, a extensão .jpeg no lugar de .jpg). Sem
   // retorno na tela, o erro só aparece quando a página publicada mostra um
   // quadrado vazio. Daí a miniatura viva em cada linha.
@@ -323,7 +330,7 @@
   // O envio acontece aqui mesmo, sem sair da oferta, mas NUNCA submetendo este
   // formulário: o arquivo vai por fetch para /admin/enviar.php e só o nome
   // devolvido entra no campo. É o motivo de admin/upload.php ter nascido em
-  // página separada — um <input type="file"> dentro de um formulário de vinte
+  // página separada, um <input type="file"> dentro de um formulário de vinte
   // campos faz a cliente perder tudo o que digitou se o envio estourar o
   // tamanho ou o tempo. Enviando por trás, o texto dela nunca sai da tela.
 
@@ -342,7 +349,7 @@
      *
      * O src só é reatribuído quando o endereço muda de verdade: cada
      * atribuição dispara um pedido novo ao servidor, e a cliente digita o nome
-     * caractere por caractere — sem esta guarda seriam ~25 pedidos por nome,
+     * caractere por caractere: sem esta guarda seriam ~25 pedidos por nome,
      * todos com 404, e a miniatura piscaria a cada tecla.
      */
     function atualizarMiniatura(campo) {
@@ -381,12 +388,12 @@
      *
      * `aPartirDe` é a linha que originou o envio, e a busca começa DEPOIS dela.
      * Sem isso, escolher duas fotos na linha 2 mandaria a segunda para a linha
-     * 1, se ela estivesse vazia — a ordem na página sairia invertida em relação
+     * 1, se ela estivesse vazia, a ordem na página sairia invertida em relação
      * à ordem em que ela escolheu os arquivos na janela do computador.
      *
      * Devolve true se entrou. O false só acontece se o teto tiver sido
      * alcançado entre a conferência de vagas e a chegada da resposta do
-     * servidor — quem chama precisa saber para contar direito o que entrou.
+     * servidor: quem chama precisa saber para contar direito o que entrou.
      */
     function inserirArquivo(nome, aPartirDe) {
       var campos = camposArquivo();
@@ -416,7 +423,7 @@
 
       if (!alvo) {
         // Último recurso: campo vazio ANTES da linha de origem. Fora de ordem,
-        // mas a foto já subiu — deixá-la de fora criaria arquivo órfão no
+        // mas a foto já subiu, deixá-la de fora criaria arquivo órfão no
         // servidor, que ninguém apagaria porque ninguém saberia que existe.
         for (var j = 0; j < inicio && j < campos.length; j++) {
           if (campos[j].value.trim() === '') { alvo = campos[j]; break; }
@@ -431,7 +438,7 @@
       // Um evento 'input' sintético faz o resto do painel reagir como se ela
       // tivesse digitado: a bolinha da aba e a prévia "Como fica na página"
       // já escutam input no documento. Chamar desenhar() daqui exigiria
-      // alcançar uma função que só existe quando há [data-previa] na tela —
+      // alcançar uma função que só existe quando há [data-previa] na tela,
       // acoplaria este bloco a um que pode não ter carregado.
       alvo.dispatchEvent(new Event('input', { bubbles: true }));
 
@@ -468,8 +475,8 @@
     //
     // O envio era um botão só, no fim da aba, e a foto caía "no primeiro campo
     // vazio": a cliente escolhia o arquivo sem poder dizer em que posição ele
-    // devia entrar, e descobria o lugar depois. Agora cada linha envia a sua —
-    // pelo botão ou arrastando o arquivo em cima dela — e a posição é escolhida
+    // devia entrar, e descobria o lugar depois. Agora cada linha envia a sua,
+    // pelo botão ou arrastando o arquivo em cima dela, e a posição é escolhida
     // antes, que é como ela pensa a página ("esta foto é a primeira").
     //
     // Tudo por delegação no container: as linhas nascem de um <template>
@@ -502,7 +509,7 @@
       aviso.classList.toggle('enviar-estado-erro', erro === true);
     }
 
-    /** Trava a linha durante o envio — inclusive contra um segundo envio nela. */
+    /** Trava a linha durante o envio, inclusive contra um segundo envio nela. */
     function travarEnvio(item, travado) {
       if (!item) return;
       var campo = item.querySelector('[data-enviar-campo]');
@@ -514,7 +521,7 @@
       }
       // O × também trava: apagar a linha no meio do envio deixaria o arquivo
       // já subido sem lugar para onde ir, e um arquivo órfão na hospedagem da
-      // cliente ninguém apaga depois — ninguém sabe que ele existe.
+      // cliente ninguém apaga depois, ninguém sabe que ele existe.
       var remover = item.querySelector('[data-remover]');
       if (remover) remover.disabled = travado;
 
@@ -530,7 +537,7 @@
      *
      * A própria linha sempre conta: se já tem foto, a primeira do lote a
      * substitui ("Trocar foto"); se está vazia, ela já entra no vazios de
-     * vagas(). O resto do lote segue a regra de sempre — campo vazio adiante,
+     * vagas(). O resto do lote segue a regra de sempre, campo vazio adiante,
      * ou linha nova enquanto couber no teto.
      */
     function cabemNesteEnvio(item) {
@@ -555,7 +562,7 @@
       // dizer isso antes de gastar o upload dela.
       var campoCsrf = document.querySelector('[data-abas] input[name="csrf"]');
       if (!campoCsrf || !campoCsrf.value) {
-        dizer(item, 'Não foi possível preparar o envio nesta página. Use a tela de envio, no fim da aba.', true);
+        dizer(item, 'Esta página perdeu a credencial do envio. Recarregue a página e tente de novo.', true);
         return;
       }
 
@@ -569,7 +576,7 @@
 
       // O corte é ANTES de enviar, não depois. Mandar cinco e aproveitar duas
       // deixaria três arquivos órfãos ocupando espaço na hospedagem da cliente
-      // para sempre — ninguém apagaria, porque ninguém saberia.
+      // para sempre, ninguém apagaria, porque ninguém saberia.
       var enviar   = escolhidos.slice(0, livres);
       var sobraram = escolhidos.length - enviar.length;
 
@@ -609,7 +616,7 @@
 
         nomes.forEach(function (nome) {
           if (typeof nome !== 'string' || nome === '') return;
-          // A primeira vai para ESTA linha — é o ponto do envio por linha.
+          // A primeira vai para ESTA linha: é o ponto do envio por linha.
           var entrou = primeira ? definirArquivo(item, nome) : inserirArquivo(nome, item);
           if (entrou) { entraram++; primeira = false; }
         });
@@ -624,20 +631,20 @@
           partes.push((sobraram === 1 ? 'Não coube 1 foto' : 'Não couberam ' + sobraram + ' fotos') +
                       ': a oferta aceita no máximo ' + tetoDaLista(listaImagens) + '.');
         }
-        if (!partes.length) partes.push('Nada foi enviado. Tente de novo ou use a tela de envio, no fim da aba.');
+        if (!partes.length) partes.push('Nada foi enviado. Tente de novo.');
 
         // Vermelho só quando NADA entrou: sucesso parcial é sucesso, e pintar
         // de erro a linha que diz "2 fotos entraram" assusta à toa.
         dizer(item, partes.join('\n'), entraram === 0);
       }).catch(function (erro) {
         dizer(item, erro && erro.message === 'resposta-invalida'
-          ? 'O servidor respondeu de um jeito inesperado. Sua sessão pode ter expirado: abra a tela de envio numa aba nova e entre de novo.'
-          : 'Não foi possível enviar. Verifique a conexão e tente de novo, ou use a tela de envio, no fim da aba.', true);
+          ? 'O servidor respondeu de um jeito inesperado. Sua sessão pode ter expirado: recarregue a página e entre de novo.'
+          : 'Não foi possível enviar. Verifique a conexão e tente de novo.', true);
       }).then(function () {
         travarEnvio(item, false);
         var campo = item.querySelector('[data-enviar-campo]');
         // Sem isto, escolher a MESMA foto de novo não dispara 'change' e o
-        // botão parece quebrado — o navegador considera que nada mudou.
+        // botão parece quebrado, o navegador considera que nada mudou.
         if (campo) campo.value = '';
       });
     }
@@ -727,7 +734,7 @@
 
     // Nome inexistente é o erro mais provável aqui, e é silencioso: sem aviso a
     // cliente só descobriria abrindo a página publicada. O evento 'error' de
-    // <img> não borbulha, então é preciso ouvi-lo na fase de captura — o que
+    // <img> não borbulha, então é preciso ouvi-lo na fase de captura: o que
     // tem a vantagem de já valer para as linhas clonadas do <template>.
     document.addEventListener('error', function (evento) {
       var img = evento.target;
@@ -843,7 +850,7 @@
 
         // TODOS os blocos são desenhados, e não só os primeiros. Cortar em
         // quatro escondia justamente os subtítulos, que num texto de venda
-        // aparecem depois da abertura — e a prévia parecia ignorar o "##".
+        // aparecem depois da abertura, e a prévia parecia ignorar o "##".
         // Quem limita a altura é o CSS, com rolagem própria.
         blocos.forEach(function (b) {
           b = b.trim();
@@ -929,7 +936,7 @@
 
         // Todas as perguntas com suas respostas, e não só a primeira aberta.
         // Imitar o acordeão da página escondia o conteúdo que ela precisa
-        // reler — e conferir o texto é a única razão de a prévia existir.
+        // reler, e conferir o texto é a única razão de a prévia existir.
         var respostas = Array.prototype.map.call(document.getElementsByName('faq_resposta[]'),
                                                  function (e2) { return e2.value.trim(); });
         var lista = el('div', 'previa-faq-lista');

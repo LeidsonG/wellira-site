@@ -4,8 +4,8 @@
  *
  * Responde JSON e existe para um motivo específico: o formulário da oferta é
  * longo, e um <input type="file"> DENTRO dele faria o navegador mandar a oferta
- * inteira junto com o arquivo. Se o envio falhasse por tamanho ou por timeout —
- * o que acontece em conexão doméstica —, a cliente perderia tudo o que digitou.
+ * inteira junto com o arquivo. Se o envio falhasse por tamanho ou por timeout,
+ * o que acontece em conexão doméstica, a cliente perderia tudo o que digitou.
  * É a mesma razão pela qual admin/upload.php nasceu como tela separada.
  *
  * Aqui o arquivo sobe por fetch, sozinho, e o formulário da oferta nunca é
@@ -13,7 +13,7 @@
  * ela escreveu corre risco.
  *
  * A tela admin/upload.php continua existindo e continua sendo a saída de quem
- * está sem JavaScript — e é a única forma de enviar vídeo.
+ * está sem JavaScript: e é a única forma de enviar vídeo.
  *
  * Nenhuma validação nova mora aqui: quem decide o que entra continua sendo
  * receber_uploads(), a mesma função da tela de upload, com a checagem por
@@ -45,7 +45,7 @@ sessao_iniciar();
 
 // Sem redirecionamento de propósito: exigir_login() manda um Location para a
 // tela de entrada, e o fetch seguiria esse redirecionamento e receberia o HTML
-// do login — que para o JavaScript é indistinguível de qualquer outra falha. Um
+// do login, que para o JavaScript é indistinguível de qualquer outra falha. Um
 // 401 com texto em português é o que permite dizer à cliente o que aconteceu.
 if (!autenticado() || sessao_expirada()) {
     if (sessao_expirada()) {
@@ -60,7 +60,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 }
 
 // Precisa vir ANTES do CSRF: com o corpo acima de post_max_size o PHP descarta
-// $_POST inteiro, e a conferência de CSRF falharia primeiro — devolvendo
+// $_POST inteiro, e a conferência de CSRF falharia primeiro, devolvendo
 // "sessão expirada" para o que na verdade é arquivo grande demais.
 if (post_estourou()) {
     recusar(

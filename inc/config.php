@@ -15,7 +15,7 @@
  *
  * Por padrão fica dentro do site, protegida pelo .htaccess de dados/.
  * Em hospedagem onde se possa gravar acima do public_html, mover para fora
- * é mais seguro — basta trocar por algo como dirname(__DIR__, 2) . '/dados'.
+ * é mais seguro, basta trocar por algo como dirname(__DIR__, 2) . '/dados'.
  * O restante do código não precisa mudar.
  */
 define('DIR_DADOS',   dirname(__DIR__) . '/dados');
@@ -47,7 +47,7 @@ define('DIR_CLIQUES', DIR_DADOS . '/cliques');
  * Onde o PHP grava as sessões do painel.
  *
  * Não usamos o padrão da hospedagem de propósito. Nesta conta ele aponta para
- * /var/cpanel/php/sessions/ea-php83, que não existe nem é gravável — e sem
+ * /var/cpanel/php/sessions/ea-php83, que não existe nem é gravável, e sem
  * gravar sessão o login nunca completa: o token de CSRF é gerado, some, e o
  * envio seguinte é recusado. O sintoma é um 400 que não explica nada.
  *
@@ -61,7 +61,7 @@ define('DIR_SESSOES', DIR_DADOS . '/sessoes');
  * Hash da senha do painel.
  *
  * Mora em dados/, e não em inc/, porque a cliente troca a própria senha pelo
- * painel — o arquivo precisa ser gravável pelo PHP. Deixar código executável
+ * painel, o arquivo precisa ser gravável pelo PHP. Deixar código executável
  * gravável pelo servidor web é o que transforma qualquer falha de escrita em
  * execução remota; dados/ já é gravável e já está fechado para a web pelo
  * .htaccess de lá.
@@ -77,7 +77,7 @@ define('ARQUIVO_SENHA', DIR_DADOS . '/senha.php');
 
 /**
  * Teto por arquivo. O plano compartilhado tem I/O limitado e o vídeo é servido
- * pelo próprio Apache, sem streaming — arquivo grande derruba a página em 4G
+ * pelo próprio Apache, sem streaming, arquivo grande derruba a página em 4G
  * antes de derrubar o servidor.
  */
 const MAX_UPLOAD_VIDEO  = 128 * 1024 * 1024; // 128 MB
@@ -113,7 +113,7 @@ const AVISO_BASE = 'Orders are completed on the manufacturer\'s website, which i
  *
  * A alternativa descartada era um mapa de categoria → texto fixo. Ela existiu
  * até 18/08/2026 e foi removida: com os avisos de FDA/DSHEA e "Results vary"
- * dispensados pelo cliente, o mapa não injetava mais nada — virou configuração
+ * dispensados pelo cliente, o mapa não injetava mais nada, virou configuração
  * que não fazia efeito. O campo livre cobre qualquer produto futuro sem exigir
  * que alguém preveja a categoria dele.
  */
@@ -144,7 +144,7 @@ const ICONES = [
  *
  * Fixo de propósito: é a mesma pessoa em todas as ofertas, e deixar a cliente
  * redigitar nome, cargo, foto e história a cada produto só produz divergência
- * entre páginas — uma com o cargo escrito de um jeito, outra com a foto
+ * entre páginas, uma com o cargo escrito de um jeito, outra com a foto
  * faltando. O painel já abre com estes valores preenchidos; ela edita se
  * quiser, ou desliga a seção inteira no interruptor.
  *

@@ -82,7 +82,7 @@ if ($acao === 'salvar_ver') {
 }
 
 // Salvar mantém a cliente no formulário, na mesma aba. Voltar para a lista a
-// cada gravação obrigava a reabrir a oferta e reencontrar o lugar — e o texto
+// cada gravação obrigava a reabrir a oferta e reencontrar o lugar, e o texto
 // de venda é escrito em várias sessões, salvando pelo caminho.
 $aba = (int) ($_POST['aba'] ?? 0);
 

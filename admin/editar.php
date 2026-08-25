@@ -5,7 +5,7 @@
  * Dividido em abas, na mesma ordem em que os blocos aparecem na página final.
  * A versão anterior era um formulário único de rolagem longa: para conferir o
  * FAQ depois de mexer no título era preciso atravessar a tela inteira, e as
- * listas (linhas, selos, perguntas) só ofereciam um campo em branco por vez —
+ * listas (linhas, selos, perguntas) só ofereciam um campo em branco por vez,
  * acrescentar dois itens exigia salvar no meio.
  *
  * Cada seção opcional diz o que acontece se ficar vazia. É a regra
@@ -31,7 +31,7 @@ if ($novo) {
     // elas prometiam na prévia um bloco que a cliente ainda não tinha escrito:
     // ou ela preenchia os quatro para a página não sair capenga, ou desligava
     // um a um o que não ia usar. Desligadas, a oferta mínima é só topo, vídeo,
-    // botão e texto — e cada bloco extra é uma escolha, não uma pendência.
+    // botão e texto, e cada bloco extra é uma escolha, não uma pendência.
     // (Autor fica de fora: vem preenchido, então não há o que pendurar.)
     $o = [
         'status'                   => 'rascunho',
@@ -111,7 +111,7 @@ function interruptor(array $o, string $secao, string $alvo): void
  *
  * O envio mora AQUI DENTRO, um por linha, e não num botão único no fim da aba.
  * O botão global mandava a foto para "o primeiro campo vazio", e a cliente não
- * tinha como dizer em qual posição ela queria a foto — ela enviava e depois
+ * tinha como dizer em qual posição ela queria a foto, ela enviava e depois
  * descobria onde tinha caído. Com o botão na linha, o lugar é escolhido antes.
  */
 function linha_imagem(array $imagem = []): void
@@ -123,7 +123,7 @@ function linha_imagem(array $imagem = []): void
       <span class="item-num"><span data-numero>1</span></span>
 
       <?php /* A moldura é ao mesmo tempo miniatura e alvo de arrastar. Vazia,
-               mostra um "+" — quadrado cinza sem nada dentro não se anuncia
+               mostra um "+", quadrado cinza sem nada dentro não se anuncia
                como lugar onde cabe alguma coisa. */ ?>
       <div class="foto-lugar" data-foto-lugar>
         <img class="item-miniatura" data-miniatura alt="" hidden>
@@ -135,30 +135,30 @@ function linha_imagem(array $imagem = []): void
                  já enviado, então ele existe sempre no HTML. Com JavaScript, o
                  CSS o esconde (regra .js) e quem manda é o botão ao lado: o
                  nome do arquivo passa a ser assunto da máquina, não dela.
-                 O valor continua sendo enviado no salvar de qualquer forma —
-                 campo escondido por CSS ainda vai no formulário. */ ?>
+                 O valor continua sendo enviado no salvar de qualquer forma,
+                 porque campo escondido por CSS ainda vai no formulário. */ ?>
         <input type="text" name="imagem_arquivo[]" class="campo-arquivo"
                value="<?= e($arquivo) ?>" maxlength="200"
                placeholder="20260824-a1b2c3.jpg" aria-label="Nome do arquivo">
-
-        <?php /* Só aparece quando há JavaScript: o envio é por fetch, e um botão
-                 que não faz nada é pior do que botão nenhum. O <input type=file>
-                 fica escondido porque navegador nenhum deixa dar estilo no
-                 controle nativo, e este precisa ser alvo de toque no celular. */ ?>
-        <div class="foto-envio">
-          <input type="file" accept="image/jpeg,image/png,image/webp" multiple
-                 data-enviar-campo hidden tabindex="-1" aria-hidden="true">
-          <button type="button" class="botao botao-fraco foto-botao" data-enviar-botao>
-            <?= $arquivo === '' ? 'Enviar foto' : 'Trocar foto' ?>
-          </button>
-        </div>
 
         <input type="text" name="imagem_legenda[]" value="<?= e($legenda) ?>"
                maxlength="150" placeholder="Descrição em inglês (aparece sob a imagem)"
                aria-label="Descrição da imagem">
       </div>
 
-      <button type="button" class="remover" data-remover title="Remover esta imagem">×</button>
+      <?php /* Só aparece quando há JavaScript: o envio é por fetch, e um botão
+               que não faz nada é pior do que botão nenhum. O <input type=file>
+               fica escondido porque navegador nenhum deixa dar estilo no
+               controle nativo, e este precisa ser alvo de toque no celular. */ ?>
+      <div class="foto-envio">
+        <input type="file" accept="image/jpeg,image/png,image/webp" multiple
+               data-enviar-campo hidden tabindex="-1" aria-hidden="true">
+        <button type="button" class="botao botao-fraco foto-botao" data-enviar-botao>
+          <?= $arquivo === '' ? 'Enviar foto' : 'Trocar foto' ?>
+        </button>
+      </div>
+
+      <button type="button" class="remover perigo" data-remover title="Remover esta imagem">×</button>
 
       <?php /* Aviso desta linha, não da aba: com o envio espalhado pelas linhas,
                uma mensagem central obrigaria a procurar de qual foto ela fala. */ ?>
@@ -173,7 +173,7 @@ $faq        = array_values((array) ($o['faq'] ?? []));
 $imagens    = array_values((array) ($o['imagens'] ?? []));
 
 // Oferta nova começa com uma linha de cada lista, só para não abrir vazia.
-// As demais a cliente acrescenta no botão — não há mais limite de uma por vez.
+// As demais a cliente acrescenta no botão, não há mais limite de uma por vez.
 if (!$linhas_nao) { $linhas_nao = ['']; }
 if (!$selos)      { $selos      = [['icone' => 'escudo', 'titulo' => '', 'texto' => '']]; }
 if (!$faq)        { $faq        = [['pergunta' => '', 'resposta' => '']]; }
@@ -182,7 +182,7 @@ if (!$imagens)    { $imagens    = [['arquivo' => '', 'legenda' => '']]; }
 /**
  * Endereço para ver a página desta oferta.
  *
- * Rascunho não existe em /<slug> — é isso que rascunho quer dizer —, e o cookie
+ * Rascunho não existe em /<slug>: é isso que rascunho quer dizer, e o cookie
  * do painel tem path=/admin, então a página pública não tem como abrir exceção
  * para a cliente logada. Até 24/08/2026 o botão apontava para /<slug> em
  * qualquer situação, e quem clicava num rascunho recebia "página não
@@ -205,7 +205,7 @@ function endereco_para_ver(array $o, string $slug): string
  * formato do bloco, mas não dizia nada sobre a oferta em si, e por isso não
  * ajudava a decidir se o texto estava bom.
  *
- * Só o invólucro sai do PHP. Nada de valor da cliente é impresso aqui — quem
+ * Só o invólucro sai do PHP. Nada de valor da cliente é impresso aqui: quem
  * escreve o texto é o JS, sempre por textContent, então o conteúdo dela nunca
  * é interpretado como marcação.
  */
@@ -411,11 +411,8 @@ if (!empty($_GET['ok'])) {
     </button>
 
     <p class="ajuda">
-      JPG, PNG ou WebP, até <?= round(limite_upload('imagem') / 1048576, 1) ?> MB cada.
-      Cada foto sobe pelo botão da própria linha — ou arrastando o arquivo em
-      cima dela. Se os botões não responderem, use a
-      <a href="/admin/upload.php?destino=imagem" target="_blank" rel="noopener">tela de envio</a>
-      e cole o nome do arquivo no campo que aparece em cada linha.
+      Cada foto sobe pelo botão da própria linha, ou arrastando o arquivo em
+      cima dela. JPG, PNG ou WebP, até <?= round(limite_upload('imagem') / 1048576, 1) ?> MB cada.
     </p>
 
     <p class="ajuda">
@@ -448,7 +445,7 @@ if (!empty($_GET['ok'])) {
       <p class="ajuda">
         A página repete o botão três vezes, e todas usam este mesmo texto.
         Antes eram dois campos para dizer quase a mesma coisa em lugares
-        diferentes — dava trabalho e produzia páginas incoerentes.
+        diferentes, dava trabalho e produzia páginas incoerentes.
       </p>
     </div>
     <?php exemplo('botao'); ?>
@@ -634,7 +631,7 @@ if (!empty($_GET['ok'])) {
            conteúdo aqui: as abas seguem a ordem em que os blocos aparecem para
            o visitante, e essa correspondência é o que permite à cliente
            conferir a página sem abrir a página. A assinatura passou para o fim
-           em 24/08/2026 — quem escreveu o texto é o que se lê depois de tudo,
+           em 24/08/2026: quem escreveu o texto é o que se lê depois de tudo,
            não uma interrupção no meio do argumento de venda. */ ?>
   <section id="sec-autor" data-secao="Autor" hidden>
     <?php interruptor($o, 'autor', 'grupo-autor'); ?>
@@ -705,7 +702,7 @@ if (!empty($_GET['ok'])) {
   </section>
 
   <?php /* Um botão principal só. Antes eram "Salvar" e "Salvar e continuar",
-           que faziam quase a mesma coisa com nomes parecidos — e o primeiro
+           que faziam quase a mesma coisa com nomes parecidos, e o primeiro
            jogava de volta para a lista no meio da escrita. Agora salvar
            mantém a cliente onde ela está, que é o que um editor deve fazer. */ ?>
   <!-- ==================== 12. Publicação ==================== -->
