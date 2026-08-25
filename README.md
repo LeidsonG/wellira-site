@@ -361,6 +361,7 @@ As pastas de `dados/` são criadas sozinhas na primeira gravação, desde que
 | `session_regenerate_id()` no login | session fixation |
 | Token CSRF em todo POST, via `hash_equals` | ação forjada por outra aba |
 | Excluir e duplicar só por POST | robô seguindo link |
+| Excluir exige `confirmado`, campo que só o `confirm()` do navegador cria — sem ele, `acoes.php` devolve a tela de "tem certeza?" em vez de apagar | clique acidental na lista, e exclusão disparada com o JS fora do ar |
 | Upload validado por **magic bytes**, extensão vinda da assinatura — inclusive arquivo a arquivo no envio múltiplo | PHP disfarçado de imagem |
 | Prévia servida de dentro de `/admin`, com login, `X-Robots-Tag` e `no-store` | rascunho da cliente visível ao público ou indexado |
 | `admin/enviar.php` exige login e CSRF pelas mesmas funções das outras telas (`csrf_ok()`, `sessao_expirada()`), e responde `nosniff` | endpoint de upload virar a porta dos fundos do painel |

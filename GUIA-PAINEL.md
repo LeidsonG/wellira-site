@@ -415,6 +415,11 @@ servidor, então dá para recuperar — mas só com ajuda técnica. Antes de exc
 considere apenas voltar para **rascunho**: tira do ar do mesmo jeito e você
 continua com o conteúdo à mão.
 
+**Clique sem querer não apaga nada.** O botão *Excluir* sempre pergunta antes,
+com o nome da oferta na pergunta — ou numa caixinha do navegador, ou numa tela
+de *"Excluir esta oferta?"* com os botões **Cancelar** e **Sim, excluir**. A
+oferta só some depois que você responde que sim.
+
 ---
 
 ## Se algo der errado

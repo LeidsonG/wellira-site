@@ -204,18 +204,40 @@ body.entrada main { padding: 1.5rem; width: 100%; }
 .etiqueta-erro  { background: var(--erro-fundo); color: var(--erro); }
 .etiqueta-fraca { background: #fff3cd; color: #7a5b00; }
 
-.acoes { white-space: nowrap; }
-.acoes a, .acoes .link {
-  color: var(--marca); text-decoration: none; font-size: 0.86rem;
-  margin-right: 0.7rem; font-weight: 550;
+/* Ações da linha, em grade 2x2.
+   Eram quatro links em fila: a fila quebrava onde coubesse, e "Excluir" mudava
+   de lugar conforme a largura do título ao lado. Em grade cada ação tem posição
+   fixa — editar e ver em cima, duplicar e excluir embaixo —, e a cliente
+   aprende o lugar em vez de reler os quatro toda vez.
+   O <form> é o próprio item da grade: assim duplicar e excluir ficam alinhados
+   com os dois de cima sem precisar de display:contents. */
+.acoes { white-space: normal; }
+.acoes-grade {
+  display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.4rem; min-width: 15rem;
 }
-.acoes a:hover, .acoes .link:hover { text-decoration: underline; }
-.em-linha { display: inline; }
-button.link {
-  background: none; border: 0; padding: 0; cursor: pointer;
-  font: inherit; font-size: 0.86rem; font-weight: 550; color: var(--marca);
+.acoes-grade > form { margin: 0; display: block; }
+.acoes-grade .larga { grid-column: 1 / -1; }
+
+/* Especificidade acima de button[type="submit"], que por padrão pinta o botão
+   com a cor da marca — aqui as quatro ações têm o mesmo peso visual. */
+.acoes-grade .botao,
+.acoes-grade button[type="submit"] {
+  display: block; width: 100%; padding: 0.45rem 0.7rem;
+  font-size: 0.85rem; font-weight: 600;
 }
-button.link.perigo { color: var(--erro); }
+.acoes-grade .botao.botao-fraco {
+  background: var(--papel); color: var(--tinta); border-color: var(--linha-forte);
+}
+.acoes-grade .botao.botao-fraco:hover {
+  background: #eef1f4; color: var(--tinta); border-color: var(--linha-forte);
+}
+/* Excluir é o mesmo botão dos outros: só a cor avisa. Um botão vermelho cheio
+   nesta grade puxaria o olho para a ação que ela menos quer clicar. */
+.acoes-grade .botao.perigo { color: var(--erro); border-color: #e8b4b0; }
+.acoes-grade .botao.perigo:hover {
+  background: var(--erro-fundo); color: var(--erro); border-color: var(--erro);
+}
 
 .vazio {
   background: var(--papel); border: 1px dashed var(--linha-forte); border-radius: var(--raio);
@@ -772,8 +794,12 @@ button[type="submit"]:hover, .botao:hover { background: var(--marca-escura); bor
   .lista td { border: 0; padding: 0.3rem 1rem; }
   .lista .num { text-align: left; }
   .lista .num::before { content: "Cliques: "; color: var(--tinta-tenue); font-size: 0.84rem; }
-  .acoes { white-space: normal; padding-top: 0.6rem !important; }
-  .acoes a, .acoes .link { display: inline-block; margin: 0 0.9rem 0.3rem 0; }
+  /* A grade continua 2x2 no celular: são quatro alvos de toque em bloco, e
+     empilhar em coluna única daria uma lista de quatro botões por oferta. */
+  .acoes { padding-top: 0.6rem !important; }
+  .acoes-grade { min-width: 0; gap: 0.5rem; }
+  .acoes-grade .botao,
+  .acoes-grade button[type="submit"] { padding: 0.6rem 0.7rem; font-size: 0.9rem; }
 
   .barra-salvar { flex-direction: column; align-items: stretch; }
   .barra-salvar button, .barra-salvar .botao { width: 100%; }

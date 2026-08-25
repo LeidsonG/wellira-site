@@ -80,9 +80,22 @@ function painel_rodape(bool $logado = true): void
    interpolar o título dentro de confirm('...') quebrava a string sempre que ele
    tinha apóstrofo, e um handler com erro de sintaxe não impede envio nenhum. */
 document.addEventListener('submit', function (evento) {
-  var mensagem = evento.target.getAttribute && evento.target.getAttribute('data-confirmar');
-  if (mensagem && !window.confirm(mensagem)) {
+  var formulario = evento.target;
+  var mensagem = formulario.getAttribute && formulario.getAttribute('data-confirmar');
+  if (!mensagem) { return; }
+  if (!window.confirm(mensagem)) {
     evento.preventDefault();
+    return;
+  }
+  /* Carimba a resposta. O servidor exige este campo para excluir: assim, um
+     pedido que chegue sem passar por aqui (JS desligado, script quebrado)
+     recebe a mesma pergunta numa página, em vez de apagar direto. */
+  if (!formulario.querySelector('input[name="confirmado"]')) {
+    var marca = document.createElement('input');
+    marca.type = 'hidden';
+    marca.name = 'confirmado';
+    marca.value = '1';
+    formulario.appendChild(marca);
   }
 });
 </script>
