@@ -101,6 +101,57 @@ function interruptor(array $o, string $secao, string $alvo): void
     <?php
 }
 /**
+ * Campo de uma linha com chave de liga/desliga ao lado.
+ *
+ * Substitui a instrução "vazios, os dois somem da página", que ficava num
+ * parágrafo solto embaixo dos dois campos: dizia a regra em palavras e obrigava
+ * a cliente a apagar o texto para esconder a linha. Agora a regra está no
+ * controle, e o estado é visível sem ler nada.
+ *
+ * NÃO existe campo novo no JSON. Desligada, a chave desabilita o input, e
+ * campo desabilitado o navegador simplesmente não envia: o salvar recebe
+ * ausente, grava vazio, e o bloco some da página exatamente como antes. É por
+ * isso que a chave nasce ligada quando há texto e desligada quando não há, o
+ * estado é lido do próprio valor, não de uma configuração à parte.
+ *
+ * O texto digitado NÃO sobrevive a um salvar com a chave desligada: vazio é
+ * vazio. Por isso o JavaScript guarda o valor ao desligar e devolve ao religar,
+ * o que cobre o arrependimento imediato, que é o caso comum.
+ */
+function campo_chaveavel(string $id, string $rotulo, string $valor,
+                         int $max, string $placeholder): void
+{
+    $ligado = trim($valor) !== '';
+    ?>
+    <div class="campo">
+      <label for="<?= e($id) ?>"><?= e($rotulo) ?></label>
+      <div class="campo-chave<?= $ligado ? '' : ' desligado' ?>">
+        <input type="text" id="<?= e($id) ?>" name="<?= e($id) ?>"
+               value="<?= e($valor) ?>" maxlength="<?= $max ?>"
+               <?= $placeholder !== '' ? 'placeholder="' . e($placeholder) . '"' : '' ?>
+               <?= $ligado ? '' : 'disabled' ?>>
+        <?php /* role="switch" e não um checkbox: é um controle da tela, não um
+                 dado da oferta. Como checkbox ele viajaria no POST e viraria
+                 mais um campo para o salvar entender, que é justamente o que
+                 esta solução evita. */ ?>
+        <button type="button" class="chave" role="switch"
+                aria-checked="<?= $ligado ? 'true' : 'false' ?>"
+                aria-controls="<?= e($id) ?>"
+                data-chave
+                title="Usar esta linha na página">
+          <span class="chave-trilho" aria-hidden="true"></span>
+          <?php /* Sem mb_strtolower: a extensão mbstring não está garantida (não
+                   está carregada nem aqui), e o projeto não usa mb_* em lugar
+                   nenhum. O rótulo entra como está, que o leitor de tela lê
+                   igual. */ ?>
+          <span class="visualmente-oculto">Usar "<?= e($rotulo) ?>" na página</span>
+        </button>
+      </div>
+    </div>
+    <?php
+}
+
+/**
  * Uma linha da lista de imagens.
  *
  * A mesma função desenha as linhas gravadas e o <template> que o JavaScript
@@ -329,18 +380,13 @@ if (!empty($_GET['ok'])) {
     </div>
 
     <div class="dupla">
-      <div class="campo">
-        <label for="eyebrow">Etiqueta acima do título</label>
-        <input type="text" id="eyebrow" name="eyebrow" value="<?= v($o, 'eyebrow') ?>"
-               maxlength="80" placeholder="Wellness · Reviewed">
-      </div>
-      <div class="campo">
-        <label for="subtitulo">Linha de apoio</label>
-        <input type="text" id="subtitulo" name="subtitulo" value="<?= v($o, 'subtitulo') ?>"
-               maxlength="300">
-      </div>
+      <?php
+      campo_chaveavel('eyebrow', 'Etiqueta acima do título',
+                      (string) ($o['eyebrow'] ?? ''), 80, 'Wellness · Reviewed');
+      campo_chaveavel('subtitulo', 'Linha de apoio',
+                      (string) ($o['subtitulo'] ?? ''), 300, '');
+      ?>
     </div>
-    <p class="ajuda">Vazios, os dois somem da página.</p>
     <?php exemplo('topo'); ?>
   </section>
 

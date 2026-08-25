@@ -318,6 +318,53 @@
   });
 
   // ---------------------------------------------------------------------------
+  // Chave de liga/desliga ao lado de um campo de uma linha
+  // ---------------------------------------------------------------------------
+  //
+  // Diferente do interruptor de seção acima, aqui desligar DESABILITA o campo,
+  // e é essa a mecânica: campo desabilitado não é enviado, o salvar grava vazio,
+  // e vazio é o que faz o bloco sumir da página. Nenhum campo novo no JSON.
+  //
+  // A consequência é que o texto não sobrevive a um salvar com a chave
+  // desligada. Guardar o valor aqui cobre o arrependimento imediato, que é o
+  // caso comum (desligou, olhou, religou), sem inventar um lugar para guardar
+  // texto que a oferta não tem.
+
+  document.addEventListener('click', function (evento) {
+    var chave = evento.target.closest('[data-chave]');
+    if (!chave) return;
+
+    var campo = document.getElementById(chave.getAttribute('aria-controls'));
+    if (!campo) return;
+
+    var ligando = chave.getAttribute('aria-checked') !== 'true';
+    chave.setAttribute('aria-checked', ligando ? 'true' : 'false');
+
+    var caixa = chave.closest('.campo-chave');
+    if (caixa) caixa.classList.toggle('desligado', !ligando);
+
+    if (ligando) {
+      campo.disabled = false;
+      if (campo.value === '' && chave.dataset.guardado) {
+        campo.value = chave.dataset.guardado;
+      }
+      delete chave.dataset.guardado;
+      campo.focus();
+    } else {
+      if (campo.value !== '') chave.dataset.guardado = campo.value;
+      // Esvaziar não é redundante com o disabled: o campo desligado precisa
+      // MOSTRAR o que vai valer no salvar. Deixar o texto num campo cinza faria
+      // a cliente acreditar que ele continua guardado em algum lugar.
+      campo.value = '';
+      campo.disabled = true;
+    }
+
+    // A bolinha da aba conta campos preenchidos; sem avisar, ela continuaria
+    // verde por causa de um campo que acabou de ser esvaziado.
+    campo.dispatchEvent(new Event('input', { bubbles: true }));
+  });
+
+  // ---------------------------------------------------------------------------
   // Imagens da oferta, miniatura viva e envio por trás
   // ---------------------------------------------------------------------------
   //
