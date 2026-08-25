@@ -178,7 +178,7 @@ subir** o arquivo (veja abaixo).
 |---|---|
 | `inc/funcoes.php` | `imagens_da_oferta()`, `render_galeria()`, `galeria_img()`, `nome_imagem_valido()` |
 | `inc/admin-funcoes.php` | `receber_uploads()` — envio de vários arquivos |
-| `admin/editar.php` | aba **Imagens**, logo após **Vídeo**, com o botão de envio |
+| `admin/editar.php` | aba **Imagens**, logo após **Vídeo**; `linha_imagem()` desenha a linha gravada e o `<template>` |
 | `admin/enviar.php` | endpoint JSON do envio feito de dentro do editor |
 | `admin/upload.php` | tela de envio: alternativa sem JavaScript e **único caminho para vídeo** |
 | `assets/js/admin.js` | miniatura viva de cada linha, contagem de vagas e o `fetch` do envio |
@@ -203,6 +203,34 @@ Decisões que não devem ser desfeitas sem motivo:
 
 A cliente escolhe as fotos na própria aba *Imagens* e elas sobem na hora, cada
 uma entrando na lista com o nome já preenchido.
+
+**Cada linha envia a sua foto** — pelo botão dentro dela ou arrastando o arquivo
+em cima dela. Até 25/08/2026 havia um botão único no fim da aba, e a foto caía
+"no primeiro campo vazio": a cliente escolhia o arquivo sem poder dizer em que
+posição ele devia entrar, e descobria o lugar só depois de subir. Com o botão na
+linha, a posição é escolhida antes — que é como ela pensa a página ("esta foto é
+a primeira"). Escolher várias fotos numa linha continua funcionando: a primeira
+fica ali e as demais seguem para os campos vazios **abaixo** dela, criando linha
+enquanto couber no teto.
+
+Consequências desse desenho, todas em `assets/js/admin.js`:
+
+- **Tudo por delegação** no `#lista-imagens`: as linhas nascem de um `<template>`
+  clonado, e ouvinte pendurado em cada linha teria de ser rependurado a cada
+  clone. `linha_imagem()` em `admin/editar.php` desenha a linha gravada **e** o
+  molde, pelo mesmo motivo — eram dois blocos de HTML quase iguais, e todo campo
+  novo precisava ser lembrado nos dois
+- **Soltar fora de uma linha não faz nada.** Um `drop` sem `preventDefault` faz
+  o navegador abrir o arquivo no lugar da página, e a oferta ainda não salva iria
+  embora junto. Há um guarda no `document` só para isso
+- **O × trava durante o envio**, e a resposta confere `item.isConnected`: apagar
+  a linha no meio do envio deixaria o arquivo já subido sem lugar para onde ir —
+  órfão que ninguém apaga depois, porque ninguém sabe que existe
+- O campo com o **nome do arquivo continua no HTML**, escondido pela regra `.js`
+  do CSS. É a única forma de apontar um arquivo já enviado quando o JavaScript
+  não roda; a classe `js` é posta por um script inline no `<head>` (`layout.php`)
+  porque `admin.js` é `defer` e os campos apareceriam por um instante antes de
+  sumir
 
 **O formulário da oferta não é enviado junto** — é a decisão que sustenta o
 recurso. Um `<input type="file">` comum dentro daquele formulário faria o
@@ -235,8 +263,8 @@ os campos vazios existentes com o espaço que falta para `MAX_IMAGENS` — a lis
 pode estar cheia e ainda ter campo vazio, e preencher campo não a faz crescer.
 
 `admin/upload.php` continua existindo e continua no `GUIA-PAINEL.md`: é a saída
-de quem estiver sem JavaScript, e o editor mantém o link para ela logo abaixo do
-botão.
+de quem estiver sem JavaScript, e o editor mantém o link para ela no fim da aba
+*Imagens*.
 
 ### Duas funções extraídas de `inc/auth.php`
 

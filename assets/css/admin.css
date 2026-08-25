@@ -459,63 +459,93 @@ textarea { resize: vertical; line-height: 1.6; }
 .teto-aviso:empty { display: none; }
 
 /* ---------- Lista de imagens ---------- */
+/* Cada linha é uma foto e envia a sua própria: o botão de envio mora dentro
+   dela, e a linha inteira aceita o arquivo arrastado. O envio era um botão
+   único no fim da aba, e a foto caía "no primeiro campo vazio" — a cliente
+   escolhia o arquivo sem poder dizer em que posição ele devia entrar. */
 
-/* A linha da imagem quebra em duas quando dá aviso: o ::after do estado
-   "quebrada" precisa de uma faixa inteira embaixo, e sem o wrap ele viraria
-   uma quarta coluna espremida entre a miniatura e o botão de remover. */
-.item-imagem { flex-wrap: wrap; }
+/* A linha quebra em duas: o aviso de estado e o de arquivo quebrado precisam de
+   uma faixa inteira embaixo, senão viram uma coluna espremida entre a moldura
+   e o botão de remover. */
+.item-imagem { flex-wrap: wrap; position: relative; }
 
-.item-miniatura {
-  flex: 0 0 auto; width: 56px; height: 56px;
-  object-fit: cover; border-radius: 8px;
+/* Moldura da foto: miniatura quando há arquivo, "+" quando está vazia.
+   Quadrado cinza sem nada dentro não se anuncia como lugar onde cabe algo. */
+.foto-lugar {
+  flex: 0 0 auto; position: relative;
+  width: 72px; height: 72px; border-radius: 8px;
   border: 1px solid var(--linha-forte); background: #eef1f4;
+  display: grid; place-items: center; overflow: hidden;
 }
+.item-miniatura {
+  width: 100%; height: 100%; object-fit: cover; display: block;
+  /* Acima do "+", que é irmão posicionado depois dele. Sem isto, a foto
+     carregada apareceria com o sinal de vazio desenhado por cima. */
+  position: relative; z-index: 1;
+}
+/* Uma regra de autor com display: block venceria o [hidden] do navegador, que
+   é folha de usuário-agente — a miniatura escondida pelo JS continuaria
+   ocupando a moldura, como retângulo de imagem quebrada. */
+.item-miniatura[hidden] { display: none; }
 
-/* Nome de arquivo errado é o engano mais comum desta aba e não dá nenhum sinal
-   por conta própria — a página publicada é que mostraria o buraco. */
+.foto-vazia {
+  position: absolute; inset: 0; display: grid; place-items: center;
+  color: var(--tinta-tenue); font-size: 1.6rem; font-weight: 300; line-height: 1;
+}
+/* Com foto, o "+" sai da frente. :has evita sincronizar mais uma classe pelo
+   JavaScript; onde ele não existir, a miniatura é opaca, ocupa a moldura
+   inteira e tem z-index maior — o "+" fica coberto do mesmo jeito. */
+.foto-lugar:has(img:not([hidden])) .foto-vazia { display: none; }
+
+.foto-envio { display: none; }          /* sem JS não há envio por fetch */
+.js .foto-envio { display: block; }
+/* Com JS, o nome do arquivo é assunto da máquina: quem manda é o botão da
+   linha. Sem JS, este campo é a única forma de apontar um arquivo já enviado,
+   e por isso ele existe sempre no HTML. */
+.js .campo-arquivo { display: none; }
+
+.foto-botao { display: block; width: 100%; }
+
+/* Enquanto sobe. O clique já está impedido pelo botão desabilitado — isto é só
+   a aparência disso, senão ele continua convidando a clicar de novo e a mesma
+   foto sobe duas vezes. */
+.foto-botao.enviando { opacity: .6; cursor: progress; }
+
+/* Arquivo arrastado por cima desta linha. Precisa ser inconfundível: com oito
+   linhas parecidas na tela, a única pergunta que importa é "em qual vai cair?" */
+.item-soltar {
+  border-color: var(--marca); background: var(--marca-clara);
+  box-shadow: 0 0 0 2px var(--marca-clara);
+}
+.item-soltar .foto-lugar { border-color: var(--marca); border-style: dashed; }
+
+.item-enviando { opacity: .85; }
+
+/* Aviso desta linha. Ganha espaço só quando tem o que dizer, e guarda as
+   quebras: sucesso parcial lista, numa linha cada, o que entrou e o que foi
+   recusado. */
+.foto-estado {
+  flex: 0 0 100%; margin: 0.15rem 0 0;
+  font-size: 0.8rem; color: var(--tinta-fraca); white-space: pre-line;
+}
+/* Escondido enquanto não tem texto. Alternar display por JS quebraria o
+   role="status": região viva escondida não é anunciada ao reaparecer. */
+.foto-estado:empty { display: none; }
+
+/* Vermelho só quando NADA entrou; sucesso parcial continua na cor normal. */
+.enviar-estado-erro { color: var(--erro); font-weight: 600; }
+
+/* Arquivo que não está mais no servidor. Não dá nenhum sinal por conta
+   própria — a página publicada é que mostraria o buraco. */
 .item-imagem-quebrada {
   border-color: var(--erro);
   background: var(--erro-fundo);
 }
 .item-imagem-quebrada::after {
-  content: "Arquivo não encontrado em assets/img/uploads — confira o nome";
-  flex: 0 0 100%;
+  content: "Esta foto não está mais no servidor. Envie de novo pelo botão desta linha.";
+  flex: 0 0 100%; order: 9;
   color: var(--erro); font-size: 0.78rem; font-weight: 600;
 }
-
-/* ---------- Enviar fotos sem sair da oferta ---------- */
-/* O <input type="file"> fica escondido e quem aparece é o <label>: input de
-   arquivo cru é pequeno, some no celular e cada navegador desenha o seu de um
-   jeito. O label herda o visual dos botões do painel e vira alvo grande. */
-
-.enviar-fotos {
-  margin-top: 1rem; padding: 0.9rem;
-  background: #fafbfc; border: 1px dashed var(--linha-forte); border-radius: 9px;
-  text-align: center;
-}
-.enviar-fotos [data-enviar-botao] { display: inline-block; min-width: 240px; }
-
-/* Enquanto sobe. O clique já está impedido pelo input desabilitado — isto é só
-   a aparência disso, senão o botão continua convidando a clicar de novo e ela
-   manda a mesma foto duas vezes. */
-.enviar-fotos [data-enviar-botao].enviando {
-  opacity: .6; cursor: progress; pointer-events: none;
-}
-
-/* Fica embaixo do botão, e ganha espaço só quando tem o que dizer. O
-   white-space guarda as quebras: sucesso parcial lista, numa linha cada, o que
-   entrou e o que foi recusado.
-   Selecionado pelo atributo, e não por classe: o PHP imprime o parágrafo como
-   class="ajuda", e inventar uma classe aqui exigiria mexer no PHP. */
-[data-enviar-estado] {
-  margin: 0.7rem 0 0; text-align: center; white-space: pre-line;
-}
-/* Escondido enquanto não tem texto. Alternar display por JS quebraria o
-   role="status": região viva escondida não é anunciada ao reaparecer. */
-[data-enviar-estado]:empty { display: none; }
-
-/* Vermelho só quando NADA entrou; sucesso parcial continua na cor normal. */
-.enviar-estado-erro { color: var(--erro); font-weight: 600; }
 
 /* ---------- Prompt do ChatGPT ---------- */
 
@@ -790,9 +820,9 @@ button[type="submit"]:hover, .botao:hover { background: var(--marca-escura); bor
   .interruptor { padding: 1rem; }
   .previa { max-width: 100%; }
 
-  /* O botão de enviar ocupa a linha inteira: no celular ele é o alvo principal
-     da aba, e min-width não garante largura cheia. */
-  .enviar-fotos [data-enviar-botao] { display: block; width: 100%; min-width: 0; }
+  /* Moldura menor: no celular a linha é estreita, e 72px empurrariam a legenda
+     para uma coluna de poucos caracteres. */
+  .foto-lugar { width: 60px; height: 60px; }
 
   .lista, .lista thead, .lista tbody, .lista tr, .lista td { display: block; width: 100%; }
   .lista thead { display: none; }

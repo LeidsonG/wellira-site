@@ -100,6 +100,73 @@ function interruptor(array $o, string $secao, string $alvo): void
     </label>
     <?php
 }
+/**
+ * Uma linha da lista de imagens.
+ *
+ * A mesma função desenha as linhas gravadas e o <template> que o JavaScript
+ * clona. Eram dois blocos de HTML quase iguais, e todo campo novo precisava ser
+ * lembrado nos dois: esquecer o segundo produzia uma linha clonada sem o
+ * controle recém-acrescentado, defeito que só aparece depois de clicar em
+ * "+ Adicionar imagem".
+ *
+ * O envio mora AQUI DENTRO, um por linha, e não num botão único no fim da aba.
+ * O botão global mandava a foto para "o primeiro campo vazio", e a cliente não
+ * tinha como dizer em qual posição ela queria a foto — ela enviava e depois
+ * descobria onde tinha caído. Com o botão na linha, o lugar é escolhido antes.
+ */
+function linha_imagem(array $imagem = []): void
+{
+    $arquivo = (string) ($imagem['arquivo'] ?? '');
+    $legenda = (string) ($imagem['legenda'] ?? '');
+    ?>
+    <div class="item item-bloco item-imagem" data-item>
+      <span class="item-num"><span data-numero>1</span></span>
+
+      <?php /* A moldura é ao mesmo tempo miniatura e alvo de arrastar. Vazia,
+               mostra um "+" — quadrado cinza sem nada dentro não se anuncia
+               como lugar onde cabe alguma coisa. */ ?>
+      <div class="foto-lugar" data-foto-lugar>
+        <img class="item-miniatura" data-miniatura alt="" hidden>
+        <span class="foto-vazia" data-foto-vazia aria-hidden="true">+</span>
+      </div>
+
+      <div class="item-campos empilhado">
+        <?php /* Sem JavaScript este campo é a única forma de apontar um arquivo
+                 já enviado, então ele existe sempre no HTML. Com JavaScript, o
+                 CSS o esconde (regra .js) e quem manda é o botão ao lado: o
+                 nome do arquivo passa a ser assunto da máquina, não dela.
+                 O valor continua sendo enviado no salvar de qualquer forma —
+                 campo escondido por CSS ainda vai no formulário. */ ?>
+        <input type="text" name="imagem_arquivo[]" class="campo-arquivo"
+               value="<?= e($arquivo) ?>" maxlength="200"
+               placeholder="20260824-a1b2c3.jpg" aria-label="Nome do arquivo">
+
+        <?php /* Só aparece quando há JavaScript: o envio é por fetch, e um botão
+                 que não faz nada é pior do que botão nenhum. O <input type=file>
+                 fica escondido porque navegador nenhum deixa dar estilo no
+                 controle nativo, e este precisa ser alvo de toque no celular. */ ?>
+        <div class="foto-envio">
+          <input type="file" accept="image/jpeg,image/png,image/webp" multiple
+                 data-enviar-campo hidden tabindex="-1" aria-hidden="true">
+          <button type="button" class="botao botao-fraco foto-botao" data-enviar-botao>
+            <?= $arquivo === '' ? 'Enviar foto' : 'Trocar foto' ?>
+          </button>
+        </div>
+
+        <input type="text" name="imagem_legenda[]" value="<?= e($legenda) ?>"
+               maxlength="150" placeholder="Descrição em inglês (aparece sob a imagem)"
+               aria-label="Descrição da imagem">
+      </div>
+
+      <button type="button" class="remover" data-remover title="Remover esta imagem">×</button>
+
+      <?php /* Aviso desta linha, não da aba: com o envio espalhado pelas linhas,
+               uma mensagem central obrigaria a procurar de qual foto ela fala. */ ?>
+      <p class="foto-estado" data-enviar-estado role="status"></p>
+    </div>
+    <?php
+}
+
 $linhas_nao = array_values((array) ($o['nao_e_para_voce'] ?? []));
 $selos      = array_values((array) ($o['selos'] ?? []));
 $faq        = array_values((array) ($o['faq'] ?? []));
@@ -333,64 +400,22 @@ if (!empty($_GET['ok'])) {
       <?php foreach ($imagens as $imagem):
         // JSON antigo ou editado à mão pode trazer só o nome do arquivo.
         if (is_string($imagem)) { $imagem = ['arquivo' => $imagem]; }
-      ?>
-        <div class="item item-bloco item-imagem" data-item>
-          <span class="item-num"><span data-numero>1</span></span>
-          <img class="item-miniatura" data-miniatura alt="" hidden>
-          <div class="item-campos empilhado">
-            <input type="text" name="imagem_arquivo[]" value="<?= e((string) ($imagem['arquivo'] ?? '')) ?>"
-                   maxlength="200" placeholder="20260824-a1b2c3.jpg" aria-label="Nome do arquivo">
-            <input type="text" name="imagem_legenda[]" value="<?= e((string) ($imagem['legenda'] ?? '')) ?>"
-                   maxlength="150" placeholder="Descrição em inglês (aparece sob a imagem)"
-                   aria-label="Descrição da imagem">
-          </div>
-          <button type="button" class="remover" data-remover title="Remover esta imagem">×</button>
-        </div>
-      <?php endforeach; ?>
+        linha_imagem((array) $imagem);
+      endforeach; ?>
     </div>
 
-    <template id="molde-imagens">
-      <div class="item item-bloco item-imagem" data-item>
-        <span class="item-num"><span data-numero>1</span></span>
-        <img class="item-miniatura" data-miniatura alt="" hidden>
-        <div class="item-campos empilhado">
-          <input type="text" name="imagem_arquivo[]" maxlength="200"
-                 placeholder="20260824-a1b2c3.jpg" aria-label="Nome do arquivo">
-          <input type="text" name="imagem_legenda[]" maxlength="150"
-                 placeholder="Descrição em inglês (aparece sob a imagem)"
-                 aria-label="Descrição da imagem">
-        </div>
-        <button type="button" class="remover" data-remover title="Remover esta imagem">×</button>
-      </div>
-    </template>
+    <template id="molde-imagens"><?php linha_imagem(); ?></template>
 
     <button type="button" class="adicionar" data-adicionar="lista-imagens" data-molde="molde-imagens">
       + Adicionar imagem
     </button>
 
-    <?php /* Envio aqui dentro, mas por trás: o arquivo sobe sozinho para
-             admin/enviar.php e o formulário da oferta NÃO é enviado junto.
-             Um <input type="file"> comum dentro deste formulário mandaria a
-             oferta inteira a cada foto — e um envio que falhasse por tamanho ou
-             timeout levaria embora todo o texto de venda ainda não salvo.
-
-             O <input> fica escondido e quem aparece é o <label>: navegador
-             nenhum deixa dar estilo no botão nativo de arquivo, e este é um
-             alvo de toque de celular. Sem JavaScript o rótulo não faz nada, e
-             por isso o link para a tela de upload continua logo abaixo. */ ?>
-    <div class="enviar-fotos" data-enviar>
-      <input type="file" id="enviar-imagem" name="enviar-imagem"
-             accept="image/jpeg,image/png,image/webp" multiple
-             data-enviar-campo hidden>
-      <label class="botao botao-fraco" for="enviar-imagem" data-enviar-botao>Enviar fotos do computador</label>
-      <p class="ajuda" data-enviar-estado role="status"></p>
-    </div>
-
     <p class="ajuda">
       JPG, PNG ou WebP, até <?= round(limite_upload('imagem') / 1048576, 1) ?> MB cada.
-      A foto entra na lista sozinha depois de subir.
-      Se o botão acima não responder, use a
-      <a href="/admin/upload.php?destino=imagem" target="_blank" rel="noopener">tela de envio</a>.
+      Cada foto sobe pelo botão da própria linha — ou arrastando o arquivo em
+      cima dela. Se os botões não responderem, use a
+      <a href="/admin/upload.php?destino=imagem" target="_blank" rel="noopener">tela de envio</a>
+      e cole o nome do arquivo no campo que aparece em cada linha.
     </p>
 
     <p class="ajuda">

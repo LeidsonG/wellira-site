@@ -243,36 +243,43 @@ carrossel é a própria página, pela quantidade que você colocou.
 
 ### Colocar uma foto na oferta
 
-Na aba *Imagens*, clique em **Enviar fotos do computador**, escolha a foto e
+Na aba *Imagens*, **cada linha é uma foto e tem o próprio botão**. Clique em
+**Enviar foto** na linha onde você quer aquela imagem, escolha o arquivo e
 pronto. Só isso.
 
-- **Pode marcar várias de uma vez** na janela que abrir
-- As fotos sobem na hora, sem sair da oferta, e **cada uma entra sozinha na
-  lista**, com o nome já preenchido
-- Enquanto sobem, uma linha logo abaixo do botão vai dizendo o que está
-  acontecendo: *"Enviando 3 fotos…"* e, no fim, quantas entraram
+Você também pode **arrastar a foto do computador e soltar em cima da linha**. A
+linha se acende ao receber o arquivo, para você ver exatamente onde ele vai
+cair.
+
+- A foto entra **naquela linha**, não em outra. É você quem escolhe a posição,
+  antes de enviar
+- **Pode marcar várias de uma vez** na janela que abrir: a primeira fica na
+  linha de onde você clicou e as demais entram nas linhas **abaixo** dela
+- Se a linha já tiver foto, o botão diz **Trocar foto** — enviar por ali
+  substitui a imagem daquela posição
+- Enquanto sobe, a própria linha vai dizendo o que está acontecendo:
+  *"Enviando 3 fotos…"* e, no fim, quantas entraram
+
+Precisa de mais linhas? Use **+ Adicionar imagem**, embaixo da lista.
 
 **Você não precisa copiar e colar nome de arquivo nenhum**, nem abrir outra
 tela. E o texto que você já escreveu na oferta não corre risco: o envio é da
 foto sozinha, não da oferta inteira.
 
-> **O botão não salva a oferta.** Ele só manda as fotos para o servidor e as põe
-> na lista. Para que elas fiquem valendo na página, clique em **Salvar** como de
+> **O botão não salva a oferta.** Ele só manda a foto para o servidor e a põe na
+> linha. Para que ela fique valendo na página, clique em **Salvar** como de
 > costume.
 
-Se o botão não responder — acontece em navegador antigo ou com JavaScript
-desligado —, use o link **tela de envio**, logo abaixo dele. É a mesma tela de
-sempre: ela envia as fotos e mostra o nome de cada arquivo, que você cola no
-campo da oferta. **Vídeo é sempre por lá**, nunca por este botão.
+Se os botões não responderem — acontece em navegador antigo ou com JavaScript
+desligado —, cada linha volta a mostrar um campo de texto para o nome do
+arquivo, e o link **tela de envio** aparece no fim da aba. Envie a foto por lá,
+copie o nome que aparecer e cole no campo da linha. **Vídeo é sempre por lá**,
+nunca pelo botão da linha.
 
 Para tirar uma foto da oferta, clique no **×** da linha. Isso remove a foto
-daquela oferta; o arquivo continua no servidor e você pode usá-lo de novo depois,
-digitando o nome no campo. Para trocar a ordem, apague e inclua na sequência que
-quiser.
-
-Se digitar o nome à mão, confira a miniatura que aparece ao lado: **se ela não
-aparecer, o nome está errado** — a foto ficaria como um quadrado vazio na página
-publicada.
+daquela oferta; o arquivo continua no servidor. Para trocar a ordem, envie de
+novo na ordem que quiser — o botão *Trocar foto* de cada linha resolve sem
+apagar nada.
 
 ### A descrição da foto
 
@@ -289,7 +296,7 @@ foto aparece sem legenda — funciona, mas você perde as duas coisas acima.
 
 ### Limites do envio
 
-- **JPG, PNG ou WebP**, até o tamanho escrito ao lado do botão (8 MB por foto)
+- **JPG, PNG ou WebP**, até o tamanho escrito no fim da aba (8 MB por foto)
 - **No máximo 8 fotos por oferta.** Chegando lá, o botão *+ Adicionar imagem*
   desliga e explica o motivo. Se você escolher 5 fotos quando só cabem 2, o
   painel manda as 2 primeiras e avisa que as outras não couberam — de propósito:
@@ -441,16 +448,21 @@ nada: é preciso salvar no formato certo pelo programa que criou o arquivo.
 **Publiquei e a página não mudou** — confira se salvou como *Publicada* e não
 como *Rascunho*. Se estiver certo, atualize a página com `Ctrl + F5`.
 
-**Uma foto não aparece na oferta** — o nome do arquivo está errado. Na aba
-*Imagens*, a linha da foto mostra a miniatura: se ela não aparece ali, também
-não vai aparecer na página. Apague a linha no **×** e envie a foto de novo pelo
-botão.
+**Uma foto não aparece na oferta** — o arquivo saiu do servidor. Na aba
+*Imagens*, a linha fica vermelha e avisa: *"Esta foto não está mais no
+servidor"*. Clique em **Enviar foto** naquela mesma linha e mande o arquivo de
+novo — não precisa apagar a linha nem mexer na descrição que você já escreveu.
 
-**Cliquei em "Enviar fotos do computador" e não aconteceu nada** — o botão
-depende de um recurso que o navegador pode não ter. Use o link **tela de envio**,
-logo abaixo dele: envie a foto por lá, copie o nome que aparecer e cole no campo
-da oferta. Se o painel estiver aberto num navegador muito antigo, vale trocar
-para o Chrome ou o Edge.
+**Cliquei em "Enviar foto" e não aconteceu nada** — o botão depende de um
+recurso que o navegador pode não ter. Nesse caso cada linha mostra um campo de
+texto para o nome do arquivo, e o link **tela de envio** aparece no fim da aba:
+envie a foto por lá, copie o nome e cole no campo da linha. Se o painel estiver
+aberto num navegador muito antigo, vale trocar para o Chrome ou o Edge.
+
+**Arrastei a foto e não aconteceu nada** — ela foi solta fora de uma linha. O
+painel ignora de propósito o arquivo solto em qualquer outro lugar: sem isso, o
+navegador abriria a imagem no lugar do painel e levaria junto o texto que você
+ainda não salvou. Solte em cima da linha, **quando ela acender**.
 
 **"Sua sessão expirou" ao enviar a foto** — a aba ficou parada tempo demais, e
 o painel derrubou a sessão. Recarregar é o único caminho: **antes disso, copie o

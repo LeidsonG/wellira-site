@@ -17,6 +17,15 @@ function painel_topo(string $titulo, bool $logado = true, bool $largo = false, s
 <meta name="robots" content="noindex, nofollow">
 <title><?= e($titulo) ?> · Painel Wellira</title>
 <link rel="icon" type="image/png" href="/assets/img/favicon.png">
+<?php /* Marca que há JavaScript, para o CSS esconder o que só existe para quem
+         está sem ele — hoje, o campo de nome de arquivo de cada foto, que o
+         botão de envio da própria linha substitui.
+
+         Inline e antes da folha de estilo de propósito: admin.js é defer e roda
+         depois de a página ser desenhada, então uma classe posta por ele
+         chegaria tarde — os campos apareceriam por um instante antes de sumir,
+         a cada carregamento. */ ?>
+<script>document.documentElement.className += ' js';</script>
 <link rel="stylesheet" href="/assets/css/admin.css">
 <script src="/assets/js/admin.js" defer></script>
 </head>

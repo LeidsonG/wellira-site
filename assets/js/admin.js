@@ -354,6 +354,11 @@
       var nome = campo.value.trim();
       var url  = nome === '' ? '' : urlUpload(nome);
 
+      // O rótulo do botão da linha acompanha o campo, inclusive quando o nome
+      // muda por digitação (sem JS escondendo o campo) ou ao clonar o molde.
+      var botao = item.querySelector('[data-enviar-botao]');
+      if (botao) botao.textContent = nome === '' ? 'Enviar foto' : 'Trocar foto';
+
       if (img.getAttribute('data-atual') === url) return;
       img.setAttribute('data-atual', url);
 
@@ -374,34 +379,50 @@
      * Põe um nome de arquivo na lista: no primeiro campo vazio, ou numa linha
      * nova se todos já estiverem preenchidos.
      *
+     * `aPartirDe` é a linha que originou o envio, e a busca começa DEPOIS dela.
+     * Sem isso, escolher duas fotos na linha 2 mandaria a segunda para a linha
+     * 1, se ela estivesse vazia — a ordem na página sairia invertida em relação
+     * à ordem em que ela escolheu os arquivos na janela do computador.
+     *
      * Devolve true se entrou. O false só acontece se o teto tiver sido
      * alcançado entre a conferência de vagas e a chegada da resposta do
      * servidor — quem chama precisa saber para contar direito o que entrou.
      */
-    function inserirArquivo(nome) {
+    function inserirArquivo(nome, aPartirDe) {
       var campos = camposArquivo();
       var alvo = null;
+      var inicio = 0;
 
-      for (var i = 0; i < campos.length; i++) {
+      if (aPartirDe) {
+        var pos = campos.indexOf(campoDoItem(aPartirDe));
+        if (pos !== -1) inicio = pos + 1;
+      }
+
+      for (var i = inicio; i < campos.length; i++) {
         if (campos[i].value.trim() === '') { alvo = campos[i]; break; }
       }
 
-      if (!alvo) {
-        // Lista cheia e nenhum campo livre: criar a linha aqui furaria o teto
-        // que o botão "+ Adicionar imagem" respeita, e o salvar cortaria a
-        // sobra depois sem avisar. Note que a lista pode estar CHEIA e ainda
-        // ter campo vazio — nesse caso o laço acima já achou o alvo, porque
-        // preencher um campo existente não faz a lista crescer.
-        if (listaCheia(listaImagens)) return false;
-
+      if (!alvo && !listaCheia(listaImagens)) {
+        // Cabe crescer. Criar a linha quando a lista JÁ está cheia furaria o
+        // teto que o botão "+ Adicionar imagem" respeita, e o salvar cortaria a
+        // sobra depois sem avisar.
         var molde = document.getElementById('molde-imagens');
         if (!molde) return false;
         listaImagens.appendChild(molde.content.cloneNode(true));
         renumerar(listaImagens);
         var novos = camposArquivo();
         alvo = novos[novos.length - 1];
-        if (!alvo) return false;
       }
+
+      if (!alvo) {
+        // Último recurso: campo vazio ANTES da linha de origem. Fora de ordem,
+        // mas a foto já subiu — deixá-la de fora criaria arquivo órfão no
+        // servidor, que ninguém apagaria porque ninguém saberia que existe.
+        for (var j = 0; j < inicio && j < campos.length; j++) {
+          if (campos[j].value.trim() === '') { alvo = campos[j]; break; }
+        }
+      }
+      if (!alvo) return false;
 
       alvo.value = nome;
       atualizarMiniatura(alvo);
@@ -414,9 +435,9 @@
       // acoplaria este bloco a um que pode não ter carregado.
       alvo.dispatchEvent(new Event('input', { bubbles: true }));
 
-      // Rola até a linha preenchida: com a lista longa, o botão de enviar fica
-      // abaixo dela e a linha que acabou de receber o nome está fora da tela.
-      // Sem o rolar, o envio parece não ter feito nada.
+      // Rola até a linha preenchida: as fotos extras de um lote caem abaixo da
+      // linha em que ela soltou o arquivo, muitas vezes fora da tela. Sem o
+      // rolar, parece que só a primeira entrou.
       var item = alvo.closest('[data-item]');
       if (item && item.scrollIntoView) {
         item.scrollIntoView({ block: 'center', behavior: 'smooth' });
@@ -443,122 +464,188 @@
       return vazios + cabeCrescer;
     }
 
-    // ---- Envio por trás ----
+    // ---- Envio, um por linha ----
+    //
+    // O envio era um botão só, no fim da aba, e a foto caía "no primeiro campo
+    // vazio": a cliente escolhia o arquivo sem poder dizer em que posição ele
+    // devia entrar, e descobria o lugar depois. Agora cada linha envia a sua —
+    // pelo botão ou arrastando o arquivo em cima dela — e a posição é escolhida
+    // antes, que é como ela pensa a página ("esta foto é a primeira").
+    //
+    // Tudo por delegação no container: as linhas nascem de um <template>
+    // clonado, e ouvinte pendurado em cada linha teria de ser rependurado a
+    // cada clone. Delegando, linha nova já chega funcionando.
 
-    var envio      = document.querySelector('[data-enviar]');
-    var envioCampo = document.querySelector('[data-enviar-campo]');
-    var envioBotao = document.querySelector('[data-enviar-botao]');
-    var envioAviso = document.querySelector('[data-enviar-estado]');
+    function campoDoItem(item) {
+      return item ? item.querySelector('input[name="imagem_arquivo[]"]') : null;
+    }
 
-    function dizer(texto, erro) {
-      if (!envioAviso) return;
+    /** Escreve o nome numa linha específica e avisa o resto do painel. */
+    function definirArquivo(item, nome) {
+      var campo = campoDoItem(item);
+      if (!campo) return false;
+      campo.value = nome;
+      atualizarMiniatura(campo);
+      // Evento sintético: a bolinha da aba e a prévia "Como fica na página"
+      // escutam input no documento e reagem como se ela tivesse digitado.
+      campo.dispatchEvent(new Event('input', { bubbles: true }));
+      return true;
+    }
+
+    function dizer(item, texto, erro) {
+      var aviso = item ? item.querySelector('[data-enviar-estado]') : null;
+      if (!aviso) return;
       // O elemento nasce vazio e com role="status"; é o texto entrando que faz
       // o leitor de tela anunciar. Por isso limpamos com '' em vez de hidden:
       // região viva escondida não é anunciada quando reaparece.
-      envioAviso.textContent = texto;
-      envioAviso.classList.toggle('enviar-estado-erro', erro === true);
+      aviso.textContent = texto;
+      aviso.classList.toggle('enviar-estado-erro', erro === true);
     }
 
-    /** Trava a interface durante o envio — inclusive contra um segundo envio. */
-    function travarEnvio(travado) {
-      if (envioCampo) envioCampo.disabled = travado;
-      // <label> não tem estado desabilitado; o que impede o clique é o input
-      // desabilitado logo acima. A classe é só a aparência disso.
-      if (envioBotao) {
-        envioBotao.classList.toggle('enviando', travado);
-        envioBotao.setAttribute('aria-disabled', travado ? 'true' : 'false');
+    /** Trava a linha durante o envio — inclusive contra um segundo envio nela. */
+    function travarEnvio(item, travado) {
+      if (!item) return;
+      var campo = item.querySelector('[data-enviar-campo]');
+      var botao = item.querySelector('[data-enviar-botao]');
+      if (campo) campo.disabled = travado;
+      if (botao) {
+        botao.disabled = travado;
+        botao.classList.toggle('enviando', travado);
       }
+      // O × também trava: apagar a linha no meio do envio deixaria o arquivo
+      // já subido sem lugar para onde ir, e um arquivo órfão na hospedagem da
+      // cliente ninguém apaga depois — ninguém sabe que ele existe.
+      var remover = item.querySelector('[data-remover]');
+      if (remover) remover.disabled = travado;
+
+      item.classList.toggle('item-enviando', travado);
     }
 
     function plural(n, singular, pluralForma) {
       return n + ' ' + (n === 1 ? singular : pluralForma);
     }
 
-    if (envio && envioCampo) {
-      envioCampo.addEventListener('change', function () {
-        var escolhidos = Array.prototype.slice.call(envioCampo.files || []);
-        if (!escolhidos.length) return;
+    /**
+     * Quantas fotos este envio pode aproveitar.
+     *
+     * A própria linha sempre conta: se já tem foto, a primeira do lote a
+     * substitui ("Trocar foto"); se está vazia, ela já entra no vazios de
+     * vagas(). O resto do lote segue a regra de sempre — campo vazio adiante,
+     * ou linha nova enquanto couber no teto.
+     */
+    function cabemNesteEnvio(item) {
+      var campo = campoDoItem(item);
+      var jaTem = campo && campo.value.trim() !== '';
+      var livres = vagas();
+      return livres === Infinity ? Infinity : livres + (jaTem ? 1 : 0);
+    }
 
-        // O token sai do formulário da oferta, que já o tem. Inventar um aqui
-        // seria inventar uma sessão: sem ele o endpoint recusa, e é melhor
-        // dizer isso antes de gastar o upload dela.
-        var campoCsrf = document.querySelector('[data-abas] input[name="csrf"]');
-        if (!campoCsrf || !campoCsrf.value) {
-          envioCampo.value = '';
-          dizer('Não foi possível preparar o envio nesta página. Use o link de envio abaixo.', true);
-          return;
-        }
+    /**
+     * Sobe os arquivos escolhidos por UMA linha.
+     *
+     * O primeiro nome que voltar fica nesta linha; os demais seguem para os
+     * campos vazios adiante, criando linha quando preciso. É o que permite
+     * escolher três fotos de uma vez sem trazer de volta o botão global.
+     */
+    function enviarPorLinha(item, escolhidos) {
+      if (!item || !escolhidos.length) return;
 
-        var livres = vagas();
+      // O token sai do formulário da oferta, que já o tem. Inventar um aqui
+      // seria inventar uma sessão: sem ele o endpoint recusa, e é melhor
+      // dizer isso antes de gastar o upload dela.
+      var campoCsrf = document.querySelector('[data-abas] input[name="csrf"]');
+      if (!campoCsrf || !campoCsrf.value) {
+        dizer(item, 'Não foi possível preparar o envio nesta página. Use a tela de envio, no fim da aba.', true);
+        return;
+      }
 
-        if (livres <= 0) {
-          envioCampo.value = '';
-          dizer('A oferta já está no máximo de ' + tetoDaLista(listaImagens) +
-                ' imagens. Remova uma da lista acima para poder enviar outra.', true);
-          return;
-        }
+      var livres = cabemNesteEnvio(item);
 
-        // O corte é ANTES de enviar, não depois. Mandar cinco e aproveitar duas
-        // deixaria três arquivos órfãos ocupando espaço na hospedagem da
-        // cliente para sempre — ninguém apagaria, porque ninguém saberia.
-        var enviar = escolhidos.slice(0, livres);
-        var sobraram = escolhidos.length - enviar.length;
+      if (livres <= 0) {
+        dizer(item, 'A oferta já está no máximo de ' + tetoDaLista(listaImagens) +
+              ' imagens. Remova uma da lista para poder enviar outra.', true);
+        return;
+      }
 
-        var dados = new FormData();
-        dados.append('csrf', campoCsrf.value);
-        dados.append('destino', 'imagem');
-        enviar.forEach(function (a) { dados.append('arquivo[]', a); });
+      // O corte é ANTES de enviar, não depois. Mandar cinco e aproveitar duas
+      // deixaria três arquivos órfãos ocupando espaço na hospedagem da cliente
+      // para sempre — ninguém apagaria, porque ninguém saberia.
+      var enviar   = escolhidos.slice(0, livres);
+      var sobraram = escolhidos.length - enviar.length;
 
-        travarEnvio(true);
-        dizer('Enviando ' + plural(enviar.length, 'foto', 'fotos') + '…', false);
+      var dados = new FormData();
+      dados.append('csrf', campoCsrf.value);
+      dados.append('destino', 'imagem');
+      enviar.forEach(function (a) { dados.append('arquivo[]', a); });
 
-        fetch('/admin/enviar.php', {
-          method: 'POST',
-          body: dados,
-          credentials: 'same-origin'   // a sessão do painel é o que autentica
-        }).then(function (resposta) {
-          // .json() falha sozinho num corpo que não é JSON, mas a mensagem do
-          // navegador não serve para a cliente. Lemos como texto e traduzimos:
-          // sessão expirada devolve a página de login, que é HTML.
-          return resposta.text().then(function (bruto) {
-            try {
-              return JSON.parse(bruto);
-            } catch (e) {
-              throw new Error('resposta-invalida');
-            }
-          });
-        }).then(function (dadosResposta) {
-          var nomes  = Array.isArray(dadosResposta.nomes)  ? dadosResposta.nomes  : [];
-          var erros  = Array.isArray(dadosResposta.erros)  ? dadosResposta.erros  : [];
-          var entraram = 0;
+      travarEnvio(item, true);
+      dizer(item, 'Enviando ' + plural(enviar.length, 'foto', 'fotos') + '…', false);
 
-          nomes.forEach(function (nome) {
-            if (typeof nome === 'string' && nome !== '' && inserirArquivo(nome)) entraram++;
-          });
-
-          var partes = [];
-          if (entraram) partes.push(plural(entraram, 'foto entrou', 'fotos entraram') + ' na lista.');
-          // Os erros já vêm do servidor com o nome do arquivo na frente.
-          erros.forEach(function (e2) { if (typeof e2 === 'string' && e2) partes.push(e2); });
-          if (sobraram) {
-            partes.push((sobraram === 1 ? 'Não coube 1 foto' : 'Não couberam ' + sobraram + ' fotos') +
-                        ': a oferta aceita no máximo ' + tetoDaLista(listaImagens) + '.');
+      fetch('/admin/enviar.php', {
+        method: 'POST',
+        body: dados,
+        credentials: 'same-origin'   // a sessão do painel é o que autentica
+      }).then(function (resposta) {
+        // .json() falha sozinho num corpo que não é JSON, mas a mensagem do
+        // navegador não serve para a cliente. Lemos como texto e traduzimos:
+        // sessão expirada devolve a página de login, que é HTML.
+        return resposta.text().then(function (bruto) {
+          try {
+            return JSON.parse(bruto);
+          } catch (e) {
+            throw new Error('resposta-invalida');
           }
-          if (!partes.length) partes.push('Nada foi enviado. Tente de novo ou use o link de envio abaixo.');
-
-          // Vermelho só quando NADA entrou: sucesso parcial é sucesso, e pintar
-          // de erro a linha que diz "2 fotos entraram" assusta à toa.
-          dizer(partes.join('\n'), entraram === 0);
-        }).catch(function (erro) {
-          dizer(erro && erro.message === 'resposta-invalida'
-            ? 'O servidor respondeu de um jeito inesperado. Sua sessão pode ter expirado: abra o link de envio abaixo numa aba nova e entre de novo.'
-            : 'Não foi possível enviar. Verifique a conexão e tente de novo, ou use o link de envio abaixo.', true);
-        }).then(function () {
-          travarEnvio(false);
-          // Sem isto, escolher a MESMA foto de novo não dispara 'change' e o
-          // botão parece quebrado — o navegador considera que nada mudou.
-          envioCampo.value = '';
         });
+      }).then(function (dadosResposta) {
+        var nomes = Array.isArray(dadosResposta.nomes) ? dadosResposta.nomes : [];
+        var erros = Array.isArray(dadosResposta.erros) ? dadosResposta.erros : [];
+        var entraram = 0;
+        // A linha pode ter sido apagada enquanto o arquivo subia (o × trava
+        // durante o envio, mas o formulário pode ter sido recarregado por
+        // outro caminho). Escrever numa linha fora do documento perderia a
+        // foto em silêncio: ela existiria no servidor e em lugar nenhum da
+        // oferta. Nesse caso todas seguem pelo caminho normal da lista.
+        var primeira = item.isConnected !== false;
+
+        nomes.forEach(function (nome) {
+          if (typeof nome !== 'string' || nome === '') return;
+          // A primeira vai para ESTA linha — é o ponto do envio por linha.
+          var entrou = primeira ? definirArquivo(item, nome) : inserirArquivo(nome, item);
+          if (entrou) { entraram++; primeira = false; }
+        });
+
+        if (entraram) atualizarTeto(listaImagens);
+
+        var partes = [];
+        if (entraram) partes.push(plural(entraram, 'foto entrou', 'fotos entraram') + '.');
+        // Os erros já vêm do servidor com o nome do arquivo na frente.
+        erros.forEach(function (e2) { if (typeof e2 === 'string' && e2) partes.push(e2); });
+        if (sobraram) {
+          partes.push((sobraram === 1 ? 'Não coube 1 foto' : 'Não couberam ' + sobraram + ' fotos') +
+                      ': a oferta aceita no máximo ' + tetoDaLista(listaImagens) + '.');
+        }
+        if (!partes.length) partes.push('Nada foi enviado. Tente de novo ou use a tela de envio, no fim da aba.');
+
+        // Vermelho só quando NADA entrou: sucesso parcial é sucesso, e pintar
+        // de erro a linha que diz "2 fotos entraram" assusta à toa.
+        dizer(item, partes.join('\n'), entraram === 0);
+      }).catch(function (erro) {
+        dizer(item, erro && erro.message === 'resposta-invalida'
+          ? 'O servidor respondeu de um jeito inesperado. Sua sessão pode ter expirado: abra a tela de envio numa aba nova e entre de novo.'
+          : 'Não foi possível enviar. Verifique a conexão e tente de novo, ou use a tela de envio, no fim da aba.', true);
+      }).then(function () {
+        travarEnvio(item, false);
+        var campo = item.querySelector('[data-enviar-campo]');
+        // Sem isto, escolher a MESMA foto de novo não dispara 'change' e o
+        // botão parece quebrado — o navegador considera que nada mudou.
+        if (campo) campo.value = '';
+      });
+    }
+
+    /** Só o que o servidor aceita; pasta arrastada não vira arquivo. */
+    function somenteImagens(lista) {
+      return Array.prototype.slice.call(lista || []).filter(function (a) {
+        return a && a.type && /^image\//.test(a.type);
       });
     }
 
@@ -567,6 +654,75 @@
     listaImagens.addEventListener('input', function (evento) {
       if (evento.target.name !== 'imagem_arquivo[]') return;
       atualizarMiniatura(evento.target);
+    });
+
+    // O botão é quem aparece; o <input type="file"> da linha fica escondido
+    // porque navegador nenhum deixa dar estilo no controle nativo.
+    listaImagens.addEventListener('click', function (evento) {
+      var botao = evento.target.closest('[data-enviar-botao]');
+      if (!botao || botao.disabled) return;
+      var item = botao.closest('[data-item]');
+      var campo = item && item.querySelector('[data-enviar-campo]');
+      if (campo) campo.click();
+    });
+
+    listaImagens.addEventListener('change', function (evento) {
+      var campo = evento.target;
+      if (!campo.hasAttribute || !campo.hasAttribute('data-enviar-campo')) return;
+      var escolhidos = somenteImagens(campo.files);
+      if (!escolhidos.length) { campo.value = ''; return; }
+      enviarPorLinha(campo.closest('[data-item]'), escolhidos);
+    });
+
+    // ---- Arrastar e soltar ----
+    //
+    // A linha inteira é o alvo, não só a moldura da foto: alvo pequeno obriga
+    // a mirar, e mirar com o arquivo na mão é justamente o que se quer evitar.
+
+    listaImagens.addEventListener('dragover', function (evento) {
+      var item = evento.target.closest('[data-item]');
+      if (!item || item.classList.contains('item-enviando')) return;
+      // Sem o preventDefault o navegador recusa o soltar: o padrão de dragover
+      // é "aqui não pode".
+      evento.preventDefault();
+      evento.dataTransfer.dropEffect = 'copy';
+      item.classList.add('item-soltar');
+    });
+
+    listaImagens.addEventListener('dragleave', function (evento) {
+      var item = evento.target.closest('[data-item]');
+      if (!item) return;
+      // dragleave também dispara ao passar de um filho para outro dentro da
+      // mesma linha. Sem esta conferência, o destaque piscaria enquanto o
+      // arquivo atravessa a linha.
+      if (evento.relatedTarget && item.contains(evento.relatedTarget)) return;
+      item.classList.remove('item-soltar');
+    });
+
+    listaImagens.addEventListener('drop', function (evento) {
+      var item = evento.target.closest('[data-item]');
+      if (!item) return;
+      evento.preventDefault();
+      item.classList.remove('item-soltar');
+      if (item.classList.contains('item-enviando')) return;
+
+      var arquivos = somenteImagens(evento.dataTransfer && evento.dataTransfer.files);
+      if (!arquivos.length) {
+        dizer(item, 'Isso não é uma imagem. Solte um arquivo JPG, PNG ou WebP.', true);
+        return;
+      }
+      enviarPorLinha(item, arquivos);
+    });
+
+    // Soltar FORA de uma linha: o navegador abriria o arquivo no lugar da
+    // página, e a oferta ainda não salva iria embora com ela. Impedir o padrão
+    // no documento faz a mira errada simplesmente não acontecer nada.
+    ['dragover', 'drop'].forEach(function (nome) {
+      document.addEventListener(nome, function (evento) {
+        var vindoDeArquivo = evento.dataTransfer &&
+          Array.prototype.indexOf.call(evento.dataTransfer.types || [], 'Files') !== -1;
+        if (vindoDeArquivo && !evento.defaultPrevented) evento.preventDefault();
+      });
     });
 
     // Nome inexistente é o erro mais provável aqui, e é silencioso: sem aviso a
