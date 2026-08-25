@@ -376,7 +376,7 @@ if (!empty($_GET['ok'])) {
     </div>
 
     <p class="ajuda">
-      JPG, PNG ou WebP, até <?= round(MAX_UPLOAD_IMAGEM / 1048576) ?> MB cada.
+      JPG, PNG ou WebP, até <?= round(limite_upload('imagem') / 1048576, 1) ?> MB cada.
       A foto entra na lista sozinha depois de subir.
       Se o botão acima não responder, use a
       <a href="/admin/upload.php?destino=imagem" target="_blank" rel="noopener">tela de envio</a>.

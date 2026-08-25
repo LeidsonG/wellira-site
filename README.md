@@ -161,7 +161,7 @@ Controle de carrossel para um item só é enfeite que confunde.
 | Constante (`inc/config.php`) | Valor | Por quê |
 |---|---|---|
 | `MAX_IMAGENS` | 8 por oferta | a galeria fica no alto: cada imagem a mais é peso que o visitante em 4G paga antes de chegar ao botão |
-| `MAX_UPLOAD_IMAGEM` | 4 MB por arquivo | inalterado |
+| `MAX_UPLOAD_IMAGEM` | 8 MB por arquivo | foto de celular moderno passa fácil de 4 MB; o limite real ainda é o menor entre este valor e o `upload_max_filesize`/`post_max_size` do servidor |
 
 O teto de 8 é conferido em três alturas, e as três precisam continuar de acordo:
 `MAX_IMAGENS` corta na gravação (`normalizar_oferta()`), `data-max` na lista do

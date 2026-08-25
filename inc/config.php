@@ -81,7 +81,7 @@ define('ARQUIVO_SENHA', DIR_DADOS . '/senha.php');
  * antes de derrubar o servidor.
  */
 const MAX_UPLOAD_VIDEO  = 128 * 1024 * 1024; // 128 MB
-const MAX_UPLOAD_IMAGEM = 4 * 1024 * 1024;   // 4 MB
+const MAX_UPLOAD_IMAGEM = 8 * 1024 * 1024;   // 8 MB
 
 /**
  * Quantas imagens uma oferta pode exibir na galeria.

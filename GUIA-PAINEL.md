@@ -284,7 +284,7 @@ foto aparece sem legenda — funciona, mas você perde as duas coisas acima.
 
 ### Limites do envio
 
-- **JPG, PNG ou WebP**, até o tamanho escrito ao lado do botão (4 MB por foto)
+- **JPG, PNG ou WebP**, até o tamanho escrito ao lado do botão (8 MB por foto)
 - **No máximo 8 fotos por oferta.** Chegando lá, o botão *+ Adicionar imagem*
   desliga e explica o motivo. Se você escolher 5 fotos quando só cabem 2, o
   painel manda as 2 primeiras e avisa que as outras não couberam — de propósito:
