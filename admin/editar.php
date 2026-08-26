@@ -369,7 +369,7 @@ if (!empty($_GET['ok'])) {
         <span>wellira.online/</span>
         <input type="text" id="slug" name="slug" value="<?= e($slug) ?>"
                maxlength="64" pattern="[a-z0-9-]+"
-               placeholder="deixe vazio para gerar do título">
+               placeholder="se vazio, gera igual ao título">
       </div>
       <p class="ajuda">
         Minúsculas, números e hífen.
@@ -399,7 +399,7 @@ if (!empty($_GET['ok'])) {
       <p class="ajuda">
         Cole o endereço do YouTube. Ou
         <a href="/admin/upload.php?destino=video" target="_blank" rel="noopener">envie um MP4</a>
-        e cole aqui o nome do arquivo. Vazio: a página fica sem vídeo.
+        e cole aqui o nome do arquivo (Ex: "video.mp4").
       </p>
     </div>
 
@@ -416,9 +416,9 @@ if (!empty($_GET['ok'])) {
       <input type="text" id="video_poster" name="video_poster"
              value="<?= v($o, 'video_poster') ?>" maxlength="200">
       <p class="ajuda">
-        Nome do arquivo já enviado.
-        <a href="/admin/upload.php?destino=imagem" target="_blank" rel="noopener">Enviar imagem</a>.
-        Vazio no YouTube: usa a capa do próprio vídeo.
+        Vídeos do <b>YouTube</b>: Deixe-o vazio. Ou
+        <a href="/admin/upload.php?destino=imagem" target="_blank" rel="noopener">Envie uma imagem</a>
+        e coloque o nome do arquivo enviado (Ex: "imagem.jpg"). 
       </p>
     </div>
     <?php exemplo('video'); ?>
@@ -432,10 +432,9 @@ if (!empty($_GET['ok'])) {
     <?php interruptor($o, 'imagens', 'grupo-imagens'); ?>
     <div id="grupo-imagens" class="grupo-alternavel<?= ligada($o, 'imagens') ? '' : ' desligado' ?>">
     <p class="ajuda ajuda-topo">
-      As fotos aparecem no mesmo lugar do vídeo, no alto da página. Se a oferta
-      tiver vídeo e fotos, o vídeo vem primeiro.
-      <strong>Uma foto aparece sozinha; duas ou mais viram um carrossel</strong>
-      que o visitante arrasta para o lado. No máximo <?= MAX_IMAGENS ?>.
+      Se a oferta tiver vídeo e fotos, o vídeo vem primeiro.
+      <strong>Uma foto aparece sozinha; duas ou mais viram um carrossel</strong>. 
+      No máximo <?= MAX_IMAGENS ?>.
     </p>
 
     <?php /* O teto sai do PHP para o HTML porque quem corta de verdade é o
@@ -457,8 +456,8 @@ if (!empty($_GET['ok'])) {
     </button>
 
     <p class="ajuda">
-      Cada foto sobe pelo botão da própria linha, ou arrastando o arquivo em
-      cima dela. JPG, PNG ou WebP, até <?= round(limite_upload('imagem') / 1048576, 1) ?> MB cada.
+      Envie ou arraste o arquivo em cima dela. JPG, PNG ou WebP, até 
+      <?= round(limite_upload('imagem') / 1048576, 1) ?> MB cada.
     </p>
 
     <p class="ajuda">
@@ -500,9 +499,9 @@ if (!empty($_GET['ok'])) {
   <!-- ==================== 6. Texto ==================== -->
   <section id="sec-texto" data-secao="Texto" hidden>
     <div class="campo">
-      <label for="texto_titulo">Título da seção</label>
+      <label for="texto_titulo">Título da seção <span class="obrig">obrigatório para publicar</span></label>
       <input type="text" id="texto_titulo" name="texto_titulo"
-             value="<?= v($o, 'texto_titulo') ?>" maxlength="120" placeholder="The honest version">
+             value="<?= v($o, 'texto_titulo') ?>" maxlength="120" placeholder="The simple method that's saving the day for a lot of people.">
     </div>
 
     <div class="campo">
