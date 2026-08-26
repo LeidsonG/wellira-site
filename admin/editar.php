@@ -594,9 +594,7 @@ if (!empty($_GET['ok'])) {
   <section id="sec-selos" data-secao="Selos" hidden>
     <?php interruptor($o, 'selos', 'grupo-selos'); ?>
     <div id="grupo-selos" class="grupo-alternavel<?= ligada($o, 'selos') ? '' : ' desligado' ?>">
-    <p class="ajuda ajuda-topo">
-      <strong>Nunca escreva garantia, devolução ou reembolso.</strong>
-      Quem responde por isso é o fornecedor, e a Wellira não pode prometer no lugar dele.
+    <p class="ajuda ajuda-topo">Selos são usados para destacar algumas coisas importante sobre o produto.
     </p>
 
     <div id="lista-selos" class="repetivel">
@@ -656,7 +654,6 @@ if (!empty($_GET['ok'])) {
     <div id="grupo-faq" class="grupo-alternavel<?= ligada($o, 'faq') ? '' : ' desligado' ?>">
     <p class="ajuda ajuda-topo">
       Pergunta e resposta precisam estar preenchidas para o item aparecer.
-      Sobre devolução, remeta aos termos do fornecedor sem citar prazo.
     </p>
 
     <div class="campo">
