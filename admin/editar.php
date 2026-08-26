@@ -503,15 +503,13 @@ if (!empty($_GET['ok'])) {
              value="<?= v($o, 'botao_texto', 'See the Official Site') ?>" maxlength="80">
     </div>
 
-    <div class="campo">
-      <label for="botao_sub">Linha de apoio sob o botão</label>
-      <input type="text" id="botao_sub" name="botao_sub" value="<?= v($o, 'botao_sub') ?>" maxlength="200">
-      <p class="ajuda">
-        A página repete o botão três vezes, e todas usam este mesmo texto.
-        Antes eram dois campos para dizer quase a mesma coisa em lugares
-        diferentes, dava trabalho e produzia páginas incoerentes.
-      </p>
-    </div>
+    <?php
+    campo_chaveavel('botao_sub', 'Linha de apoio sob o botão',
+                    (string) ($o['botao_sub'] ?? ''), 200, '');
+    ?>
+    <p class="ajuda">
+      Botão que o cliente clica para ir ao site do fornecedor. A linha de apoio é opcional, e aparece embaixo do botão.
+    </p>
     <?php exemplo('botao'); ?>
   </section>
 
@@ -525,7 +523,8 @@ if (!empty($_GET['ok'])) {
 
     <div class="campo">
       <label for="texto">Texto de venda <span class="obrig">obrigatório para publicar</span></label>
-      <textarea id="texto" name="texto" rows="22"><?= e((string) ($o['texto'] ?? '')) ?></textarea>
+      <textarea id="texto" name="texto" rows="22"
+                placeholder="Exemplo:&#10;&#10;Most people try three or four things before finding this.&#10;&#10;It's a simple routine, and it doesn't need any special equipment.&#10;&#10;## Why it works&#10;&#10;..."><?= e((string) ($o['texto'] ?? '')) ?></textarea>
       <p class="ajuda">
         <strong>Uma linha em branco</strong> separa parágrafos.
         Linha começando com <code>## </code> vira subtítulo. Não use asterisco nem hífen de lista.
@@ -556,8 +555,8 @@ if (!empty($_GET['ok'])) {
     <div class="campo">
       <label for="nao_e_para_voce_titulo">Título da seção</label>
       <input type="text" id="nao_e_para_voce_titulo" name="nao_e_para_voce_titulo"
-             value="<?= v($o, 'nao_e_para_voce_titulo') ?>" maxlength="120"
-             placeholder="This isn't for you if…">
+             value="<?= v($o, 'nao_e_para_voce_titulo', "This isn't for you if") ?>"
+             maxlength="120">
     </div>
 
     <div id="lista-nao" class="repetivel">
@@ -605,11 +604,16 @@ if (!empty($_GET['ok'])) {
         <div class="item item-bloco" data-item>
           <span class="item-num"><span data-numero>1</span></span>
           <div class="item-campos">
-            <select name="selo_icone[]" aria-label="Ícone">
-              <?php foreach (array_keys(ICONES) as $nome): ?>
-                <option value="<?= e($nome) ?>" <?= ($selo['icone'] ?? '') === $nome ? 'selected' : '' ?>><?= e($nome) ?></option>
-              <?php endforeach; ?>
-            </select>
+            <div class="campo-icone">
+              <select name="selo_icone[]" aria-label="Ícone" data-icone-select>
+                <?php foreach (array_keys(ICONES) as $nome): ?>
+                  <option value="<?= e($nome) ?>" <?= (($selo['icone'] ?? '') ?: 'escudo') === $nome ? 'selected' : '' ?>><?= e($nome) ?></option>
+                <?php endforeach; ?>
+              </select>
+              <span class="icone-previa" data-icone-previa aria-hidden="true">
+                <?= icone(((string) ($selo['icone'] ?? '')) ?: 'escudo') ?>
+              </span>
+            </div>
             <input type="text" name="selo_titulo[]" value="<?= e((string) ($selo['titulo'] ?? '')) ?>"
                    maxlength="60" placeholder="Ships from the USA" aria-label="Título do selo">
             <input type="text" name="selo_texto[]" value="<?= e((string) ($selo['texto'] ?? '')) ?>"
@@ -624,11 +628,14 @@ if (!empty($_GET['ok'])) {
       <div class="item item-bloco" data-item>
         <span class="item-num"><span data-numero>1</span></span>
         <div class="item-campos">
-          <select name="selo_icone[]" aria-label="Ícone">
-            <?php foreach (array_keys(ICONES) as $nome): ?>
-              <option value="<?= e($nome) ?>"><?= e($nome) ?></option>
-            <?php endforeach; ?>
-          </select>
+          <div class="campo-icone">
+            <select name="selo_icone[]" aria-label="Ícone" data-icone-select>
+              <?php foreach (array_keys(ICONES) as $nome): ?>
+                <option value="<?= e($nome) ?>" <?= $nome === 'escudo' ? 'selected' : '' ?>><?= e($nome) ?></option>
+              <?php endforeach; ?>
+            </select>
+            <span class="icone-previa" data-icone-previa aria-hidden="true"><?= icone('escudo') ?></span>
+          </div>
           <input type="text" name="selo_titulo[]" maxlength="60" aria-label="Título do selo">
           <input type="text" name="selo_texto[]" maxlength="100" aria-label="Linha de apoio">
         </div>

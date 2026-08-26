@@ -381,6 +381,47 @@
   })();
 
   // ---------------------------------------------------------------------------
+  // Prévia do ícone do selo, ao lado do menu
+  // ---------------------------------------------------------------------------
+  //
+  // O <select> continua sendo a única forma de escolher, e funciona sem
+  // JavaScript. Isto só desenha ao lado o traçado de verdade do ícone
+  // escolhido: texto puro num <option> ("cadeado", "envio") não mostra a
+  // forma dele, e <option> não aceita SVG dentro.
+  //
+  // innerHTML aqui é seguro e deliberado: o traçado vem de inc/config.php,
+  // não do formulário, mesma razão documentada na prévia da aba "Como fica
+  // na página" mais abaixo.
+  (function () {
+    var tag = document.getElementById('icones-svg');
+    var tracados;
+    try { tracados = tag ? JSON.parse(tag.textContent) : {}; } catch (erro) { tracados = {}; }
+
+    function desenharIcone(select) {
+      var previa = select.parentElement.querySelector('[data-icone-previa]');
+      var tracado = tracados[select.value];
+      if (!previa || !tracado) return;
+      previa.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" ' +
+        'stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">' + tracado + '</svg>';
+    }
+
+    document.addEventListener('change', function (evento) {
+      if (evento.target.matches('[data-icone-select]')) desenharIcone(evento.target);
+    });
+
+    // Uma linha clonada do <template> nasce com a prévia já certa, desenhada
+    // pelo PHP, mas o valor do <select> pode não bater se o clone reaproveitar
+    // uma linha existente. Redesenha depois de qualquer adicionar/remover,
+    // mesmo gancho já usado para redesenhar a aba "Como fica na página".
+    document.addEventListener('click', function (evento) {
+      if (!evento.target.closest('[data-adicionar], [data-remover]')) return;
+      setTimeout(function () {
+        document.querySelectorAll('[data-icone-select]').forEach(desenharIcone);
+      }, 0);
+    });
+  })();
+
+  // ---------------------------------------------------------------------------
   // Imagens da oferta, miniatura viva e envio por trás
   // ---------------------------------------------------------------------------
   //

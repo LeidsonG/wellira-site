@@ -127,12 +127,20 @@ const AVISO_BASE = 'Orders are completed on the manufacturer\'s website, which i
  * sem precisar lidar com SVG.
  */
 const ICONES = [
-    'garantia' => '<path d="M12 3 4 6.5v5c0 4.6 3.3 8.4 8 9.5 4.7-1.1 8-4.9 8-9.5v-5L12 3Z"/><path d="m9 12 2 2 4-4"/>',
-    'escudo'   => '<path d="M12 3 4 6.5v5c0 4.6 3.3 8.4 8 9.5 4.7-1.1 8-4.9 8-9.5v-5L12 3Z"/>',
-    'envio'    => '<path d="M2 8h11v8H2zM13 11h4l3 3v2h-7z"/><circle cx="6" cy="18" r="1.8"/><circle cx="17" cy="18" r="1.8"/>',
-    'fabrica'  => '<path d="M5 21V8l7-5 7 5v13z"/><path d="M9 21v-6h6v6"/>',
-    'retorno'  => '<path d="M3 12a9 9 0 1 0 3-6.7M3 4v4h4"/>',
-    'cadeado'  => '<rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/>',
+    'garantia'   => '<path d="M12 3 4 6.5v5c0 4.6 3.3 8.4 8 9.5 4.7-1.1 8-4.9 8-9.5v-5L12 3Z"/><path d="m9 12 2 2 4-4"/>',
+    'escudo'     => '<path d="M12 3 4 6.5v5c0 4.6 3.3 8.4 8 9.5 4.7-1.1 8-4.9 8-9.5v-5L12 3Z"/>',
+    'envio'      => '<path d="M2 8h11v8H2zM13 11h4l3 3v2h-7z"/><circle cx="6" cy="18" r="1.8"/><circle cx="17" cy="18" r="1.8"/>',
+    'fabrica'    => '<path d="M5 21V8l7-5 7 5v13z"/><path d="M9 21v-6h6v6"/>',
+    'retorno'    => '<path d="M3 12a9 9 0 1 0 3-6.7M3 4v4h4"/>',
+    'cadeado'    => '<rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/>',
+    // Acrescentados em 26/08/2026, pedido do Leidson: "verificado" para claim
+    // testado/checado, "natural" para ingrediente vegetal, "rapidez" para
+    // prazo de envio ou processamento, "destaque" para qualidade do produto
+    // (nunca para nota ou avaliação, que o projeto não pode declarar).
+    'verificado' => '<circle cx="12" cy="12" r="9"/><path d="m8.5 12.5 2.5 2.5 4.5-5"/>',
+    'natural'    => '<path d="M6 18C6 10 10 6 18 6c0 8-4 12-12 12Z"/><path d="M8 16c2-4 5-7 8-9"/>',
+    'rapidez'    => '<circle cx="12" cy="12" r="9"/><path d="M12 6.5v5.5l4 2"/>',
+    'destaque'   => '<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26"/>',
 ];
 
 // ---------------------------------------------------------------------------

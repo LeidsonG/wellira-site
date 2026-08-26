@@ -476,8 +476,21 @@ textarea { resize: vertical; line-height: 1.6; }
 .item-campos { flex: 1 1 auto; min-width: 0; display: grid; gap: 0.5rem; }
 .item-campos > * { min-width: 0; }
 @media (min-width: 700px) {
-  .item-campos:not(.empilhado) { grid-template-columns: 130px 1fr 1fr; }
+  .item-campos:not(.empilhado) { grid-template-columns: 176px 1fr 1fr; }
 }
+
+/* Menu do ícone do selo, com o desenho de verdade ao lado. O <select>
+   continua sendo quem decide (funciona sem JavaScript); o quadradinho só
+   mostra o traçado do que já está escolhido, porque nome de ícone em texto
+   ("cadeado", "envio") não diz muito sobre a forma dele. */
+.campo-icone { display: flex; align-items: stretch; gap: 0.4rem; }
+.campo-icone select { flex: 1 1 auto; min-width: 0; }
+.icone-previa {
+  flex: 0 0 auto; width: 38px; height: 38px; display: flex;
+  align-items: center; justify-content: center; border-radius: 8px;
+  background: #eef1f4; border: 1px solid var(--linha-forte); color: var(--tinta-fraca);
+}
+.icone-previa svg { width: 22px; height: 22px; }
 
 /* 40px, e não os 28 de antes: alvo de toque abaixo de ~40px faz o dedo errar,
    e errar aqui significa apagar a linha ao lado da que ela queria. */
