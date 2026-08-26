@@ -33,7 +33,7 @@ Aberto por padrão. Fica fora do índice:
 | O quê | Como |
 |---|---|
 | Ofertas de demonstração | `"indexar": false` no JSON da oferta |
-| Gêmeos estáticos (`vitalane.html`, `hydrasource.html`) | `meta robots` na página |
+| Gêmeo estático (`vitalane.html`) | `meta robots` na página |
 | `404.html` | `meta robots` na página |
 | `/go/<slug>` | `robots.txt` + `X-Robots-Tag` |
 
@@ -45,8 +45,8 @@ O `sitemap.xml` é gerado por `sitemap.php` a partir dos mesmos critérios.
 ## Estrutura
 
 A raiz do repositório **é** a raiz do site: o que a hospedagem serve a partir de
-`public_html`. Isso mantém o deploy trivial e é o que o GitHub Pages
-exige para a prévia. O que não é público fica separado por pasta:
+`public_html`. Isso mantém o deploy trivial. O que não é público fica separado
+por pasta:
 
 ```
 ─ Servido pela web ────────────────────────────────────────────
@@ -88,9 +88,8 @@ tools/gerar-hash.php    Gera o hash da senha do painel
 scripts/deploy.sh       Deploy por SFTP (lftp + chave), com o conteúdo protegido
 README.md · GUIA-PAINEL.md
 
-─ Temporário, sai depois da aprovação ─────────────────────────
-vitalane.html           Protótipo estático da oferta
-hydrasource.html        Protótipo estático da oferta
+─ Protótipo estático, fora do deploy (scripts/deploy.sh) ──────
+vitalane.html           Demonstração estática da oferta Vitalane
 ```
 
 As páginas legais são **pastas com index.html**, não arquivos soltos: a regra de
@@ -122,7 +121,7 @@ Três lugares repetem essa ordem e **precisam mudar juntos**:
 |---|---|
 | `oferta.php` | a página real |
 | `admin/editar.php` | as abas do editor seguem a ordem dos blocos: é o que permite à cliente conferir a página sem abri-la |
-| `vitalane.html` | o gêmeo estático da prévia do GitHub Pages |
+| `vitalane.html` | gêmeo estático mantido fora do fluxo normal de oferta |
 
 ---
 
@@ -434,7 +433,7 @@ git checkout staging                          # 1. sempre em staging
 ./scripts/dev.sh                              # 2. validar no navegador
 
 git add <arquivos> && git commit              # 3. commitar
-git push origin staging                       #    (atualiza a prévia do Pages)
+git push origin staging                       #    (backup remoto)
 
 git checkout main && git merge staging        # 4. promover
 git push origin main

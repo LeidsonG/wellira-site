@@ -179,9 +179,8 @@ const AUTOR_TITULO_PADRAO = "Why I'm sharing this";
  * Endereço canônico, sem barra final.
  *
  * Toda página declara <link rel="canonical"> apontando para cá, e o sitemap é
- * montado a partir disso. É o que impede o Google de tratar as prévias do
- * GitHub Pages e as variações de URL (com/sem www, com/sem barra) como páginas
- * concorrentes: o conteúdo pode ser servido de vários endereços, mas só um
- * conta para a busca.
+ * montado a partir disso. É o que impede o Google de tratar as variações de
+ * URL (com/sem www, com/sem barra) como páginas concorrentes: o conteúdo pode
+ * ser servido de vários endereços, mas só um conta para a busca.
  */
 const SITE_URL = 'https://wellira.online';

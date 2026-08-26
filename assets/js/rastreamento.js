@@ -1,10 +1,9 @@
 /* =============================================================================
    Meta Pixel + Google Analytics 4
    =============================================================================
-   Arquivo único de propósito. As páginas institucionais são .html estáticas
-   (para a prévia do GitHub Pages funcionar sem PHP) e as ofertas são geradas
-   por oferta.php — se cada uma trouxesse o próprio trecho, trocar um ID
-   exigiria editar tudo e alguma página ficaria para trás.
+   Arquivo único de propósito. As páginas institucionais são .html estáticas e
+   as ofertas são geradas por oferta.php — se cada uma trouxesse o próprio
+   trecho, trocar um ID exigiria editar tudo e alguma página ficaria para trás.
 
    Os IDs NÃO ficam neste arquivo: vêm de assets/js/ids.js, que está no
    .gitignore. O repositório é público, e embora o Pixel apareça no inspetor de
@@ -34,9 +33,9 @@
   /**
    * Só rastreia no domínio de produção.
    *
-   * Sem esta trava, a prévia do GitHub Pages e o servidor local somariam às
-   * estatísticas. O efeito não é cosmético: a Meta aprende com quem converte,
-   * e ensiná-la com os nossos próprios testes piora a entrega dos anúncios.
+   * Sem esta trava, o servidor local somaria às estatísticas de produção. O
+   * efeito não é cosmético: a Meta aprende com quem converte, e ensiná-la com
+   * os nossos próprios testes piora a entrega dos anúncios.
    */
   var DOMINIOS = ['wellira.online', 'www.wellira.online'];
 

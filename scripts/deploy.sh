@@ -98,11 +98,9 @@ EXCLUIR=(
   --exclude-glob 'scripts/'
   --exclude-glob 'tools/'
   --exclude-glob '*.md'
-  --exclude-glob '.nojekyll'
 
-  # --- Protótipos estáticos: existem para a prévia do GitHub Pages ---
+  # --- Protótipo estático: demonstração fora do fluxo normal de oferta ---
   --exclude-glob 'vitalane.html'
-  --exclude-glob 'hydrasource.html'
 
   # --- Lixo de editor e sistema ---
   --exclude-glob '.DS_Store'
