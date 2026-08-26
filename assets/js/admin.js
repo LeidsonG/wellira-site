@@ -365,6 +365,22 @@
   });
 
   // ---------------------------------------------------------------------------
+  // Prefixo fixo do link do fornecedor (http:// ou https://)
+  // ---------------------------------------------------------------------------
+  //
+  // A caixinha "só http" já funciona sem isto, o PHP lê o checkbox no salvar.
+  // Isto é só o texto fixo acompanhando ao vivo, para a cliente não marcar a
+  // caixa e ficar sem saber se pegou.
+  (function () {
+    var caixa    = document.querySelector('[data-link-http]');
+    var prefixo  = document.querySelector('[data-link-prefixo]');
+    if (!caixa || !prefixo) return;
+    caixa.addEventListener('change', function () {
+      prefixo.textContent = caixa.checked ? 'http://' : 'https://';
+    });
+  })();
+
+  // ---------------------------------------------------------------------------
   // Imagens da oferta, miniatura viva e envio por trás
   // ---------------------------------------------------------------------------
   //

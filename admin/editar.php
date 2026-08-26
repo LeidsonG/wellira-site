@@ -230,6 +230,15 @@ if (!$selos)      { $selos      = [['icone' => 'escudo', 'titulo' => '', 'texto'
 if (!$faq)        { $faq        = [['pergunta' => '', 'resposta' => '']]; }
 if (!$imagens)    { $imagens    = [['arquivo' => '', 'legenda' => '']]; }
 
+// O link do fornecedor é gravado inteiro ("https://exemplo.com/..."), mas o
+// campo do painel não obriga mais digitar o esquema: aqui ele é separado em
+// "resto do endereço" (o que a cliente digita) e uma casinha para o caso raro
+// de o fornecedor não ter https. Ausente ou sem "http" explícito vale https,
+// que é o padrão pedido.
+$link_atual     = (string) ($o['link'] ?? '');
+$link_http_only = strtolower((string) parse_url($link_atual, PHP_URL_SCHEME)) === 'http';
+$link_resto     = preg_replace('#^https?://#i', '', $link_atual);
+
 /**
  * Endereço para ver a página desta oferta.
  *
@@ -472,10 +481,20 @@ if (!empty($_GET['ok'])) {
   <!-- ==================== 5. Botão ==================== -->
   <section id="sec-botao" data-secao="Botão" hidden>
     <div class="campo">
-      <label for="link">Link do fornecedor <span class="obrig">obrigatório</span></label>
-      <input type="url" id="link" name="link" value="<?= v($o, 'link') ?>"
-             maxlength="500" required placeholder="https://...">
-      <p class="ajuda">Para onde o botão leva. Precisa começar com https://</p>
+      <label for="link_resto">Link do fornecedor <span class="obrig">obrigatório</span></label>
+      <div class="prefixo">
+        <span data-link-prefixo><?= $link_http_only ? 'http://' : 'https://' ?></span>
+        <input type="text" id="link_resto" name="link_resto" value="<?= e($link_resto) ?>"
+               maxlength="490" required placeholder="affiliate.exemplo.com/produto">
+      </div>
+      <label class="check">
+        <input type="checkbox" name="link_http" value="1" data-link-http
+               <?= $link_http_only ? 'checked' : '' ?>>
+        <span>Ative se o link for http.</span>
+      </label>
+      <p class="ajuda">
+        Coloque o link do fornecedor e se atente se começa com http ou https.
+      </p>
     </div>
 
     <div class="campo">

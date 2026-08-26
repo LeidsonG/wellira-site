@@ -144,7 +144,16 @@ function normalizar_oferta(array $post): array
 
     // O link é o único campo sem o qual a oferta não existe, então é validado
     // aqui e não apenas conferido na exibição.
-    $link = link_seguro((string) ($post['link'] ?? ''));
+    //
+    // O painel não pede mais o esquema por extenso: a cliente digita só o
+    // resto do endereço, e a casinha "só http" cobre o caso raro de o
+    // fornecedor não ter https. Ausente vale https, que é o padrão. Os dois
+    // chegam separados e são remontados aqui. O strip defende contra quem cola
+    // o endereço completo (copiado do navegador, esquema incluído) no campo do
+    // resto por hábito, o que duplicaria o esquema.
+    $esquema     = empty($post['link_http']) ? 'https' : 'http';
+    $link_resto  = preg_replace('#^https?://#i', '', trim((string) ($post['link_resto'] ?? '')));
+    $link        = $link_resto !== '' ? link_seguro($esquema . '://' . $link_resto) : null;
     if ($link !== null) {
         $o['link'] = substr($link, 0, 500);
     }
@@ -261,7 +270,7 @@ function validar_oferta(array $o, string $slug, bool $novo): array
         $erros[] = 'O título é obrigatório.';
     }
     if (($o['link'] ?? '') === '') {
-        $erros[] = 'O link do botão é obrigatório e precisa começar com http:// ou https://';
+        $erros[] = 'O link do fornecedor é obrigatório.';
     }
     if (($o['status'] ?? '') === 'publicado' && ($o['texto'] ?? '') === '') {
         $erros[] = 'Para publicar, escreva o texto de venda.';
