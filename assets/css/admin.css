@@ -1,13 +1,9 @@
 /* =============================================================================
    Painel administrativo
    =============================================================================
-   Folha separada da do site: o painel não é visto pelo público e não deve
-   carregar peso do layout de venda.
-
-   Prioridades, nesta ordem: clareza do que está preenchido, alvo de toque
-   grande (ela usa no celular) e rolagem curta. A versão anterior era um
-   formulário único de mais de vinte campos, abrir o FAQ depois de mexer no
-   título exigia atravessar a tela inteira.
+   Folha separada da do site: o painel não é visto pelo público.
+   Prioridades: clareza do que está preenchido, alvo de toque grande (ela usa
+   no celular) e rolagem curta.
    ========================================================================== */
 
 :root {
@@ -32,18 +28,14 @@
 
 * { box-sizing: border-box; }
 
-/* Reserva o espaço da barra de rolagem SEMPRE.
-   Sem isto, trocar para uma aba mais alta faz a barra aparecer, a viewport
-   encolher ~15px e todo o conteúdo centralizado saltar para a esquerda. A cada
-   clique. O scrollbar-gutter resolve nos navegadores atuais; o overflow-y
-   garante o mesmo nos antigos, à custa de uma barra sempre visível. */
+/* Reserva o espaço da barra de rolagem SEMPRE, senão trocar de aba faz o
+   conteúdo saltar para a esquerda a cada clique. */
 html {
   scrollbar-gutter: stable;
   overflow-y: scroll;
 }
 
-/* Nada pode empurrar a página para os lados. Se algum bloco estourar a largura
-   (tabela larga, palavra longa, textarea), quem rola é ele, não o documento. */
+/* Nada pode empurrar a página para os lados: quem rola é o bloco, não o documento. */
 html, body { max-width: 100%; overflow-x: hidden; }
 
 body {
@@ -74,21 +66,15 @@ body.largo .wrap { width: min(100% - 2rem, 1080px); }
 }
 .marca span { color: var(--marca); }
 
-/* O espaçamento vem da margem do ícone, nunca de gap no container.
-   Com gap, o flex separaria também "Well" do <span>ira</span>: são dois itens
-   distintos para ele, e o nome apareceria partido no meio. Foi o que aconteceu
-   na tela de login antes desta correção. */
+/* Espaçamento pela margem do ícone, não por gap: gap separaria também
+   "Well" do <span>ira</span>, partindo o nome ao meio. */
 .marca-icone { flex: 0 0 auto; margin-right: 0.5rem; border-radius: 6px; }
 .marca em {
   font-style: normal; font-weight: 500; color: var(--tinta-tenue);
   font-size: 0.8rem; margin-left: 0.2rem;
 }
-/* margin-left: auto empurra o nav para a direita consumindo o espaço livre da
-   PRÓPRIA linha em que ele está, diferente de justify-content no .wrap, que
-   com só um item na linha (nav sozinho, depois de quebrar no celular) não tem
-   contra quem "espalhar" o espaço e deixa o item colado à esquerda, embaixo da
-   marca. Com a margem automática, o nav vai para a direita tanto numa linha só
-   (desktop) quanto na própria linha depois de quebrar (celular). */
+/* margin-left: auto empurra o nav para a direita mesmo sozinho na linha
+   (celular), onde justify-content no .wrap não teria efeito. */
 .topo nav { display: flex; gap: 0.35rem; align-items: center; flex-wrap: wrap; margin-left: auto; }
 .topo nav a {
   color: var(--tinta-fraca); text-decoration: none; font-size: 0.9rem; font-weight: 500;
@@ -96,8 +82,7 @@ body.largo .wrap { width: min(100% - 2rem, 1080px); }
 }
 .topo nav a:hover { color: var(--marca); background: var(--marca-clara); }
 
-/* Página aberta: fundo cheio e peso maior. O hover usa o mesmo tom claro, então
-   sem o preenchimento sólido os dois estados se confundiriam. */
+/* Página aberta: fundo cheio, para não se confundir com o hover. */
 .topo nav a.ativo {
   background: var(--marca); color: #fff; font-weight: 650;
 }
@@ -210,13 +195,8 @@ body.entrada main { padding: 1.5rem; width: 100%; }
 .etiqueta-erro  { background: var(--erro-fundo); color: var(--erro); }
 .etiqueta-fraca { background: #fff3cd; color: #7a5b00; }
 
-/* Ações da linha, em grade 2x2.
-   Eram quatro links em fila: a fila quebrava onde coubesse, e "Excluir" mudava
-   de lugar conforme a largura do título ao lado. Em grade cada ação tem posição
-   fixa, editar e ver em cima, duplicar e excluir embaixo, e a cliente
-   aprende o lugar em vez de reler os quatro toda vez.
-   O <form> é o próprio item da grade: assim duplicar e excluir ficam alinhados
-   com os dois de cima sem precisar de display:contents. */
+/* Ações da linha, em grade 2x2: posição fixa para cada uma, editar/ver em
+   cima, duplicar/excluir embaixo. O <form> é o próprio item da grade. */
 .acoes { white-space: normal; }
 .acoes-grade {
   display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -225,8 +205,7 @@ body.entrada main { padding: 1.5rem; width: 100%; }
 .acoes-grade > form { margin: 0; display: block; }
 .acoes-grade .larga { grid-column: 1 / -1; }
 
-/* Especificidade acima de button[type="submit"], que por padrão pinta o botão
-   com a cor da marca, aqui as quatro ações têm o mesmo peso visual. */
+/* Especificidade acima de button[type="submit"]: as quatro ações têm o mesmo peso visual. */
 .acoes-grade .botao,
 .acoes-grade button[type="submit"] {
   display: block; width: 100%; padding: 0.45rem 0.7rem;
@@ -238,8 +217,7 @@ body.entrada main { padding: 1.5rem; width: 100%; }
 .acoes-grade .botao.botao-fraco:hover {
   background: #eef1f4; color: var(--tinta); border-color: var(--linha-forte);
 }
-/* Excluir é o mesmo botão dos outros: só a cor avisa. Um botão vermelho cheio
-   nesta grade puxaria o olho para a ação que ela menos quer clicar. */
+/* Excluir é o mesmo botão dos outros: só a cor avisa, sem puxar o olho. */
 .acoes-grade .botao.perigo { color: var(--erro); border-color: #e8b4b0; }
 .acoes-grade .botao.perigo:hover {
   background: var(--erro-fundo); color: var(--erro); border-color: var(--erro);
@@ -259,9 +237,7 @@ body.entrada main { padding: 1.5rem; width: 100%; }
   overflow-x: auto; scrollbar-width: none; padding-bottom: 1px;
   position: sticky; top: 57px; z-index: 10; background: var(--fundo);
 
-  /* Sombra na borda direita enquanto houver aba fora da tela. São dez abas e no
-     celular cabem três: sem esta pista, as outras sete simplesmente não existem
-     para quem não pensou em arrastar. */
+  /* Sombra na borda direita enquanto houver aba fora da tela (celular cabem só três). */
   background-image: linear-gradient(to right, var(--fundo) 30%, rgba(244,246,249,0)),
                     linear-gradient(to left,  var(--fundo) 30%, rgba(244,246,249,0)),
                     linear-gradient(to right, rgba(0,0,0,.12), rgba(0,0,0,0)),
@@ -342,29 +318,21 @@ textarea { resize: vertical; line-height: 1.6; }
 .dupla { display: grid; gap: 0.9rem; }
 @media (min-width: 620px) { .dupla { grid-template-columns: 1fr 1fr; } }
 
-/* O gap da grade já separa os dois campos. Sem zerar a margem, a do .campo se
-   soma a ele e abre um vão grande, que era o buraco visível entre a etiqueta e
-   a linha de ajuda que ficava embaixo. */
+/* O gap da grade já separa os campos; sem zerar, a margem do .campo se soma. */
 .dupla > .campo { margin-bottom: 0; }
 
-/* Texto que só o leitor de tela recebe. O <button> da chave é um trilho sem
-   palavra nenhuma dentro; sem isto, quem navega por leitor ouve "botão" e mais
-   nada. */
+/* Texto que só o leitor de tela recebe: o <button> da chave é um trilho sem palavra dentro. */
 .visualmente-oculto {
   position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
   overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0;
 }
 
 /* ---------- Campo com chave de liga/desliga ---------- */
-/* A regra "vazio some da página" morava num parágrafo embaixo dos campos: dizia
-   em palavras o que agora o controle mostra, e para esconder a linha a cliente
-   tinha de apagar o que havia escrito. */
 
 .campo-chave { display: flex; align-items: center; gap: 0.55rem; }
 .campo-chave > input { flex: 1 1 auto; min-width: 0; }
 
-/* Desligado, o campo fica visivelmente fora de uso. O disabled já impede
-   digitar; isto é o aviso de que impede. */
+/* Desligado, o campo fica visivelmente fora de uso, avisando o que o disabled já impede. */
 .campo-chave.desligado > input {
   background: #f2f4f7; color: var(--tinta-tenue); border-style: dashed;
 }
@@ -434,8 +402,7 @@ textarea { resize: vertical; line-height: 1.6; }
 .interruptor-texto strong { display: block; font-size: 0.89rem; }
 .interruptor-texto small { color: var(--tinta-fraca); font-size: 0.81rem; }
 
-/* Seção desligada: escurece e avisa, mas os campos continuam editáveis, ela
-   pode preparar o conteúdo antes de ligar. */
+/* Seção desligada: escurece e avisa, mas os campos continuam editáveis. */
 .grupo-alternavel { transition: opacity .15s; }
 .grupo-alternavel.desligado {
   opacity: .5; filter: grayscale(.7);
@@ -467,22 +434,16 @@ textarea { resize: vertical; line-height: 1.6; }
 }
 .item > input { flex: 1 1 auto; min-width: 0; }
 
-/* min-width: 0 é o que permite a linha encolher.
-   Item de flex nasce com min-width: auto, que é a largura mínima do CONTEÚDO:
-   o placeholder "Descrição em inglês (aparece sob a imagem)" fixava um piso
-   maior que a tela do celular, a linha não cabia e a página inteira ganhava
-   rolagem lateral. Vale para o campo também, que é item de grid pelo mesmo
-   motivo. */
+/* min-width: 0 permite a linha encolher: sem isto, item de flex herda a
+   largura mínima do CONTEÚDO e o placeholder longo abria rolagem lateral. */
 .item-campos { flex: 1 1 auto; min-width: 0; display: grid; gap: 0.5rem; }
 .item-campos > * { min-width: 0; }
 @media (min-width: 700px) {
   .item-campos:not(.empilhado) { grid-template-columns: 176px 1fr 1fr; }
 }
 
-/* Menu do ícone do selo, com o desenho de verdade ao lado. O <select>
-   continua sendo quem decide (funciona sem JavaScript); o quadradinho só
-   mostra o traçado do que já está escolhido, porque nome de ícone em texto
-   ("cadeado", "envio") não diz muito sobre a forma dele. */
+/* Menu do ícone do selo, com o desenho de verdade ao lado (o <select> continua
+   sendo quem decide, funciona sem JavaScript). */
 .campo-icone { display: flex; align-items: stretch; gap: 0.4rem; }
 .campo-icone select { flex: 1 1 auto; min-width: 0; }
 .icone-previa {
@@ -492,8 +453,7 @@ textarea { resize: vertical; line-height: 1.6; }
 }
 .icone-previa svg { width: 22px; height: 22px; }
 
-/* 40px, e não os 28 de antes: alvo de toque abaixo de ~40px faz o dedo errar,
-   e errar aqui significa apagar a linha ao lado da que ela queria. */
+/* 40px: alvo de toque abaixo disso faz o dedo errar e apagar a linha ao lado. */
 .remover {
   flex: 0 0 auto; width: 40px; height: 40px; margin-top: 0.15rem;
   border: 1px solid var(--linha-forte); background: #fff; color: var(--tinta-tenue);
@@ -501,8 +461,7 @@ textarea { resize: vertical; line-height: 1.6; }
 }
 .remover:hover { border-color: var(--erro); color: var(--erro); background: var(--erro-fundo); }
 
-/* Vermelho desde parado, e não só no hover: é a única ação da linha que
-   descarta trabalho, e no celular não existe hover para avisar antes. */
+/* Vermelho desde parado, não só no hover: no celular não há hover para avisar antes. */
 .remover.perigo { color: var(--erro); border-color: #e8b4b0; }
 .remover.perigo:hover { background: var(--erro-fundo); border-color: var(--erro); }
 .remover:disabled { opacity: .45; cursor: not-allowed; }
@@ -516,10 +475,8 @@ textarea { resize: vertical; line-height: 1.6; }
 }
 .adicionar:hover { border-color: var(--marca); background: var(--marca-clara); }
 
-/* Lista no teto (data-max). O botão continua na tela, apagado, em vez de
-   sumir: o lugar dele é a referência que ela usa para achar a lista, e um
-   controle que desaparece parece defeito. O porquê vem no .teto-aviso logo
-   abaixo, botão morto sem explicação é indistinguível de bug. */
+/* Lista no teto (data-max): o botão fica na tela, apagado, em vez de sumir.
+   O porquê vem no .teto-aviso logo abaixo. */
 .adicionar:disabled {
   color: var(--tinta-tenue); border-style: solid; border-color: var(--linha);
   background: #fafbfc; cursor: not-allowed;
@@ -530,34 +487,25 @@ textarea { resize: vertical; line-height: 1.6; }
   margin: 0.45rem 0 0; text-align: center;
   font-size: 0.8rem; color: var(--tinta-fraca);
 }
-/* Escondido enquanto não tem texto. Um display:none alternado por JS quebraria
-   o role="status": região viva escondida não é anunciada. */
+/* Escondido enquanto não tem texto (não display:none alternado, quebraria o role="status"). */
 .teto-aviso:empty { display: none; }
 
 /* ---------- Lista de imagens ---------- */
-/* Cada linha é uma foto e envia a sua própria: o botão de envio mora dentro
-   dela, e a linha inteira aceita o arquivo arrastado. O envio era um botão
-   único no fim da aba, e a foto caía "no primeiro campo vazio", a cliente
-   escolhia o arquivo sem poder dizer em que posição ele devia entrar. */
+/* Cada linha é uma foto e envia a sua própria: o botão mora dentro dela, e a
+   linha inteira aceita o arquivo arrastado. */
 
-/* Uma linha só, na ordem em que ela lê: número, foto, descrição, enviar, ×.
-   O wrap existe para duas coisas: os avisos (estado do envio, arquivo ausente)
-   ocupam uma faixa inteira embaixo, e no celular o botão e o × descem juntos
-   para a segunda faixa em vez de espremer a descrição a três caracteres. */
+/* Uma linha só: número, foto, descrição, enviar, ×. O wrap manda os avisos
+   para uma faixa embaixo, e no celular o botão e o × descem juntos. */
 .item-imagem { flex-wrap: wrap; align-items: center; position: relative; }
 .item-imagem .item-num { margin-top: 0; }
 
-/* Base de 12rem: acima disso a descrição divide a linha com o botão; abaixo,
-   o flex-wrap manda o botão para baixo em vez de estrangular o campo. */
+/* Base de 12rem: abaixo disso o flex-wrap manda o botão para baixo. */
 .item-imagem .item-campos { flex: 1 1 12rem; }
 
-/* margin-left: auto mantém o par "enviar + ×" encostado à direita mesmo depois
-   de cair para a segunda faixa no celular. Sem isso eles ficam colados embaixo
-   do número, e a linha perde a leitura de fileira que tem no computador. */
+/* margin-left: auto mantém "enviar + ×" à direita mesmo na segunda faixa do celular. */
 .foto-envio { flex: 0 0 auto; margin-left: auto; }
 
-/* Moldura da foto: miniatura quando há arquivo, "+" quando está vazia.
-   Quadrado cinza sem nada dentro não se anuncia como lugar onde cabe algo. */
+/* Moldura da foto: miniatura quando há arquivo, "+" quando está vazia. */
 .foto-lugar {
   flex: 0 0 auto; position: relative;
   width: 72px; aspect-ratio: 1; border-radius: 8px;
@@ -565,49 +513,34 @@ textarea { resize: vertical; line-height: 1.6; }
   overflow: hidden;
 }
 
-/* Preenche a moldura por posicionamento, não por porcentagem.
-   A versão anterior centrava a imagem numa moldura grid e pedia height: 100%:
-   num item de grid centralizado a altura percentual fica indefinida, o
-   navegador volta a usar a proporção original do arquivo, e uma foto em pé
-   virava 58x87 dentro de um quadrado de 60 (medido). Com inset: 0 a altura
-   passa a ser a da moldura, e o object-fit recorta como deve. */
+/* Preenche a moldura por posicionamento (inset: 0), não por porcentagem: com
+   height: 100% num item de grid a altura percentual ficava indefinida. */
 .item-miniatura {
   position: absolute; inset: 0; z-index: 1;
   width: 100%; height: 100%; object-fit: cover; display: block;
 }
-/* Uma regra de autor com display: block venceria o [hidden] do navegador, que
-   é folha de usuário-agente: a miniatura escondida pelo JS continuaria
-   ocupando a moldura, como retângulo de imagem quebrada. */
+/* display: block venceria o [hidden] do navegador, que é regra de menor prioridade. */
 .item-miniatura[hidden] { display: none; }
 
 .foto-vazia {
   position: absolute; inset: 0; display: grid; place-items: center;
   color: var(--tinta-tenue); font-size: 1.6rem; font-weight: 300; line-height: 1;
 }
-/* Com foto, o "+" sai da frente. :has evita sincronizar mais uma classe pelo
-   JavaScript; onde ele não existir, a miniatura é opaca, ocupa a moldura
-   inteira e tem z-index maior, o "+" fica coberto do mesmo jeito. */
+/* Com foto, o "+" sai da frente. Sem :has, a miniatura fica opaca com z-index maior. */
 .foto-lugar:has(img:not([hidden])) .foto-vazia { display: none; }
 
 .foto-envio { display: none; }          /* sem JS não há envio por fetch */
 .js .foto-envio { display: block; }
-/* Com JS, o nome do arquivo é assunto da máquina: quem manda é o botão da
-   linha. Sem JS, este campo é a única forma de apontar um arquivo já enviado,
-   e por isso ele existe sempre no HTML. */
+/* Com JS, quem manda o nome é o botão; sem JS, o campo é a única forma de apontar um arquivo já enviado. */
 .js .campo-arquivo { display: none; }
 
-/* Largura pelo texto, não pela coluna: o botão fica à direita da descrição, e
-   esticá-lo daria ao "Enviar foto" o mesmo peso do campo que ela precisa
-   preencher. O nowrap impede que vire duas linhas e desalinhe a fileira. */
+/* Largura pelo texto, não pela coluna, para não dar peso demais ao "Enviar foto". */
 .foto-botao { display: block; white-space: nowrap; }
 
-/* Enquanto sobe. O clique já está impedido pelo botão desabilitado: isto é só
-   a aparência disso, senão ele continua convidando a clicar de novo e a mesma
-   foto sobe duas vezes. */
+/* Aparência do envio em curso, já que o clique está bloqueado pelo disabled. */
 .foto-botao.enviando { opacity: .6; cursor: progress; }
 
-/* Arquivo arrastado por cima desta linha. Precisa ser inconfundível: com oito
-   linhas parecidas na tela, a única pergunta que importa é "em qual vai cair?" */
+/* Arquivo arrastado por cima desta linha: precisa ser inconfundível entre oito linhas parecidas. */
 .item-soltar {
   border-color: var(--marca); background: var(--marca-clara);
   box-shadow: 0 0 0 2px var(--marca-clara);
@@ -616,22 +549,17 @@ textarea { resize: vertical; line-height: 1.6; }
 
 .item-enviando { opacity: .85; }
 
-/* Aviso desta linha. Ganha espaço só quando tem o que dizer, e guarda as
-   quebras: sucesso parcial lista, numa linha cada, o que entrou e o que foi
-   recusado. */
+/* Aviso desta linha, guardando quebras: sucesso parcial lista o que entrou e o que foi recusado. */
 .foto-estado {
   flex: 0 0 100%; margin: 0.15rem 0 0;
   font-size: 0.8rem; color: var(--tinta-fraca); white-space: pre-line;
 }
-/* Escondido enquanto não tem texto. Alternar display por JS quebraria o
-   role="status": região viva escondida não é anunciada ao reaparecer. */
 .foto-estado:empty { display: none; }
 
 /* Vermelho só quando NADA entrou; sucesso parcial continua na cor normal. */
 .enviar-estado-erro { color: var(--erro); font-weight: 600; }
 
-/* Arquivo que não está mais no servidor. Não dá nenhum sinal por conta
-   própria, a página publicada é que mostraria o buraco. */
+/* Arquivo que não está mais no servidor. */
 .item-imagem-quebrada {
   border-color: var(--erro);
   background: var(--erro-fundo);
@@ -661,9 +589,7 @@ textarea { resize: vertical; line-height: 1.6; }
 /* =============================================================================
    Previsão de como a seção fica na página
    =============================================================================
-   Miniatura do bloco real, com o texto que ela acabou de digitar. A primeira
-   versão eram formas cinzas fixas: mostravam o formato, não a oferta, e por
-   isso não ajudavam a decidir se o texto estava bom. */
+   Miniatura do bloco real, com o texto que ela acabou de digitar. */
 
 .exemplo {
   margin-top: 1.4rem; padding-top: 1.1rem;
@@ -680,8 +606,7 @@ textarea { resize: vertical; line-height: 1.6; }
   font-size: 0.8rem; line-height: 1.5; color: var(--tinta-fraca);
   overflow-wrap: anywhere;
 }
-/* O texto de venda tem 600 a 900 palavras: a prévia mostra tudo, mas dentro de
-   uma caixa com rolagem própria. Cortar blocos escondia os subtítulos. */
+/* O texto de venda tem até 900 palavras: a prévia mostra tudo, com rolagem própria. */
 .previa[data-previa="texto"] { max-height: 340px; overflow-y: auto; }
 
 .previa > *:first-child { margin-top: 0; }
@@ -741,9 +666,7 @@ textarea { resize: vertical; line-height: 1.6; }
   display: block; color: var(--tinta-tenue); font-size: 0.74rem; margin-bottom: 0.35rem;
 }
 
-/* Reproduz o bloco real: moldura com a borda esquerda laranja e um × antes de
-   cada linha. As cores são as do site (--cta e --brand em style.css), não as do
-   painel, a prévia só serve se parecer com a página. */
+/* Reproduz o bloco real: cores do site (style.css), não as do painel. */
 .previa-nao {
   border: 1px solid var(--linha); border-left: 4px solid #d9552b;
   border-radius: 8px; background: #fff; padding: 0.75rem 0.9rem;
@@ -773,9 +696,7 @@ textarea { resize: vertical; line-height: 1.6; }
 .previa-selo strong { display: block; font-size: 0.72rem; color: var(--tinta); margin-top: 0.3rem; }
 .previa-selo span   { display: block; font-size: 0.66rem; color: var(--tinta-tenue); }
 
-/* Todas as perguntas com resposta à vista. O acordeão real esconde as demais,
-   mas aqui o objetivo é reler o texto, não imitar a interação. O contraste
-   entre pergunta e resposta faz o trabalho que o "+" fazia na página. */
+/* Todas as perguntas com resposta à vista: o objetivo é reler o texto, não imitar o acordeão. */
 .previa-faq-lista { border-top: 1px solid var(--linha); }
 .previa-faq {
   border-bottom: 1px solid var(--linha); padding: 0.6rem 0 0.65rem 0.95rem;
@@ -783,7 +704,6 @@ textarea { resize: vertical; line-height: 1.6; }
 }
 .previa-faq:last-child { border-bottom: 0; padding-bottom: 0; }
 
-/* Marcador de pergunta, no lugar do "+" da página. */
 .previa-faq::before {
   content: "▸"; position: absolute; left: 0; top: 0.62rem;
   color: #0d7d71; font-size: 0.72rem; line-height: 1;
@@ -800,14 +720,10 @@ textarea { resize: vertical; line-height: 1.6; }
   margin: 0.25rem 0 0; font-size: 0.72rem; color: #b3261e; font-style: italic;
 }
 
-/* O FAQ costuma ter cinco ou seis perguntas: cabe rolagem própria, como no
-   texto de venda, para a prévia não empurrar a barra de salvar para longe. */
+/* Rolagem própria, para a prévia não empurrar a barra de salvar para longe. */
 .previa[data-previa="faq"] { max-height: 320px; overflow-y: auto; }
 
 /* ---------- Prévia: imagens ---------- */
-/* A regra "1 imagem fica sozinha, 2 ou mais viram carrossel" mora no template
-   da página. A prévia precisa mostrar essa troca acontecendo, senão apagar uma
-   imagem faz as setas sumirem sem explicação. */
 
 .previa-imagem {
   display: block; width: 100%; border-radius: 6px;
@@ -816,8 +732,7 @@ textarea { resize: vertical; line-height: 1.6; }
 .previa-imagem-unica { margin: 0; }
 .previa-imagem-unica .previa-imagem { max-height: 180px; }
 
-/* Substitui a imagem quando o arquivo não carrega: o ícone de imagem quebrada
-   do navegador não diz se o nome está errado ou se o upload não foi feito. */
+/* Substitui a imagem quando o arquivo não carrega. */
 .previa-imagem-falta {
   display: grid; place-items: center; width: 100%; min-height: 70px;
   border: 1px dashed var(--erro); border-radius: 6px;
@@ -825,10 +740,8 @@ textarea { resize: vertical; line-height: 1.6; }
   font-size: 0.72rem; font-style: italic; text-align: center; padding: 0.4rem;
 }
 
-/* Alinhado pelo TOPO, não pelo centro: só alguns slides têm legenda, e com
-   align-items:center as imagens ficariam em alturas diferentes conforme a
-   cliente escreve: o que parece defeito do carrossel, não da legenda.
-   A seta desce os 24px que a centralizam sobre a imagem, de altura fixa. */
+/* Alinhado pelo TOPO, não pelo centro: legenda de tamanho variável não pode
+   deslocar a imagem. A seta desce os 24px que a centralizam. */
 .previa-carrossel { display: flex; align-items: flex-start; gap: 0.35rem; }
 .previa-seta {
   flex: 0 0 auto; width: 20px; height: 20px; margin-top: 24px; border-radius: 50%;
@@ -836,8 +749,7 @@ textarea { resize: vertical; line-height: 1.6; }
   font-size: 0.85rem; line-height: 20px; text-align: center;
 }
 
-/* Rola dentro de si. A prévia tem largura fixa e o carrossel pode ter oito
-   imagens: quem rola é a fileira, nunca a página. */
+/* Rola dentro de si: quem rola é a fileira, nunca a página. */
 .previa-carrossel-fileira {
   flex: 1 1 auto; min-width: 0;
   display: flex; gap: 0.35rem; overflow-x: auto;
@@ -845,12 +757,9 @@ textarea { resize: vertical; line-height: 1.6; }
 }
 .previa-slide { flex: 0 0 92px; margin: 0; }
 .previa-slide .previa-imagem { height: 68px; }
-/* O aviso ocupa exatamente o lugar da imagem que falhou, senão o slide
-   quebrado ficaria mais alto que os vizinhos e desalinharia a fileira. */
+/* Mesma altura da imagem, senão o slide quebrado desalinharia a fileira. */
 .previa-slide .previa-imagem-falta { height: 68px; min-height: 0; font-size: 0.66rem; }
 
-/* Os pontinhos do carrossel real, na mesma quantidade das imagens: é o jeito
-   mais rápido de conferir se ela pôs mais fotos do que pretendia. */
 .previa-pontos {
   display: flex; justify-content: center; gap: 0.25rem; margin-top: 0.45rem;
 }
@@ -906,8 +815,7 @@ button[type="submit"]:hover, .botao:hover { background: var(--marca-escura); bor
   .aba { padding: 0.75rem 1rem; font-size: 0.9rem; }
   .formulario > section { padding: 1.1rem; border-radius: var(--raio); }
 
-  /* Campo com fonte abaixo de 16px faz o iOS dar zoom sozinho ao focar, e a
-     página fica deslocada até a pessoa fechar o teclado e reposicionar. */
+  /* Fonte abaixo de 16px faz o iOS dar zoom sozinho ao focar o campo. */
   input[type="text"], input[type="url"], input[type="password"],
   textarea, select { font-size: 16px; padding: 0.7rem; }
 
@@ -915,27 +823,11 @@ button[type="submit"]:hover, .botao:hover { background: var(--marca-escura); bor
   .interruptor { padding: 1rem; }
   .previa { max-width: 100%; }
 
-  /* Moldura menor: no celular a linha é estreita, e 72px roubariam espaço da
-     faixa de cima, onde ficam também o botão e o ×. A altura sai do
-     aspect-ratio da regra base, não é repetida aqui. */
   .foto-lugar { width: 60px; }
 
-  /* No celular a linha vira DUAS faixas, com ordem diferente da do computador:
-
-       [n] [foto]        [Enviar foto] [×]
-       [ descrição em largura inteira        ]
-
-     No computador a descrição divide a faixa com o botão e sobra espaço para
-     todos. Aqui não sobra: repartindo a mesma faixa entre quatro coisas, o
-     campo de texto fica com uns poucos caracteres visíveis, e é justamente o
-     campo em que ela DIGITA uma frase e precisa reler o que escreveu. Os
-     controles (enviar, remover) não precisam de largura, o texto precisa.
-
-     Feito com order, e não mudando o HTML: no computador a ordem visual tem de
-     continuar sendo a de leitura (foto, descrição, ações), e uma ordem só no
-     HTML não serve às duas telas. Como a ordem de foco segue o HTML, o campo de
-     descrição continua sendo alcançado depois da foto pelo teclado, que é a
-     sequência que faz sentido nas duas. */
+  /* No celular a linha vira duas faixas (foto+ações em cima, descrição
+     embaixo em largura inteira), com order em vez de mudar o HTML, para a
+     ordem de leitura e de foco continuarem corretas no computador. */
   .item-imagem .foto-envio { order: 2; }
   .item-imagem .remover    { order: 3; }
   .item-imagem .item-campos { order: 4; flex: 1 1 100%; }
@@ -947,8 +839,7 @@ button[type="submit"]:hover, .botao:hover { background: var(--marca-escura); bor
   .lista td { border: 0; padding: 0.3rem 1rem; }
   .lista .num { text-align: left; }
   .lista .num::before { content: "Cliques: "; color: var(--tinta-tenue); font-size: 0.84rem; }
-  /* A grade continua 2x2 no celular: são quatro alvos de toque em bloco, e
-     empilhar em coluna única daria uma lista de quatro botões por oferta. */
+  /* A grade continua 2x2 no celular, contra empilhar quatro botões em coluna única. */
   .acoes { padding-top: 0.6rem !important; }
   .acoes-grade { min-width: 0; gap: 0.5rem; }
   .acoes-grade .botao,

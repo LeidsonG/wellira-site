@@ -2,22 +2,15 @@
 /**
  * Validação, gravação e upload do painel.
  *
- * Regra que organiza este arquivo: nada que venha do formulário é gravado como
- * chegou. Todo campo passa por normalizar_oferta(), que decide o tipo, corta o
- * tamanho e descarta o que não reconhece. O JSON no disco é sempre resultado
- * desta função, nunca do $_POST.
+ * Nada que venha do formulário é gravado como chegou: todo campo passa por
+ * normalizar_oferta(), que decide o tipo, corta o tamanho e descarta o que
+ * não reconhece.
  */
 
 require_once __DIR__ . '/funcoes.php';
 
-/**
- * Grava um arquivo sem risco de deixá-lo pela metade.
- *
- * Escreve num temporário e só então renomeia. rename() é atômico no mesmo
- * sistema de arquivos: ou o arquivo antigo continua inteiro, ou o novo aparece
- * inteiro. Um file_put_contents interrompido no meio (timeout, disco cheio,
- * queda) deixaria a oferta corrompida e a página no ar quebrada.
- */
+// Grava um arquivo sem risco de deixá-lo pela metade: escreve num temporário
+// e só então renomeia, rename() é atômico no mesmo sistema de arquivos.
 function escrever_atomico(string $destino, string $conteudo): bool
 {
     $temporario = $destino . '.tmp' . bin2hex(random_bytes(4));
@@ -37,13 +30,7 @@ function escrever_atomico(string $destino, string $conteudo): bool
 // Backup
 // ---------------------------------------------------------------------------
 
-/**
- * Copia a versão atual da oferta antes de sobrescrevê-la.
- *
- * O conteúdo da cliente existe só no servidor e não passa por git. Salvar por
- * cima de um texto que levou uma hora para escrever é o erro mais provável do
- * painel, e o único sem volta.
- */
+// Copia a versão atual da oferta antes de sobrescrevê-la.
 function fazer_backup(string $slug): void
 {
     $origem = DIR_OFERTAS . '/' . $slug . '.json';
@@ -53,8 +40,7 @@ function fazer_backup(string $slug): void
 
     @copy($origem, DIR_BACKUPS . '/' . $slug . '.' . date('Ymd-His') . '.json');
 
-    // Poda: mantém só as N mais recentes. Sem isso a pasta cresce sem fim e
-    // consome os inodes do plano compartilhado, que são contados.
+    // Poda: mantém só as N mais recentes.
     $copias = glob(DIR_BACKUPS . '/' . $slug . '.*.json') ?: [];
     sort($copias);
     foreach (array_slice($copias, 0, max(0, count($copias) - BACKUPS_POR_OFERTA)) as $velho) {
@@ -94,13 +80,8 @@ function limpar_bloco($valor, int $max = 20000): string
     return substr(trim($texto), 0, $max);
 }
 
-/**
- * Monta o array final da oferta a partir do formulário.
- *
- * Campo vazio é removido, não gravado como string vazia: é isso que faz o
- * template esconder o bloco inteiro ("campo vazio = bloco some"). Gravar ""
- * deixaria uma seção com título e nada dentro.
- */
+// Monta o array final da oferta a partir do formulário. Campo vazio é
+// removido, não gravado como string vazia ("campo vazio = bloco some").
 function normalizar_oferta(array $post): array
 {
     $o = [];
@@ -108,12 +89,8 @@ function normalizar_oferta(array $post): array
     $o['status']  = ($post['status'] ?? 'rascunho') === 'publicado' ? 'publicado' : 'rascunho';
     $o['indexar'] = !empty($post['indexar']);
 
-    // Interruptores das seções opcionais.
-    //
-    // Antes, esconder um bloco significava apagar o conteúdo dele, e voltar
-    // atrás custava redigitar tudo. O interruptor separa "não quero mostrar" de
-    // "não tenho o que mostrar": o texto continua gravado, apenas não é
-    // impresso. Ausente vale true, para que oferta antiga não perca seção.
+    // Interruptores das seções opcionais. Ausente vale true, para que oferta
+    // antiga não perca seção.
     foreach (['imagens', 'autor', 'nao_e_para_voce', 'selos', 'faq'] as $secao) {
         $o['mostrar_' . $secao] = !empty($post['mostrar_' . $secao]);
     }
@@ -142,15 +119,10 @@ function normalizar_oferta(array $post): array
         }
     }
 
-    // O link é o único campo sem o qual a oferta não existe, então é validado
-    // aqui e não apenas conferido na exibição.
-    //
-    // O painel não pede mais o esquema por extenso: a cliente digita só o
-    // resto do endereço, e a casinha "só http" cobre o caso raro de o
-    // fornecedor não ter https. Ausente vale https, que é o padrão. Os dois
-    // chegam separados e são remontados aqui. O strip defende contra quem cola
-    // o endereço completo (copiado do navegador, esquema incluído) no campo do
-    // resto por hábito, o que duplicaria o esquema.
+    // Único campo sem o qual a oferta não existe, então validado aqui. A
+    // cliente digita só o resto do endereço; a casinha "só http" cobre o caso
+    // raro de o fornecedor não ter https. O strip defende contra quem cola o
+    // endereço completo (com esquema) no campo do resto.
     $esquema     = empty($post['link_http']) ? 'https' : 'http';
     $link_resto  = preg_replace('#^https?://#i', '', trim((string) ($post['link_resto'] ?? '')));
     $link        = $link_resto !== '' ? link_seguro($esquema . '://' . $link_resto) : null;
@@ -168,12 +140,9 @@ function normalizar_oferta(array $post): array
 
     // --- Imagens ------------------------------------------------------------
     //
-    // O nome do arquivo é conferido contra o formato que o upload gera, e não
-    // apenas limpo: ele vira caminho de arquivo e URL na página pública. A
-    // legenda é opcional e faz dois trabalhos ao mesmo tempo: é o texto
-    // alternativo da imagem (leitor de tela e Google) e a linha impressa sob
-    // ela. Um campo só, porque dois campos dizendo quase a mesma coisa é o que
-    // faz a cliente deixar os dois em branco.
+    // O nome do arquivo é conferido contra o formato que o upload gera, ele
+    // vira caminho de arquivo e URL na página pública. A legenda é opcional e
+    // serve de alt e de legenda impressa ao mesmo tempo.
     $imagens = [];
     foreach ((array) ($post['imagem_arquivo'] ?? []) as $i => $arquivo) {
         $arquivo = basename(limpar_linha($arquivo, 200));
@@ -250,12 +219,8 @@ function normalizar_oferta(array $post): array
     return $o;
 }
 
-/**
- * O que impede a oferta de ser publicada.
- *
- * Devolve lista de mensagens, vazia quando está tudo certo. Rascunho pode ficar
- * incompleto, só a publicação exige o mínimo, porque é ela que expõe a página.
- */
+// O que impede a oferta de ser publicada. Lista de mensagens, vazia se ok.
+// Rascunho pode ficar incompleto, só a publicação exige o mínimo.
 function validar_oferta(array $o, string $slug, bool $novo): array
 {
     $erros = [];
@@ -345,14 +310,8 @@ function ini_bytes(string $valor): int
     }
 }
 
-/**
- * Limite real de upload, em bytes.
- *
- * O teto que vale é o MENOR entre o nosso e os dois do PHP. A hospedagem
- * compartilhada costuma vir com upload_max_filesize de 2M e post_max_size de
- * 8M, muito abaixo dos 64 MB que queríamos para vídeo, anunciar o nosso número
- * faria a cliente tentar de novo e de novo um envio que nunca ia passar.
- */
+// Limite real de upload, em bytes: o MENOR entre o nosso e os dois do PHP
+// (upload_max_filesize e post_max_size).
 function limite_upload(string $genero): int
 {
     $nosso = ($genero === 'video') ? MAX_UPLOAD_VIDEO : MAX_UPLOAD_IMAGEM;
@@ -367,15 +326,9 @@ function limite_upload(string $genero): int
     return min($limites);
 }
 
-/**
- * O POST chegou vazio por exceder post_max_size?
- *
- * Quando o corpo passa de post_max_size, o PHP descarta tudo: $_POST e $_FILES
- * voltam vazios. Sem detectar isso aqui, a validação de CSRF é a primeira a
- * falhar e a cliente recebe "Sessão expirada" ao enviar um vídeo grande, uma
- * mensagem que não tem nada a ver com o que aconteceu e que ela não tem como
- * decifrar.
- */
+// O POST chegou vazio por exceder post_max_size? Quando isso acontece o PHP
+// descarta $_POST e $_FILES inteiros, e sem detectar aqui a cliente recebia
+// "Sessão expirada" ao enviar um vídeo grande.
 function post_estourou(): bool
 {
     if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -390,17 +343,8 @@ function post_estourou(): bool
     return $teto > 0 && $enviado > $teto;
 }
 
-/**
- * Descobre o tipo real do arquivo lendo os primeiros bytes.
- *
- * A extensão do nome não vale nada: qualquer pessoa renomeia um .php para .mp4
- * antes de enviar. E a pasta de destino é servida publicamente. Isto lê a
- * assinatura binária real e é o que decide a extensão gravada no disco, o nome
- * que veio do navegador é descartado inteiro.
- *
- * Complementa, e não substitui, o bloqueio de execução de PHP no .htaccess das
- * pastas de upload.
- */
+// Descobre o tipo real do arquivo pelos primeiros bytes (magic bytes), em vez
+// de confiar na extensão do nome, que qualquer um pode forjar.
 function tipo_por_assinatura(string $caminho): ?string
 {
     $f = @fopen($caminho, 'rb');
@@ -431,18 +375,9 @@ function tipo_por_assinatura(string $caminho): ?string
     return null;
 }
 
-/**
- * Recebe vários arquivos de uma vez.
- *
- * O PHP entrega um upload múltiplo "virado do avesso": em vez de uma lista de
- * arquivos, chegam listas paralelas de nome, tipo, erro e tamanho. Esta função
- * desvira e chama receber_upload() para cada um, que é quem continua decidindo
- * o que entra, a validação por assinatura binária segue idêntica.
- *
- * Devolve ['nomes' => [...], 'erros' => [...]]: um arquivo recusado não pode
- * derrubar os outros, porque a cliente seleciona cinco fotos de uma vez e uma
- * delas ser um HEIC do iPhone é o caso comum, não a exceção.
- */
+// Recebe vários arquivos de uma vez. O PHP entrega upload múltiplo como
+// listas paralelas de nome/tipo/erro/tamanho; desvira e chama
+// receber_upload() para cada um. Um arquivo recusado não derruba os outros.
 function receber_uploads(array $campo, string $genero): array
 {
     $nomes = [];
@@ -470,9 +405,7 @@ function receber_uploads(array $campo, string $genero): array
 
         $resultado = receber_upload($arquivo, $genero);
         if (isset($resultado['erro'])) {
-            // O nome que veio do navegador só aparece na mensagem de erro, e
-            // escapado na impressão: serve para ela saber QUAL das cinco fotos
-            // foi recusada.
+            // O nome do arquivo entra na mensagem para a cliente saber qual foi recusado.
             $erros[] = limpar_linha((string) ($arquivo['name'] ?? 'arquivo'), 80)
                      . ': ' . $resultado['erro'];
             continue;

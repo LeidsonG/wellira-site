@@ -1,16 +1,11 @@
 /* =============================================================================
    Meta Pixel + Google Analytics 4
    =============================================================================
-   Arquivo único de propósito. As páginas institucionais são .html estáticas e
-   as ofertas são geradas por oferta.php — se cada uma trouxesse o próprio
-   trecho, trocar um ID exigiria editar tudo e alguma página ficaria para trás.
+   Arquivo único: páginas institucionais são .html estáticas e as ofertas vêm
+   de oferta.php, trocar um ID aqui vale para todas.
 
-   Os IDs NÃO ficam neste arquivo: vêm de assets/js/ids.js, que está no
-   .gitignore. O repositório é público, e embora o Pixel apareça no inspetor de
-   qualquer visitante — ele identifica a conta, não dá acesso a ela — deixá-lo
-   num repositório aberto o entrega a quem varre o GitHub em massa. Pixel
-   conhecido recebe evento falso, e evento falso ensina a Meta a mostrar o
-   anúncio para o público errado.
+   Os IDs NÃO ficam neste arquivo: vêm de assets/js/ids.js, fora do
+   repositório público, contra Pixel conhecido receber evento falso.
 
    Sem ids.js o rastreamento simplesmente não roda, que é o padrão seguro.
    ========================================================================== */
@@ -24,19 +19,10 @@
 
   var IDS = window.WELLIRA_IDS || {};
 
-  /** ID do Meta Pixel (Gerenciador de Eventos → Fontes de dados). */
   var META_PIXEL_ID = IDS.pixel || '';
-
-  /** ID de métrica do GA4 (Admin → Fluxos de dados). */
   var GA4_ID = IDS.ga4 || '';
 
-  /**
-   * Só rastreia no domínio de produção.
-   *
-   * Sem esta trava, o servidor local somaria às estatísticas de produção. O
-   * efeito não é cosmético: a Meta aprende com quem converte, e ensiná-la com
-   * os nossos próprios testes piora a entrega dos anúncios.
-   */
+  // Só rastreia no domínio de produção, para o servidor local não somar às estatísticas.
   var DOMINIOS = ['wellira.online', 'www.wellira.online'];
 
   if (DOMINIOS.indexOf(window.location.hostname) === -1) {
@@ -67,8 +53,7 @@
   // ---------------------------------------------------------------------------
 
   if (META_PIXEL_ID) {
-    /* Trecho oficial da Meta, mantido como eles publicam. Reescrevê-lo "mais
-       bonito" é o tipo de mudança que quebra em silêncio numa atualização. */
+    // Trecho oficial da Meta, mantido como eles publicam.
     !function (f, b, e, v, n, t, s) {
       if (f.fbq) return; n = f.fbq = function () {
         n.callMethod ? n.callMethod.apply(n, arguments) : n.queue.push(arguments);
@@ -87,17 +72,9 @@
   // Clique no botão de compra
   // ---------------------------------------------------------------------------
 
-  /**
-   * O clique que leva ao fornecedor é o evento que mais importa.
-   *
-   * Não há como registrar a compra: ela acontece no site do fornecedor, fora do
-   * nosso alcance. O clique é o sinal mais próximo disso que temos, e é ele que
-   * a Meta usa para aprender a quem mostrar o anúncio. Sem este evento, a
-   * campanha otimiza por visita — e visita barata não é venda.
-   *
-   * O disparo acontece na captura, antes de a navegação começar: o clique num
-   * link sai da página, e um envio iniciado tarde demais não chega a ser feito.
-   */
+  // O clique que leva ao fornecedor é o evento que mais importa: não há como
+  // registrar a compra, que acontece no site dele. Disparado na captura,
+  // antes de a navegação começar.
   document.addEventListener('click', function (evento) {
     var alvo = evento.target.closest('a[href^="/go/"]');
     if (!alvo) return;

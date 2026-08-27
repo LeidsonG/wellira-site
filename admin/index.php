@@ -18,8 +18,7 @@ $ofertas = [];
 foreach ($slugs as $slug) {
     $o = carregar_oferta($slug);
     if ($o === null) {
-        // JSON corrompido não pode sumir da lista em silêncio: se a cliente não
-        // enxerga o arquivo, ela nunca descobre que a página caiu.
+        // JSON corrompido não some da lista em silêncio.
         $ofertas[] = ['slug' => $slug, 'quebrada' => true];
         continue;
     }
@@ -34,8 +33,7 @@ foreach ($slugs as $slug) {
     ];
 }
 
-// Mais recentes primeiro: a oferta em que ela mexeu por último é a que ela
-// provavelmente quer abrir de novo.
+// Mais recentes primeiro.
 usort($ofertas, fn($a, $b) => ($b['alterada'] ?? 0) <=> ($a['alterada'] ?? 0));
 
 painel_topo('Ofertas');
@@ -94,18 +92,10 @@ painel_aviso('erro', $_GET['erro'] ?? null);
             <?php endif; ?>
           </td>
           <td class="num"><?= number_format($o['cliques'], 0, ',', '.') ?></td>
-          <?php /* Grade 2x2, na ordem em que ela usa: em cima o par do dia a dia
-                   (editar / ver como ficou), embaixo o par ocasional (duplicar /
-                   excluir). Antes eram quatro links em fila: no celular
-                   quebravam em qualquer ponto, e "Excluir" tanto podia cair ao
-                   lado de "Duplicar" quanto sozinho na linha seguinte. */ ?>
+          <?php // Grade 2x2: em cima o par do dia a dia, embaixo o ocasional. ?>
           <td class="acoes">
             <div class="acoes-grade">
               <a class="botao botao-fraco" href="/admin/editar.php?slug=<?= e($o['slug']) ?>">Editar</a>
-              <?php /* Rascunho não existe em /<slug> e o cookie do painel não
-                       acompanha a página pública: sem a prévia, este link
-                       entregava um 404 para a oferta que a cliente acabou de
-                       escrever, como se o painel estivesse quebrado. */ ?>
               <?php if ($o['status'] === 'publicado'): ?>
                 <a class="botao botao-fraco" href="/<?= e($o['slug']) ?>" target="_blank" rel="noopener">Ver página</a>
               <?php else: ?>
@@ -117,16 +107,7 @@ painel_aviso('erro', $_GET['erro'] ?? null);
                 <input type="hidden" name="acao" value="duplicar">
                 <button type="submit" class="botao botao-fraco">Duplicar</button>
               </form>
-              <?php /* A mensagem vai num data-attribute, não em JS embutido: título
-                       com apóstrofo ("Here's what changed") fechava a string do
-                       confirm() e o handler morria com erro de sintaxe, o
-                       formulário então enviava SEM perguntar nada.
-
-                       O name="confirmado" é a segunda tranca, do lado do servidor:
-                       quem apaga o campo é o próprio confirm(), então um POST de
-                       excluir sem ele significa que a pergunta não foi respondida
-                       (JS desligado, script quebrado, formulário forjado) e
-                       acoes.php recusa. Clique acidental precisa vencer as duas. */ ?>
+              <?php // Mensagem em data-attribute, não em JS embutido: título com apóstrofo quebraria a string. ?>
               <form method="post" action="/admin/acoes.php"
                     data-confirmar="Excluir a oferta &quot;<?= e($o['titulo']) ?>&quot;?&#10;&#10;A página sai do ar. Uma cópia de segurança fica guardada.">
                 <?= csrf_campo() ?>

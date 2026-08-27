@@ -2,41 +2,26 @@
 /**
  * Funções de apoio ao roteamento e à renderização das ofertas.
  *
- * Compatível com PHP 8.0+ e sem depender de mbstring, a versão do PHP na
- * hospedagem compartilhada pode ser trocada pelo cPanel a qualquer momento, e
- * nem todo plano traz a extensão habilitada.
+ * Compatível com PHP 8.0+, sem depender de mbstring.
  */
 
 require_once __DIR__ . '/config.php';
 
-/**
- * Escapa texto para saída em HTML.
- *
- * Toda saída derivada de conteúdo da cliente passa por aqui. Como o painel
- * grava o que ela digitar, tratar esse conteúdo como confiável abriria XSS
- * numa página pública.
- */
+// Escapa texto para saída em HTML. Toda saída derivada de conteúdo da
+// cliente passa por aqui, contra XSS.
 function e(?string $texto): string
 {
     return htmlspecialchars((string) $texto, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 }
 
-/**
- * Um slug só é aceito se contiver exclusivamente minúsculas, números e hífen,
- * começando e terminando por caractere alfanumérico.
- *
- * Isso é a primeira barreira contra path traversal: sem ponto e sem barra,
- * "../../etc/passwd" nunca chega a virar um caminho de arquivo.
- */
+// Só minúsculas, números e hífen, começando e terminando por alfanumérico.
+// Primeira barreira contra path traversal.
 function slug_valido(string $slug): bool
 {
     return (bool) preg_match('/^[a-z0-9](?:[a-z0-9-]{0,62}[a-z0-9])?$/', $slug);
 }
 
-/**
- * Converte um título livre em slug utilizável na URL.
- * Usado pelo painel para preencher o endereço automaticamente.
- */
+// Converte um título livre em slug utilizável na URL.
 function gerar_slug(string $titulo): string
 {
     $mapa = [
@@ -49,21 +34,15 @@ function gerar_slug(string $titulo): string
     return trim($s, '-');
 }
 
-/**
- * Lê uma oferta do disco.
- *
- * Devolve null quando o slug é inválido, o arquivo não existe ou o JSON está
- * corrompido, nunca lança exceção, porque qualquer um desses casos deve
- * resultar simplesmente num 404, não num erro exposto ao visitante.
- */
+// Lê uma oferta do disco. Null quando o slug é inválido, o arquivo não
+// existe ou o JSON está corrompido, sempre resultando num 404 simples.
 function carregar_oferta(string $slug): ?array
 {
     if (!slug_valido($slug)) {
         return null;
     }
 
-    // basename() é redundante depois de slug_valido(), e é mantido de propósito:
-    // se alguém afrouxar a validação acima no futuro, esta linha ainda segura.
+    // basename() é redundante depois de slug_valido(), mantido como segunda barreira.
     $arquivo = DIR_OFERTAS . '/' . basename($slug) . '.json';
 
     if (!is_file($arquivo)) {
@@ -93,12 +72,7 @@ function listar_ofertas(): array
     return $lista;
 }
 
-/**
- * Extrai o ID de um vídeo do YouTube.
- *
- * Aceita tanto o ID puro quanto a URL completa colada da barra de endereços,
- * porque é isso que a cliente naturalmente vai fazer.
- */
+// Extrai o ID de um vídeo do YouTube, aceitando tanto o ID puro quanto a URL completa.
 function youtube_id(string $valor): ?string
 {
     $valor = trim($valor);
@@ -112,14 +86,8 @@ function youtube_id(string $valor): ?string
     return null;
 }
 
-/**
- * Monta o bloco do vídeo.
- *
- * O player não é carregado junto com a página: o que sai daqui é uma fachada
- * (miniatura + botão), e o vídeo real só é buscado quando o visitante clica.
- * Isso mantém a página leve em 4G e evita que o YouTube deposite cookies em
- * quem nunca deu play.
- */
+// Monta o bloco do vídeo como fachada (miniatura + botão): o player real só
+// carrega quando o visitante clica, mantendo a página leve.
 function render_video(array $oferta): string
 {
     $valor = trim((string) ($oferta['video'] ?? ''));
@@ -144,11 +112,8 @@ function render_video(array $oferta): string
 
     $estilo = '';
     if ($poster !== '') {
-        // A capa é enviada pela tela de IMAGEM do painel e mora em
-        // assets/img/uploads, não na pasta de vídeos. Este código apontava
-        // para URL_VIDEOS e toda capa saía 404, silenciosamente: o botão
-        // ficava só com o fundo escuro e ninguém via erro nenhum.
-        // O fallback para a pasta de vídeos cobre pôster antigo enviado por lá.
+        // A capa mora em assets/img/uploads; o fallback cobre pôster antigo
+        // enviado para a pasta de vídeos.
         $nome = basename($poster);
         $url  = is_file(DIR_UPLOADS . '/' . $nome)
               ? URL_UPLOADS . '/' . rawurlencode($nome)
@@ -167,27 +132,16 @@ function render_video(array $oferta): string
     return $html;
 }
 
-/**
- * O nome é de um arquivo de imagem aceitável?
- *
- * Vale para o que o painel gravou e para o que alguém possa ter digitado à mão
- * no JSON. Sem barra, sem ponto duplo e com extensão de imagem conhecida: o
- * nome vira caminho de arquivo e URL, então "../../inc/config.php" não pode
- * passar daqui.
- */
+// O nome é de um arquivo de imagem aceitável? Sem barra, sem ponto duplo e
+// com extensão conhecida, o nome vira caminho de arquivo e URL.
 function nome_imagem_valido(string $nome): bool
 {
     return (bool) preg_match('/^[A-Za-z0-9][A-Za-z0-9._-]{0,120}\.(jpe?g|png|webp)$/i', $nome)
         && strpos($nome, '..') === false;
 }
 
-/**
- * Lê a lista de imagens da oferta, já limpa e pronta para exibir.
- *
- * Aceita tanto o formato do painel (`{"arquivo": ..., "legenda": ...}`) quanto
- * uma string solta com o nome do arquivo, JSON editado à mão acontece, e a
- * página não pode quebrar por causa disso.
- */
+// Lê a lista de imagens da oferta, já limpa. Aceita tanto o formato do
+// painel quanto uma string solta com o nome do arquivo.
 function imagens_da_oferta(array $oferta): array
 {
     if (($oferta['mostrar_imagens'] ?? true) === false) {
@@ -219,13 +173,8 @@ function imagens_da_oferta(array $oferta): array
     return $itens;
 }
 
-/**
- * Monta a etiqueta <img> de um item da galeria.
- *
- * A primeira imagem não é adiada: ela fica no alto da página e costuma ser o
- * maior elemento visível na abertura, marcá-la como lazy atrasaria justamente
- * o que o Google mede como LCP. Da segunda em diante, adiar é o certo.
- */
+// Monta a etiqueta <img> de um item da galeria. A primeira imagem não é
+// adiada, ela costuma ser o LCP da página; da segunda em diante, lazy.
 function galeria_img(array $item, bool $primeira): string
 {
     return '<img src="' . e(URL_UPLOADS . '/' . rawurlencode($item['arquivo'])) . '"'
@@ -234,18 +183,9 @@ function galeria_img(array $item, bool $primeira): string
          . ' decoding="async">';
 }
 
-/**
- * Monta o bloco de imagens do produto.
- *
- * Ocupa o mesmo lugar do vídeo, dentro do topo da página: há oferta que só tem
- * vídeo, há oferta que só tem foto, e há a que tem os dois, nesse caso o vídeo
- * vem primeiro e a galeria logo abaixo.
- *
- * Uma imagem sai como figura simples, sem seta nem pontinho: controle de
- * carrossel para um item só é enfeite que confunde. De duas em diante vira
- * carrossel, que rola por arrasto mesmo sem JavaScript: quem liga as setas e
- * os pontinhos é assets/js/galeria.js, carregado só quando existe carrossel.
- */
+// Monta o bloco de imagens do produto, no mesmo lugar do vídeo. Uma imagem
+// sai como figura simples; de duas em diante vira carrossel (rola por
+// arrasto mesmo sem JS; setas e pontinhos vêm de assets/js/galeria.js).
 function render_galeria(array $oferta): string
 {
     $itens = imagens_da_oferta($oferta);
@@ -279,13 +219,8 @@ function render_galeria(array $oferta): string
     return $html;
 }
 
-/**
- * Transforma o texto livre digitado no painel em HTML.
- *
- * Regras deliberadamente mínimas, para que a cliente não precise aprender
- * marcação: linha em branco separa parágrafo, e uma linha iniciada por "## "
- * vira subtítulo. Tudo é escapado antes de virar HTML.
- */
+// Transforma o texto livre digitado no painel em HTML: linha em branco separa
+// parágrafo, linha iniciada por "## " vira subtítulo. Tudo escapado antes.
 function paragrafos(string $texto): string
 {
     $blocos = preg_split('/\R\s*\R/', trim($texto)) ?: [];
@@ -305,18 +240,10 @@ function paragrafos(string $texto): string
     return $html;
 }
 
-/**
- * Devolve os avisos legais que vão ao rodapé da oferta.
- *
- * O primeiro é constante confiável de config.php, com HTML proposital. Os
- * demais vêm do campo livre preenchido pela cliente, então passam por
- * paragrafos(), que escapa antes de virar HTML.
- */
+// Devolve os avisos legais que vão ao rodapé da oferta. O primeiro é
+// constante de config.php; os demais vêm do campo livre da cliente.
 function avisos(array $oferta): array
 {
-    // Cada item já sai como bloco HTML pronto. O aviso base é constante e ganha
-    // o <p> aqui; o campo livre volta de paragrafos() já com os próprios <p>.
-    // Embrulhar os dois no template geraria <p> dentro de <p>, que é inválido.
     $saida = ['<p>' . AVISO_BASE . '</p>'];
 
     $extra = trim((string) ($oferta['avisos_legais'] ?? ''));
@@ -335,12 +262,8 @@ function icone(string $nome): string
          . $caminho . '</svg>';
 }
 
-/**
- * Valida o destino do botão.
- *
- * Só http e https passam. Sem isso, um "javascript:" gravado no painel viraria
- * execução de script na página pública.
- */
+// Valida o destino do botão. Só http e https passam, contra um
+// "javascript:" gravado no painel virar execução de script.
 function link_seguro(string $url): ?string
 {
     $url = trim($url);
@@ -388,12 +311,7 @@ function ler_cliques(string $slug): int
     return is_file($arquivo) ? (int) file_get_contents($arquivo) : 0;
 }
 
-/**
- * Soma um clique.
- *
- * Abre com 'c' e trava o arquivo: dois visitantes clicando no mesmo instante
- * leriam o mesmo número e gravariam o mesmo valor, perdendo um clique.
- */
+// Soma um clique. Trava o arquivo para dois cliques simultâneos não se perderem.
 function somar_clique(string $slug): void
 {
     if (!slug_valido($slug) || !garantir_pasta(DIR_CLIQUES)) {

@@ -52,9 +52,8 @@ if (!salvar_oferta($slug, $oferta)) {
     exit;
 }
 
-// Renomear é criar no endereço novo e remover o antigo. A remoção vem por
-// último e só depois da gravação confirmada: se algo falhar no meio, a oferta
-// continua existindo no endereço velho em vez de desaparecer.
+// Renomear é criar no endereço novo e só então remover o antigo, para uma
+// falha no meio deixar a oferta existindo em vez de desaparecer.
 if ($renomeando) {
     excluir_oferta($slug_original);
 }
@@ -69,10 +68,7 @@ if (($oferta['status'] ?? '') === 'publicado') {
 $acao = (string) ($_POST['acao'] ?? '');
 
 // "Salvar e ver" leva à página quando ela está no ar e à prévia do painel
-// quando é rascunho. Antes, o rascunho caía nesta condição e simplesmente
-// voltava ao formulário: o botão parecia não fazer nada, e quem insistia pela
-// URL recebia um 404. Rascunho não aparece em /<slug>, e o cookie do painel
-// (path=/admin) não acompanha a página pública para abrir exceção.
+// quando é rascunho (rascunho não existe em /<slug>).
 if ($acao === 'salvar_ver') {
     $destino = ($oferta['status'] ?? '') === 'publicado'
         ? '/' . rawurlencode($slug)
@@ -81,9 +77,7 @@ if ($acao === 'salvar_ver') {
     exit;
 }
 
-// Salvar mantém a cliente no formulário, na mesma aba. Voltar para a lista a
-// cada gravação obrigava a reabrir a oferta e reencontrar o lugar, e o texto
-// de venda é escrito em várias sessões, salvando pelo caminho.
+// Salvar mantém a cliente no formulário, na mesma aba.
 $aba = (int) ($_POST['aba'] ?? 0);
 
 header('Location: /admin/editar.php?slug=' . rawurlencode($slug)

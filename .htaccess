@@ -1,5 +1,5 @@
 # =============================================================================
-# Wellira — configuração do Apache (HostGator, plano compartilhado)
+# Wellira, configuração do Apache (HostGator, plano compartilhado)
 # =============================================================================
 
 # -----------------------------------------------------------------------------
@@ -40,19 +40,14 @@ ServerSignature Off
 <IfModule mod_rewrite.c>
     RewriteEngine On
 
-    # Força HTTPS. A segunda condição cobre a hospedagem compartilhada, onde o
-    # PHP recebe a requisição já em HTTP atrás do proxy — sem ela, o site entra
-    # em laço infinito de redirecionamento.
+    # Força HTTPS. A segunda condição cobre o proxy da hospedagem, que entrega
+    # a requisição já em HTTP, sem ela o site entraria em laço de redirecionamento.
     RewriteCond %{HTTPS} off
     RewriteCond %{HTTP:X-Forwarded-Proto} !https
     RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
 
-    # Um domínio só: www.wellira.online → wellira.online.
-    #
-    # Servir o mesmo conteúdo nos dois endereços divide o histórico de links
-    # entre duas versões que o Google trata como sites diferentes. O 301 fixa
-    # qual é a oficial e transfere o que já foi acumulado. Precisa bater com o
-    # SITE_URL de inc/config.php, que é a origem dos canonical e do sitemap.
+    # Um domínio só: www.wellira.online → wellira.online (precisa bater com
+    # SITE_URL de inc/config.php, origem dos canonical e do sitemap).
     RewriteCond %{HTTP_HOST} ^www\.(.+)$ [NC]
     RewriteRule ^ https://%1%{REQUEST_URI} [R=301,L]
 
@@ -63,21 +58,13 @@ ServerSignature Off
     # Precisa vir antes da regra de oferta, que casa um segmento só.
     RewriteRule ^go/([a-z0-9-]+)/?$ go.php?slug=$1 [L,QSA]
 
-    # Normaliza a barra final: /oferta/ → /oferta
-    #
-    # Não é preciosismo. A página de erro é servida pelo PHP com readfile, e os
-    # caminhos dela são relativos — em /oferta/ o navegador resolveria o CSS a
-    # partir de /oferta/, quebrando o visual justamente na página que existe
-    # para não parecer quebrada. A condição !-d preserva as pastas reais, como
-    # /privacy-policy/.
+    # Normaliza a barra final: /oferta/ → /oferta (a condição !-d preserva
+    # pastas reais, como /privacy-policy/).
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteRule ^(.+)/$ /$1 [R=301,L]
 
-    # Roteamento das ofertas: /nome-da-oferta → oferta.php?slug=nome-da-oferta
-    #
-    # As duas condições garantem que arquivos e pastas reais continuem sendo
-    # servidos normalmente — a reescrita só age sobre caminhos que não existem
-    # no disco, que é exatamente o caso dos slugs.
+    # Roteamento das ofertas: /nome-da-oferta → oferta.php?slug=nome-da-oferta.
+    # As duas condições preservam arquivo e pasta reais no disco.
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteRule ^([a-z0-9-]+)/?$ oferta.php?slug=$1 [L,QSA]

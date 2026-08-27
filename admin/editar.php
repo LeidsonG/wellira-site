@@ -3,13 +3,7 @@
  * Formulário de criação e edição de oferta.
  *
  * Dividido em abas, na mesma ordem em que os blocos aparecem na página final.
- * A versão anterior era um formulário único de rolagem longa: para conferir o
- * FAQ depois de mexer no título era preciso atravessar a tela inteira, e as
- * listas (linhas, selos, perguntas) só ofereciam um campo em branco por vez,
- * acrescentar dois itens exigia salvar no meio.
- *
- * Cada seção opcional diz o que acontece se ficar vazia. É a regra
- * "campo vazio = bloco some", dita na língua da cliente.
+ * Cada seção opcional segue a regra "campo vazio = bloco some".
  */
 
 require_once __DIR__ . '/../inc/admin-funcoes.php';
@@ -24,15 +18,8 @@ $novo  = ($slug === '');
 $erros = [];
 
 if ($novo) {
-    // Oferta nova já nasce com a assinatura preenchida: é sempre a mesma
-    // pessoa, e obrigar a redigitar produz divergência entre páginas.
-    //
-    // As seções opcionais, ao contrário, nascem DESLIGADAS. Ligadas por padrão
-    // elas prometiam na prévia um bloco que a cliente ainda não tinha escrito:
-    // ou ela preenchia os quatro para a página não sair capenga, ou desligava
-    // um a um o que não ia usar. Desligadas, a oferta mínima é só topo, vídeo,
-    // botão e texto, e cada bloco extra é uma escolha, não uma pendência.
-    // (Autor fica de fora: vem preenchido, então não há o que pendurar.)
+    // Assinatura já vem preenchida (sempre a mesma pessoa). As demais seções
+    // opcionais nascem desligadas, para a oferta mínima ser só topo + texto.
     $o = [
         'status'                   => 'rascunho',
         'indexar'                  => true,
@@ -60,7 +47,7 @@ if (!empty($_SESSION['form_devolvido'])) {
     unset($_SESSION['form_devolvido']);
 }
 
-/** Valor de um campo simples, pronto para o atributo value. */
+// Valor de um campo simples, pronto para o atributo value.
 function v(array $o, string $campo, string $padrao = ''): string
 {
     return e((string) ($o[$campo] ?? $padrao));
@@ -71,20 +58,13 @@ if ($autor === []) {
     $autor = AUTOR_PADRAO;
 }
 
-/** A seção está ligada? Ausente vale ligada, para não sumir seção de oferta antiga. */
+// A seção está ligada? Ausente vale ligada, para não sumir seção de oferta antiga.
 function ligada(array $o, string $secao): bool
 {
     return ($o['mostrar_' . $secao] ?? true) !== false;
 }
 
-/**
- * Interruptor de seção.
- *
- * Substitui a regra antiga de "deixe em branco para sumir": ela obrigava a
- * apagar o conteúdo para esconder o bloco, e religar custava redigitar tudo.
- * Aqui o texto fica gravado e a caixa escurece, deixando visível o que vai e o
- * que não vai para a página.
- */
+// Interruptor de seção: o texto continua gravado, só não é impresso.
 function interruptor(array $o, string $secao, string $alvo): void
 {
     $on = ligada($o, $secao);
@@ -100,24 +80,9 @@ function interruptor(array $o, string $secao, string $alvo): void
     </label>
     <?php
 }
-/**
- * Campo de uma linha com chave de liga/desliga ao lado.
- *
- * Substitui a instrução "vazios, os dois somem da página", que ficava num
- * parágrafo solto embaixo dos dois campos: dizia a regra em palavras e obrigava
- * a cliente a apagar o texto para esconder a linha. Agora a regra está no
- * controle, e o estado é visível sem ler nada.
- *
- * NÃO existe campo novo no JSON. Desligada, a chave desabilita o input, e
- * campo desabilitado o navegador simplesmente não envia: o salvar recebe
- * ausente, grava vazio, e o bloco some da página exatamente como antes. É por
- * isso que a chave nasce ligada quando há texto e desligada quando não há, o
- * estado é lido do próprio valor, não de uma configuração à parte.
- *
- * O texto digitado NÃO sobrevive a um salvar com a chave desligada: vazio é
- * vazio. Por isso o JavaScript guarda o valor ao desligar e devolve ao religar,
- * o que cobre o arrependimento imediato, que é o caso comum.
- */
+// Campo de uma linha com chave de liga/desliga ao lado. Não existe campo novo
+// no JSON: desligada, o input fica disabled e o navegador não o envia, então
+// o salvar grava vazio e o bloco some, igual à regra "campo vazio = some".
 function campo_chaveavel(string $id, string $rotulo, string $valor,
                          int $max, string $placeholder): void
 {
@@ -130,20 +95,13 @@ function campo_chaveavel(string $id, string $rotulo, string $valor,
                value="<?= e($valor) ?>" maxlength="<?= $max ?>"
                <?= $placeholder !== '' ? 'placeholder="' . e($placeholder) . '"' : '' ?>
                <?= $ligado ? '' : 'disabled' ?>>
-        <?php /* role="switch" e não um checkbox: é um controle da tela, não um
-                 dado da oferta. Como checkbox ele viajaria no POST e viraria
-                 mais um campo para o salvar entender, que é justamente o que
-                 esta solução evita. */ ?>
+        <?php // role="switch", não checkbox: controle da tela, não dado da oferta. ?>
         <button type="button" class="chave" role="switch"
                 aria-checked="<?= $ligado ? 'true' : 'false' ?>"
                 aria-controls="<?= e($id) ?>"
                 data-chave
                 title="Usar esta linha na página">
           <span class="chave-trilho" aria-hidden="true"></span>
-          <?php /* Sem mb_strtolower: a extensão mbstring não está garantida (não
-                   está carregada nem aqui), e o projeto não usa mb_* em lugar
-                   nenhum. O rótulo entra como está, que o leitor de tela lê
-                   igual. */ ?>
           <span class="visualmente-oculto">Usar "<?= e($rotulo) ?>" na página</span>
         </button>
       </div>
@@ -151,20 +109,8 @@ function campo_chaveavel(string $id, string $rotulo, string $valor,
     <?php
 }
 
-/**
- * Uma linha da lista de imagens.
- *
- * A mesma função desenha as linhas gravadas e o <template> que o JavaScript
- * clona. Eram dois blocos de HTML quase iguais, e todo campo novo precisava ser
- * lembrado nos dois: esquecer o segundo produzia uma linha clonada sem o
- * controle recém-acrescentado, defeito que só aparece depois de clicar em
- * "+ Adicionar imagem".
- *
- * O envio mora AQUI DENTRO, um por linha, e não num botão único no fim da aba.
- * O botão global mandava a foto para "o primeiro campo vazio", e a cliente não
- * tinha como dizer em qual posição ela queria a foto, ela enviava e depois
- * descobria onde tinha caído. Com o botão na linha, o lugar é escolhido antes.
- */
+// Uma linha da lista de imagens. A mesma função desenha as linhas gravadas e
+// o <template> que o JavaScript clona, para não duplicar o HTML dos campos.
 function linha_imagem(array $imagem = []): void
 {
     $arquivo = (string) ($imagem['arquivo'] ?? '');
@@ -173,21 +119,13 @@ function linha_imagem(array $imagem = []): void
     <div class="item item-bloco item-imagem" data-item>
       <span class="item-num"><span data-numero>1</span></span>
 
-      <?php /* A moldura é ao mesmo tempo miniatura e alvo de arrastar. Vazia,
-               mostra um "+", quadrado cinza sem nada dentro não se anuncia
-               como lugar onde cabe alguma coisa. */ ?>
       <div class="foto-lugar" data-foto-lugar>
         <img class="item-miniatura" data-miniatura alt="" hidden>
         <span class="foto-vazia" data-foto-vazia aria-hidden="true">+</span>
       </div>
 
       <div class="item-campos empilhado">
-        <?php /* Sem JavaScript este campo é a única forma de apontar um arquivo
-                 já enviado, então ele existe sempre no HTML. Com JavaScript, o
-                 CSS o esconde (regra .js) e quem manda é o botão ao lado: o
-                 nome do arquivo passa a ser assunto da máquina, não dela.
-                 O valor continua sendo enviado no salvar de qualquer forma,
-                 porque campo escondido por CSS ainda vai no formulário. */ ?>
+        <?php // Sem JS é a única forma de apontar um arquivo já enviado; com JS o CSS esconde. ?>
         <input type="text" name="imagem_arquivo[]" class="campo-arquivo"
                value="<?= e($arquivo) ?>" maxlength="200"
                placeholder="20260824-a1b2c3.jpg" aria-label="Nome do arquivo">
@@ -197,10 +135,7 @@ function linha_imagem(array $imagem = []): void
                aria-label="Descrição da imagem">
       </div>
 
-      <?php /* Só aparece quando há JavaScript: o envio é por fetch, e um botão
-               que não faz nada é pior do que botão nenhum. O <input type=file>
-               fica escondido porque navegador nenhum deixa dar estilo no
-               controle nativo, e este precisa ser alvo de toque no celular. */ ?>
+      <?php // Só aparece com JavaScript: o envio é por fetch. ?>
       <div class="foto-envio">
         <input type="file" accept="image/jpeg,image/png,image/webp" multiple
                data-enviar-campo hidden tabindex="-1" aria-hidden="true">
@@ -211,8 +146,6 @@ function linha_imagem(array $imagem = []): void
 
       <button type="button" class="remover perigo" data-remover title="Remover esta imagem">×</button>
 
-      <?php /* Aviso desta linha, não da aba: com o envio espalhado pelas linhas,
-               uma mensagem central obrigaria a procurar de qual foto ela fala. */ ?>
       <p class="foto-estado" data-enviar-estado role="status"></p>
     </div>
     <?php
@@ -224,32 +157,19 @@ $faq        = array_values((array) ($o['faq'] ?? []));
 $imagens    = array_values((array) ($o['imagens'] ?? []));
 
 // Oferta nova começa com uma linha de cada lista, só para não abrir vazia.
-// As demais a cliente acrescenta no botão, não há mais limite de uma por vez.
 if (!$linhas_nao) { $linhas_nao = ['']; }
 if (!$selos)      { $selos      = [['icone' => 'escudo', 'titulo' => '', 'texto' => '']]; }
 if (!$faq)        { $faq        = [['pergunta' => '', 'resposta' => '']]; }
 if (!$imagens)    { $imagens    = [['arquivo' => '', 'legenda' => '']]; }
 
-// O link do fornecedor é gravado inteiro ("https://exemplo.com/..."), mas o
-// campo do painel não obriga mais digitar o esquema: aqui ele é separado em
-// "resto do endereço" (o que a cliente digita) e uma casinha para o caso raro
-// de o fornecedor não ter https. Ausente ou sem "http" explícito vale https,
-// que é o padrão pedido.
+// O link é gravado inteiro, mas o campo separa "resto do endereço" de uma
+// casinha para o caso raro de não ser https.
 $link_atual     = (string) ($o['link'] ?? '');
 $link_http_only = strtolower((string) parse_url($link_atual, PHP_URL_SCHEME)) === 'http';
 $link_resto     = preg_replace('#^https?://#i', '', $link_atual);
 
-/**
- * Endereço para ver a página desta oferta.
- *
- * Rascunho não existe em /<slug>: é isso que rascunho quer dizer, e o cookie
- * do painel tem path=/admin, então a página pública não tem como abrir exceção
- * para a cliente logada. Até 24/08/2026 o botão apontava para /<slug> em
- * qualquer situação, e quem clicava num rascunho recebia "página não
- * encontrada", sem nada explicando que aquele era o comportamento esperado.
- * Rascunho agora vai para a prévia do painel; publicada continua indo à página
- * de verdade, que é o que ela quer conferir quando já está no ar.
- */
+// Endereço para ver a página: rascunho vai para a prévia do painel,
+// publicada vai direto à página real.
 function endereco_para_ver(array $o, string $slug): string
 {
     return ($o['status'] ?? 'rascunho') === 'publicado'
@@ -257,18 +177,8 @@ function endereco_para_ver(array $o, string $slug): string
         : '/admin/previa.php?slug=' . rawurlencode($slug);
 }
 
-/**
- * Previsão de como a seção fica na página.
- *
- * O conteúdo é montado pelo JavaScript a partir dos campos, e acompanha a
- * digitação. A primeira versão desenhava formas cinzas fixas: mostrava o
- * formato do bloco, mas não dizia nada sobre a oferta em si, e por isso não
- * ajudava a decidir se o texto estava bom.
- *
- * Só o invólucro sai do PHP. Nada de valor da cliente é impresso aqui: quem
- * escreve o texto é o JS, sempre por textContent, então o conteúdo dela nunca
- * é interpretado como marcação.
- */
+// Previsão de como a seção fica na página, montada pelo JS a partir dos
+// campos (sempre por textContent). Só o invólucro sai do PHP.
 function exemplo(string $qual): void
 {
     ?>
@@ -279,17 +189,8 @@ function exemplo(string $qual): void
     <?php
 }
 
-/**
- * Prompt que a cliente cola no ChatGPT.
- *
- * Ela já usa o ChatGPT para escrever o texto de venda. Sem instrução, o que
- * volta vem com markdown que o template não entende: **negrito**, listas com
- * hífen, títulos com # em vez de ##. O texto sai na página com os asteriscos
- * visíveis, e alguém tem que limpar à mão.
- *
- * O prompt ensina o formato aceito e as regras que o fornecedor impõe. Fica
- * aqui, e não no guia, porque é aqui que ela está quando precisa dele.
- */
+// Prompt que a cliente cola no ChatGPT para escrever o texto de venda no
+// formato que o template aceita.
 $prompt_chatgpt = <<<'TXT'
 Write the sales copy for a product landing page. Follow these rules exactly.
 
@@ -332,9 +233,6 @@ if (!empty($_GET['ok'])) {
     <?php endif; ?>
   </div>
   <div class="cabeca-lado">
-    <?php /* Publicação virou a penúltima aba, seguindo o fluxo de quem escreve
-             primeiro e decide publicar depois. A etiqueta mantém o estado à
-             vista o tempo todo, sem precisar abrir a aba para conferir. */ ?>
     <?php $publicada = ($o['status'] ?? 'rascunho') === 'publicado'; ?>
     <span class="etiqueta <?= $publicada ? 'etiqueta-ok' : 'etiqueta-fraca' ?>">
       <?= $publicada ? 'No ar' : 'Rascunho' ?>
@@ -348,9 +246,6 @@ if (!empty($_GET['ok'])) {
   </div>
 </div>
 
-<?php /* Os traçados dos ícones vêm da constante ICONES, definida por nós em
-         inc/config.php. Não é conteúdo da cliente, e é por isso que a prévia
-         pode montá-los como SVG sem risco. */ ?>
 <script type="application/json" id="icones-svg"><?= json_encode(ICONES, JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) ?></script>
 
 <nav class="abas" role="tablist" aria-label="Seções da oferta"></nav>
@@ -359,8 +254,6 @@ if (!empty($_GET['ok'])) {
   <?= csrf_campo() ?>
   <input type="hidden" name="slug_original" value="<?= e($novo ? '' : $slug) ?>">
 
-  <?php /* A aba aberta viaja no formulário e volta na URL. Guardá-la só no
-           navegador fazia a cliente cair numa aba de outra oferta. */ ?>
   <input type="hidden" name="aba" id="aba-atual" value="<?= (int) ($_GET['aba'] ?? 0) ?>">
 
   <!-- ==================== 2. Topo ==================== -->
@@ -434,9 +327,6 @@ if (!empty($_GET['ok'])) {
   </section>
 
   <!-- ==================== 4. Imagens ==================== -->
-  <?php /* Fica logo depois do vídeo porque ocupa o MESMO lugar na página: há
-           oferta que só tem vídeo, há a que só tem foto, e há a que tem os
-           dois. Vizinhas no editor, as duas abas contam essa história sozinhas. */ ?>
   <section id="sec-imagens" data-secao="Imagens" hidden>
     <?php interruptor($o, 'imagens', 'grupo-imagens'); ?>
     <div id="grupo-imagens" class="grupo-alternavel<?= ligada($o, 'imagens') ? '' : ' desligado' ?>">
@@ -446,10 +336,6 @@ if (!empty($_GET['ok'])) {
       No máximo <?= MAX_IMAGENS ?>.
     </p>
 
-    <?php /* O teto sai do PHP para o HTML porque quem corta de verdade é o
-             salvar (array_slice em normalizar_oferta). Sem o JS conhecer o
-             número, a cliente acrescentaria a nona foto, salvaria, e ela
-             sumiria sem que nada na tela explicasse por quê. */ ?>
     <div id="lista-imagens" class="repetivel" data-max="<?= MAX_IMAGENS ?>">
       <?php foreach ($imagens as $imagem):
         // JSON antigo ou editado à mão pode trazer só o nome do arquivo.
@@ -695,12 +581,6 @@ if (!empty($_GET['ok'])) {
   </section>
 
   <!-- ==================== 10. Autor ==================== -->
-  <?php /* Última seção com conteúdo da página, e por isso última aba de
-           conteúdo aqui: as abas seguem a ordem em que os blocos aparecem para
-           o visitante, e essa correspondência é o que permite à cliente
-           conferir a página sem abrir a página. A assinatura passou para o fim
-           em 24/08/2026: quem escreveu o texto é o que se lê depois de tudo,
-           não uma interrupção no meio do argumento de venda. */ ?>
   <section id="sec-autor" data-secao="Autor" hidden>
     <?php interruptor($o, 'autor', 'grupo-autor'); ?>
     <div id="grupo-autor" class="grupo-alternavel<?= ligada($o, 'autor') ? '' : ' desligado' ?>">
@@ -769,10 +649,6 @@ if (!empty($_GET['ok'])) {
     </div>
   </section>
 
-  <?php /* Um botão principal só. Antes eram "Salvar" e "Salvar e continuar",
-           que faziam quase a mesma coisa com nomes parecidos, e o primeiro
-           jogava de volta para a lista no meio da escrita. Agora salvar
-           mantém a cliente onde ela está, que é o que um editor deve fazer. */ ?>
   <!-- ==================== 12. Publicação ==================== -->
   <section id="sec-publicacao" data-secao="Publicação" hidden>
     <div class="campo">
@@ -804,9 +680,6 @@ if (!empty($_GET['ok'])) {
   <div class="barra-salvar">
     <button type="submit" name="acao" value="salvar">Salvar</button>
     <?php if (!$novo): ?>
-      <?php /* O rótulo acompanha a situação da oferta: em rascunho o destino é
-               a prévia do painel, e prometer "abrir a página" levaria de volta
-               ao 404 que esta mudança veio consertar. */ ?>
       <button type="submit" name="acao" value="salvar_ver" class="botao-fraco">
         <?= $publicada ? 'Salvar e abrir a página ↗' : 'Salvar e ver a prévia ↗' ?>
       </button>

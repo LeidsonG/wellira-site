@@ -2,11 +2,9 @@
 /**
  * Envio de vídeo e imagem.
  *
- * Tela separada de propósito: o formulário da oferta é longo, e juntar upload
- * com ele faria a cliente perder tudo o que digitou se o envio falhasse por
- * tamanho ou timeout: o que, com vídeo em conexão doméstica, acontece.
- *
- * Aqui ela envia, copia o nome gerado e cola no campo da oferta.
+ * Tela separada do formulário da oferta, para não perder o texto digitado se
+ * o upload falhar por tamanho ou timeout. Ela envia, copia o nome gerado e
+ * cola no campo da oferta.
  */
 
 require_once __DIR__ . '/../inc/admin-funcoes.php';
@@ -19,9 +17,8 @@ $destino = ($_GET['destino'] ?? 'imagem') === 'video' ? 'video' : 'imagem';
 $erro    = null;
 $enviados = [];
 
-// Precisa vir ANTES do csrf_validar(): com o corpo acima de post_max_size o PHP
-// descarta $_POST inteiro, e a validação de CSRF falharia primeiro, devolvendo
-// "Sessão expirada" para o que na verdade é um arquivo grande demais.
+// Precisa vir antes do csrf_validar(): post_max_size estourado zera $_POST,
+// e o CSRF falharia primeiro com "Sessão expirada".
 if (post_estourou()) {
     $erro = 'Arquivo grande demais. O servidor aceita no máximo '
           . round(ini_bytes((string) ini_get('post_max_size')) / 1048576, 1)
@@ -30,10 +27,7 @@ if (post_estourou()) {
     csrf_validar();
     $destino = ($_POST['destino'] ?? 'imagem') === 'video' ? 'video' : 'imagem';
 
-    // Vários de uma vez: a galeria de uma oferta tem três, quatro fotos, e
-    // enviar uma por vez significava repetir o formulário inteiro a cada foto.
-    // Um arquivo recusado não cancela os outros, a lista de erros sai ao lado
-    // da lista do que entrou.
+    // Vários de uma vez: um arquivo recusado não cancela os outros.
     $resultado = receber_uploads($_FILES['arquivo'] ?? [], $destino);
     $enviados  = $resultado['nomes'];
     $erro      = $resultado['erros'] ?: null;
@@ -58,10 +52,6 @@ if ($enviados) {
         echo '<p class="nome-arquivo"><code>' . e($nome) . '</code></p>';
     }
     if ($destino === 'imagem') {
-        // Ela não precisa mais copiar nome nenhum: o editor lista as imagens
-        // enviadas e basta clicar. O nome fica à vista mesmo assim, porque é o
-        // que aparece no campo depois e porque o painel não deve esconder da
-        // cliente o que gravou no servidor dela.
         echo '<p>Volte para a oferta, abra a aba <strong>Imagens</strong> e clique '
            . 'na foto que quiser usar, ela já aparece lá.</p>';
     } else {
@@ -80,11 +70,7 @@ if ($enviados) {
 
     <div class="campo">
       <label for="arquivo"><?= $destino === 'video' ? 'Escolha o arquivo' : 'Escolha as imagens' ?></label>
-      <?php /* Imagem aceita seleção múltipla; vídeo não. Não é falta de
-               simetria: cada MP4 come dezenas de MB do post_max_size, e dois
-               num envio só estouram o limite do servidor sem que nada explique
-               por quê. Foto de produto tem alguns KB, a galeria inteira cabe
-               numa seleção. */ ?>
+      <?php // Imagem aceita seleção múltipla; vídeo não, cada MP4 come dezenas de MB. ?>
       <input type="file" id="arquivo" name="arquivo<?= $destino === 'imagem' ? '[]' : '' ?>" required
              <?= $destino === 'imagem' ? 'multiple' : '' ?>
              accept="<?= $destino === 'video' ? 'video/mp4' : 'image/jpeg,image/png,image/webp' ?>">

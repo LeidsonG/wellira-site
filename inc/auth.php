@@ -2,28 +2,19 @@
 /**
  * Sessão, login e proteção contra abuso do painel.
  *
- * O painel fica numa hospedagem compartilhada, exposto à internet, e dá acesso
- * de escrita a arquivos servidos publicamente. Tudo aqui parte disso: quem
- * achar /admin vai tentar entrar.
- *
- * Não há usuário, só senha. A cliente é a única pessoa que usa o painel, e um
- * campo a menos é um campo a menos para ela errar.
+ * Não há usuário, só senha: a cliente é a única pessoa que usa o painel.
  */
 
 require_once __DIR__ . '/config.php';
 
-/** Quantas tentativas erradas antes de bloquear, e por quanto tempo. */
+// Quantas tentativas erradas antes de bloquear, e por quanto tempo.
 const LOGIN_MAX_TENTATIVAS = 5;
 const LOGIN_JANELA_SEG     = 900;   // 15 min de contagem
 const LOGIN_BLOQUEIO_SEG   = 900;   // 15 min de castigo
 
 /**
- * Inicia a sessão com cookie endurecido.
- *
- * Precisa rodar antes de qualquer saída. Os três atributos do cookie cobrem os
- * três jeitos clássicos de roubar sessão: HttpOnly impede JavaScript de ler,
- * SameSite impede o navegador de enviá-lo num POST vindo de outro site, e
- * Secure impede que ele trafegue em claro.
+ * Inicia a sessão com cookie endurecido: HttpOnly, SameSite e Secure.
+ * Precisa rodar antes de qualquer saída.
  */
 function sessao_iniciar(): void
 {
@@ -31,17 +22,11 @@ function sessao_iniciar(): void
         return;
     }
 
-    // A pasta de sessões do cPanel nesta conta aponta para um caminho que não
-    // existe, e o PHP falha calado: a sessão nunca grava, o token de CSRF some
-    // entre uma requisição e outra, e o login responde 400 sem explicar nada.
-    // Gravar dentro da conta resolve e sobrevive a troca de versão do PHP.
     if (is_dir(DIR_SESSOES) || @mkdir(DIR_SESSOES, 0700, true)) {
         session_save_path(DIR_SESSOES);
     }
 
-    // Atrás do proxy da hospedagem compartilhada, $_SERVER['HTTPS'] costuma vir
-    // vazio mesmo com o site em HTTPS. Sem checar o cabeçalho do proxy, o
-    // cookie nunca receberia o atributo Secure em produção.
+    // Atrás do proxy da hospedagem, $_SERVER['HTTPS'] pode vir vazio mesmo em HTTPS.
     $https = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
           || (($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https');
 
@@ -53,7 +38,6 @@ function sessao_iniciar(): void
         'samesite' => 'Lax',
     ]);
 
-    // Nome próprio: o PHPSESSID padrão anuncia a tecnologia para quem varre.
     session_name('wellira_painel');
     session_start();
 }
@@ -64,28 +48,15 @@ function autenticado(): bool
     return !empty($_SESSION['autenticado']);
 }
 
-/**
- * Sessão parada por muito tempo é sessão esquecida aberta.
- *
- * Duas horas cobrem uma tarde de trabalho sem obrigar a relogar a cada oferta.
- *
- * Extraída de exigir_login() porque o envio de foto pelo editor (admin/enviar.php)
- * responde JSON e não pode redirecionar: fetch seguiria o redirecionamento e
- * receberia o HTML da tela de login, que para o JavaScript é indistinguível de
- * um erro qualquer. A regra do prazo precisa ser a MESMA nos dois caminhos, e a
- * única forma de garantir isso é existir num lugar só.
- */
+// Sessão parada por 2h expira. Extraída à parte porque admin/enviar.php
+// também precisa checar o prazo, mas responde JSON em vez de redirecionar.
 function sessao_expirada(): bool
 {
     return isset($_SESSION['visto_em']) && time() - $_SESSION['visto_em'] > 7200;
 }
 
-/**
- * Exige login. Redireciona para a tela de entrada quando não houver.
- *
- * Guarda o destino pretendido para devolver a pessoa ao lugar certo depois de
- * entrar: sem isso, quem clica num link salvo de edição cai sempre na lista.
- */
+// Exige login, redirecionando para a tela de entrada quando não houver.
+// Guarda o destino pretendido para devolver a pessoa ao lugar certo depois.
 function exigir_login(): void
 {
     sessao_iniciar();
@@ -104,11 +75,7 @@ function exigir_login(): void
     $_SESSION['visto_em'] = time();
 }
 
-/**
- * Lê usuário e hash do arquivo de credenciais.
- *
- * Devolve null quando o painel ainda não foi configurado.
- */
+// Lê usuário e hash do arquivo de credenciais. Null quando ainda não configurado.
 function credenciais(): ?array
 {
     if (!is_file(ARQUIVO_SENHA)) {
@@ -125,11 +92,7 @@ function credenciais(): ?array
     return ($usuario !== '' && $hash !== '') ? ['usuario' => $usuario, 'hash' => $hash] : null;
 }
 
-/**
- * Confere usuário e senha e abre a sessão.
- *
- * Devolve string de erro quando falha, ou null em caso de sucesso.
- */
+// Confere usuário e senha e abre a sessão. Erro em string, ou null se ok.
 function tentar_login(string $usuario, string $senha): ?string
 {
     sessao_iniciar();
@@ -166,17 +129,9 @@ function tentar_login(string $usuario, string $senha): ?string
     return null;
 }
 
-/** Tamanho mínimo aceito. O painel fica exposto: senha curta cai em varredura. */
 const SENHA_MINIMA = 10;
 
-/**
- * Troca a senha do painel.
- *
- * Existe para que a cliente não dependa de ninguém: a primeira senha é entregue
- * provisória e ela troca sozinha no primeiro acesso.
- *
- * Devolve string de erro, ou null em caso de sucesso.
- */
+// Troca a senha do painel. Erro em string, ou null se ok.
 function trocar_senha(string $atual, string $nova, string $confirmacao, ?string $novo_usuario = null): ?string
 {
     $cred = credenciais();
@@ -209,9 +164,7 @@ function trocar_senha(string $atual, string $nova, string $confirmacao, ?string 
     }
 
     // Sem espaço nem quebra antes do <?php: qualquer byte fora das tags vira
-    // saída no momento em que o arquivo é lido, os cabeçalhos são enviados
-    // junto, e todo header() posterior deixa de funcionar. Foi assim que o
-    // redirecionamento pós-login parou de funcionar em produção.
+    // saída assim que o arquivo é lido, e os cabeçalhos param de funcionar.
     $conteudo = "<?php\n"
               . "// Credenciais do painel. Alteradas pelo próprio painel.\n"
               . "// NUNCA versionar este arquivo, o repositório é público.\n"
@@ -264,13 +217,7 @@ function encerrar_sessao(): void
 // CSRF
 // ---------------------------------------------------------------------------
 
-/**
- * Token da sessão, criado sob demanda.
- *
- * Sem ele, uma página maliciosa aberta noutra aba conseguiria fazer o navegador
- * da cliente enviar um POST autenticado, apagando ou reescrevendo uma oferta
- * sem que ela clicasse em nada aqui.
- */
+// Token CSRF da sessão, criado sob demanda.
 function csrf_token(): string
 {
     sessao_iniciar();
@@ -286,12 +233,7 @@ function csrf_campo(): string
     return '<input type="hidden" name="csrf" value="' . htmlspecialchars(csrf_token(), ENT_QUOTES) . '">';
 }
 
-/**
- * Exige token válido. Encerra a requisição quando não bate.
- *
- * hash_equals compara em tempo constante: um == comum vazaria, pela diferença
- * de tempo de resposta, quantos caracteres iniciais do token estavam certos.
- */
+// Confere o token CSRF. hash_equals compara em tempo constante, contra timing attack.
 function csrf_ok(): bool
 {
     sessao_iniciar();
@@ -301,15 +243,7 @@ function csrf_ok(): bool
     return $sessao !== '' && hash_equals($sessao, $enviado);
 }
 
-/**
- * A conferência acima, na forma que a maioria das telas usa: falhou, morre aqui.
- *
- * A verificação foi separada em csrf_ok() para que admin/enviar.php possa
- * recusar em JSON, sem cuspir texto puro no meio de uma resposta que o
- * JavaScript vai tentar interpretar. Quem valida continua sendo um código só,
- * duas conferências de CSRF escritas em lugares diferentes é como uma delas
- * envelhece e deixa de conferir.
- */
+// A conferência acima, na forma que a maioria das telas usa: falhou, morre aqui.
 function csrf_validar(): void
 {
     if (!csrf_ok()) {
@@ -322,11 +256,9 @@ function csrf_validar(): void
 // Limite de tentativas
 // ---------------------------------------------------------------------------
 //
-// Contagem em arquivo, por IP. Sem banco de dados não há onde mais guardar, e
-// deixar o formulário aceitar tentativas infinitas transforma qualquer senha
-// fraca em questão de tempo.
+// Contagem em arquivo, por IP, já que não há banco de dados.
 
-/** Caminho do contador do IP atual. */
+// Caminho do contador do IP atual.
 function arquivo_tentativas(): string
 {
     $ip = (string) ($_SERVER['REMOTE_ADDR'] ?? 'desconhecido');
@@ -380,15 +312,8 @@ function registrar_tentativa(): void
     limpar_tentativas_velhas();
 }
 
-/**
- * Remove contadores de IPs que já saíram da janela.
- *
- * Sem isto os arquivos só somem no login bem-sucedido daquele mesmo IP, ou
- * seja: nunca, no caso de quem só erra. Um varredor rodando de endereços
- * diferentes criaria um arquivo por IP, sem teto, e plano compartilhado conta
- * inodes, não só espaço. A limpeza roda em 1 de cada 20 tentativas para não
- * varrer a pasta a cada requisição.
- */
+// Remove contadores de IPs que já saíram da janela. Roda em 1 de cada 20
+// tentativas, para não varrer a pasta a cada requisição.
 function limpar_tentativas_velhas(): void
 {
     if (random_int(1, 20) !== 1) {

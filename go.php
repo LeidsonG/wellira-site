@@ -2,16 +2,8 @@
 /**
  * Saída para o site do fornecedor: /go/<slug>
  *
- * Some o clique e redireciona. Duas coisas de uma vez:
- *
- * - a cliente descobre qual página converte sem depender de analytics externo,
- *   que ela não saberia configurar nem ler
- * - o link de afiliado deixa de aparecer no HTML da página, então trocar de
- *   fornecedor não exige reescrever nada além do JSON da oferta
- *
- * O redirecionamento é 302, não 301: 301 fica gravado no navegador do visitante
- * e continuaria mandando para o fornecedor antigo mesmo depois de a cliente
- * trocar o link.
+ * Soma o clique e redireciona, escondendo o link de afiliado do HTML.
+ * 302, não 301: 301 ficaria gravado no navegador mesmo após trocar o link.
  */
 
 require_once __DIR__ . '/inc/funcoes.php';

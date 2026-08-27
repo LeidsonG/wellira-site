@@ -3,23 +3,17 @@
  * Roteador de DESENVOLVIMENTO, não vai para produção.
  *
  * O servidor embutido do PHP (`php -S`) não lê .htaccess, então este arquivo
- * reproduz localmente o que o Apache fará na HostGator: a reescrita de
- * /<slug> para oferta.php e os bloqueios de acesso a arquivos internos.
+ * reproduz localmente a reescrita /<slug> para oferta.php e os bloqueios de
+ * acesso a arquivos internos.
  *
  * Uso:
  *   php -S localhost:8000 -d upload_max_filesize=128M -d post_max_size=136M \
  *       tools/dev-router.php
  *
- * Os dois -d repetem o que o .user.ini faz em produção. O servidor embutido não
- * lê .user.ini, e sem eles o PHP local fica com os 2M da instalação padrão: a
- * aba Imagens passa a anunciar "até 2 MB cada", porque o painel sempre mostra o
- * limite REAL (o menor entre o nosso e o do servidor), e some a impressão de
- * que a constante de 8 MB não está valendo.
- *
  * O script de deploy exclui este arquivo do envio.
  */
 
-/** Raiz do site: este arquivo vive um nível abaixo dela. */
+// Raiz do site: este arquivo vive um nível abaixo dela.
 define('RAIZ', dirname(__DIR__));
 
 $caminho = (string) parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH);

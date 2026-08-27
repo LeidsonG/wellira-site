@@ -6,9 +6,7 @@
  * e monta a página a partir do JSON correspondente em dados/ofertas/.
  *
  * A regra que sustenta o layout é "campo vazio = bloco some": cada seção
- * opcional só é impressa se houver conteúdo. É o que permite um único template
- * atender de suplemento a eletrodoméstico sem que nenhuma página nasça com
- * seção vazia.
+ * opcional só é impressa se houver conteúdo.
  */
 
 require_once __DIR__ . '/inc/funcoes.php';
@@ -20,22 +18,10 @@ if ($oferta === null) {
     nao_encontrado();
 }
 
-/**
- * Prévia do painel.
- *
- * Quem define PREVIA_ADMIN é admin/previa.php, que já exigiu login. Este
- * arquivo não decide nada sobre autenticação: a constante só existe quando a
- * requisição já passou pela porta do painel.
- *
- * A prévia precisa existir porque o cookie da sessão tem path=/admin e nunca
- * acompanha /<slug> — não há como a página pública reconhecer a cliente
- * logada. Sem a rota de prévia, o botão "Ver página" de um rascunho caía num
- * 404 e parecia defeito.
- */
+// PREVIA_ADMIN é definida por admin/previa.php, que já exigiu login.
 $previa = defined('PREVIA_ADMIN');
 
-// Rascunho é invisível ao público: a cliente monta a página com calma e só
-// divulga o link depois de publicar. Na prévia do painel ele aparece, com
+// Rascunho é invisível ao público. Na prévia do painel ele aparece, com
 // tarja e sem chance de ser indexado.
 if (!$previa && ($oferta['status'] ?? 'rascunho') !== 'publicado') {
     nao_encontrado();
@@ -43,23 +29,13 @@ if (!$previa && ($oferta['status'] ?? 'rascunho') !== 'publicado') {
 
 $destino = link_seguro((string) ($oferta['link'] ?? ''));
 if ($destino === null && !$previa) {
-    // Sem destino válido não há oferta — melhor um 404 do que uma página com
-    // botão que não leva a lugar nenhum.
-    //
-    // A prévia é a exceção, e de propósito: ela existe para acabar com o 404
-    // que a cliente recebia ao conferir um rascunho, e trocar um motivo de 404
-    // por outro não conserta nada. Lá o botão fica inerte e o aviso na tarja
-    // diz o que falta.
+    // Sem destino válido não há oferta. A prévia é a exceção: lá o botão
+    // fica inerte e a tarja avisa o que falta.
     nao_encontrado();
 }
 
-// Os botões apontam para a saída própria, que conta o clique e só então manda
-// ao fornecedor. O link de afiliado deixa de aparecer no HTML: trocar de
-// fornecedor passa a ser edição do JSON, sem mexer na página.
-//
-// Na prévia o botão vai direto ao fornecedor: /go/<slug> recusa oferta em
-// rascunho (e faria a prévia terminar num 404), e conferir o layout não pode
-// somar clique ao contador da cliente.
+// Os botões apontam para a saída própria, que conta o clique e só então
+// manda ao fornecedor. Na prévia o botão vai direto ao fornecedor.
 $link = $previa ? ($destino ?? '#') : '/go/' . $slug;
 
 $titulo      = (string) ($oferta['titulo'] ?? '');
@@ -69,20 +45,14 @@ $titulo_aba  = trim((string) ($oferta['titulo_aba'] ?? $titulo));
 
 $url_canonica = SITE_URL . '/' . $slug;
 
-// Ofertas de demonstração ficam fora do índice sem sair do ar: a cliente
-// precisa do link para mostrar o layout, mas produto fictício indexado é
-// exatamente o que faz o Google classificar o site como conteúdo enganoso.
-// Ausente = indexável, para que a oferta real não dependa de ninguém lembrar.
-// A prévia nunca é indexável, independente do que a oferta pedir.
+// Ofertas de demonstração ficam fora do índice sem sair do ar. Ausente = indexável.
 $indexar = !$previa && ($oferta['indexar'] ?? true) !== false;
 
-// A galeria é montada antes do <head> porque o script do carrossel só é
-// carregado quando existe carrossel — oferta com uma foto só, ou sem foto
-// nenhuma, não paga uma requisição por um comportamento que não vai usar.
+// Montada antes do <head> para decidir se carrega o script do carrossel.
 $galeria     = render_galeria($oferta);
 $tem_carrossel = strpos($galeria, 'galeria-carrossel') !== false;
 
-/** Botão de ação, repetido ao longo da página. */
+// Botão de ação, repetido ao longo da página.
 function cta(string $link, string $texto, ?string $sub = null): string
 {
     $html  = '<div class="cta-block">';
@@ -95,14 +65,8 @@ function cta(string $link, string $texto, ?string $sub = null): string
     return $html;
 }
 
-/**
- * Atributo de classe da próxima seção, alternando a faixa de fundo.
- *
- * O listrado não pode ficar fixo no HTML: como toda seção é opcional, basta a
- * cliente esvaziar um campo para duas seções claras ficarem coladas e o
- * contraste entre blocos sumir. Decidir na hora de imprimir mantém a
- * alternância correta em qualquer combinação de blocos.
- */
+// Atributo de classe da próxima seção, alternando a faixa de fundo. Decidido
+// na hora de imprimir porque toda seção é opcional.
 function faixa(): string
 {
     static $n = 0;
@@ -120,9 +84,6 @@ function faixa(): string
 <?php endif; ?>
 <link rel="canonical" href="<?= e($url_canonica) ?>">
 <?php if (!$indexar): ?>
-<!-- Oferta marcada como não indexável ("indexar": false no JSON). Usado em
-     páginas de demonstração e teste, que não devem disputar espaço no Google
-     com as ofertas reais. -->
 <meta name="robots" content="noindex, follow">
 <?php endif; ?>
 
@@ -145,9 +106,7 @@ function faixa(): string
 <script src="/assets/js/galeria.js" defer></script>
 <?php endif; ?>
 <?php if ($previa): ?>
-<?php /* O estilo da tarja mora aqui, e não em style.css, de propósito: é
-         enfeite exclusivo do painel, e o visitante da página publicada não
-         deve baixar um byte sequer de CSS que nunca vai usar. */ ?>
+<?php /* Estilo da tarja fica aqui, não em style.css: visitante público nunca carrega. */ ?>
 <style>
 .tarja-previa {
   position: sticky; top: 0; z-index: 50;
@@ -198,8 +157,6 @@ function faixa(): string
 
       <?= render_video($oferta) ?>
 
-      <?php /* Vídeo e galeria dividem o mesmo lugar. Oferta com os dois mostra
-               o vídeo primeiro; oferta só com foto usa este espaço sozinha. */ ?>
       <?= $galeria ?>
 
       <?= cta($link, $botao, $oferta['botao_sub'] ?? null) ?>
@@ -289,20 +246,13 @@ function faixa(): string
   </section>
   <?php endif; ?>
 
-  <?php /* A assinatura fecha a página, depois do FAQ.
-           Quem assina o texto é a última coisa que se lê: colocada no meio,
-           ela interrompia o argumento de venda para falar de quem escreveu.
-           No fim, funciona como o que de fato é — a pessoa se apresentando
-           depois de já ter dito tudo o que tinha a dizer. */ ?>
   <?php if (($oferta['mostrar_autor'] ?? true) !== false && !empty($oferta['autor']['texto'])): $a = $oferta['autor']; ?>
   <section<?= faixa() ?>>
     <div class="wrap">
       <h2><?= e($oferta['autor_titulo'] ?? "Why I'm sharing this") ?></h2>
       <div class="author">
         <?php if (!empty($a['foto'])):
-          // Caminho começando com "/" é arquivo do projeto (a foto padrão da
-          // assinatura). Qualquer outra coisa é nome de arquivo enviado pelo
-          // painel, e aí só o basename entra — o resto viraria path traversal.
+          // "/" no início é arquivo do projeto; senão, nome enviado pelo painel (só o basename).
           $foto = $a['foto'][0] === '/'
                 ? $a['foto']
                 : URL_UPLOADS . '/' . rawurlencode(basename($a['foto']));
@@ -347,8 +297,7 @@ function faixa(): string
 </div>
 
 <script>
-/* Fachada do vídeo: o player só é carregado quando o visitante clica.
-   Mantém a página leve em 4G e evita cookies de terceiro em quem nunca deu play. */
+// Fachada do vídeo: o player só carrega quando o visitante clica.
 document.addEventListener('click', function (evento) {
   var alvo = evento.target.closest('.video');
   if (!alvo) return;

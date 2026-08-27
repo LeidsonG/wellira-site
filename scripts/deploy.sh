@@ -4,21 +4,15 @@
 #
 # ⚠️  A REGRA MAIS IMPORTANTE DESTE ARQUIVO
 #
-# As ofertas, os vídeos, as imagens e a SENHA do painel existem SOMENTE no
-# servidor. Não estão no git, não estão na sua máquina, e não há outra cópia.
-# Um espelhamento com remoção, sem exclusões, apaga o trabalho da cliente para
-# sempre.
-#
-# Por isso este script:
+# Ofertas, vídeos, imagens e a SENHA do painel existem SOMENTE no servidor,
+# sem outra cópia. Um espelhamento sem exclusões apaga o trabalho da cliente
+# para sempre. Por isso este script:
 #   1. nunca envia o conteúdo de dados/, assets/videos nem assets/img/uploads
-#   2. roda em simulação por padrão — só envia de verdade com --real
+#   2. roda em simulação por padrão, só envia de verdade com --real
 #   3. só remove arquivo remoto com --limpar, e mesmo assim respeitando (1)
 #
-# POR QUE SFTP E NÃO rsync: a conta é de plano compartilhado e não tem shell
-# ("Shell access is not enabled on your account"). O rsync precisa executar um
-# processo do outro lado; o SFTP não. A mesma chave SSH autentica os dois, então
-# não se perde nada além da velocidade do algoritmo delta — e o mirror do lftp
-# já compara tamanho e data, enviando só o que mudou.
+# SFTP, não rsync: a conta é compartilhada, sem shell. rsync precisa executar
+# um processo do outro lado; SFTP não. A mesma chave autentica os dois.
 #
 set -euo pipefail
 
@@ -59,21 +53,15 @@ fi
 # O que NÃO vai
 # ---------------------------------------------------------------------------
 
-# ⚠️ NUNCA comece esta lista com --include-glob. No lftp, se a PRIMEIRA regra
-# é um include, o padrão inverte: tudo que não casa com include algum fica
-# excluído. Foi exatamente isso que aconteceu aqui — o deploy dizia "Enviado"
-# sem transferir um único arquivo, e com --limpar ainda apagava do servidor o
-# que não estava na lista de includes. Os .htaccess das pastas de conteúdo,
-# que eram a razão dos includes, agora sobem por put explícito após o mirror.
+# ⚠️ NUNCA comece esta lista com --include-glob: no lftp, a primeira regra
+# sendo um include inverte o padrão e exclui tudo que não casar com nenhum.
+# Os .htaccess das pastas de conteúdo sobem por put explícito após o mirror.
 EXCLUIR=(
   # --- Infraestrutura do servidor: NÃO é nossa, e --limpar apagaria ---
   #
-  # .well-known é onde o AutoSSL põe o arquivo de validação do domínio. Apagar
-  # essa pasta não derruba o site na hora: derruba quando o certificado vencer,
-  # porque a renovação falha calada. E como o .htaccess força HTTPS, "certificado
-  # vencido" significa site inacessível.
-  #
-  # cgi-bin e error_log são criados pelo cPanel e ele espera encontrá-los.
+  # .well-known é onde o AutoSSL põe a validação do domínio; apagar derruba o
+  # certificado (e o site, que força HTTPS) quando ele vencer.
+  # cgi-bin e error_log são criados pelo cPanel.
   --exclude-glob '.well-known/'
   --exclude-glob 'cgi-bin/'
   --exclude-glob 'error_log'
@@ -89,9 +77,7 @@ EXCLUIR=(
   --exclude-glob '.git/'
   --exclude-glob '.gitignore'
 
-  # Configuração local do Claude Code. Apareceu numa simulação indo para o
-  # servidor: não faz nada em produção, e pasta oculta com nome de ferramenta é
-  # exatamente o tipo de coisa que um scanner procura.
+  # Configuração local de ferramenta de desenvolvimento, não pertence a produção.
   --exclude-glob '.claude/'
 
   # --- Não pertence a produção ---
@@ -149,12 +135,9 @@ echo "Destino: sftp://${SSH_USUARIO}@${SSH_HOST}:${SSH_PORTA}${DESTINO}"
 echo "Chave  : $CHAVE"
 echo
 
-# O lftp fala SFTP through de um ssh que ele mesmo executa. Passar a chave e a
-# porta pelo connect-program é o que permite autenticar sem senha — não há
-# prompt, e nada de credencial fica no deploy.conf.
-# O usuário vai no próprio "open", com vírgula e nada depois: é assim que o lftp
-# entende "sem senha, quem autentica é o ssh". Passado por -u na linha de
-# comando, ele ainda pede senha e a conexão morre antes de começar.
+# O lftp fala SFTP através de um ssh que ele mesmo executa; a chave entra pelo
+# connect-program, e o usuário vai em "open" com vírgula e nada depois, é
+# assim que o lftp entende "sem senha, quem autentica é o ssh".
 lftp -e "set sftp:connect-program 'ssh -a -x -i $CHAVE -p $SSH_PORTA';
          set sftp:auto-confirm yes;
          set net:max-retries 5;
@@ -168,10 +151,8 @@ lftp -e "set sftp:connect-program 'ssh -a -x -i $CHAVE -p $SSH_PORTA';
          put -O '${DESTINO}/assets/img/uploads' '$RAIZ/assets/img/uploads/.htaccess';
          bye" 2>&1 | tee "$SAIDA"
 
-# O lftp sai com 0 mesmo quando o mirror aborta no meio. Aconteceu no primeiro
-# deploy real: ele removeu o WordPress, parou antes de enviar um único arquivo,
-# e o script anunciou "Enviado" — o site ficou fora do ar com um WordPress sem
-# miolo. Conferir a saída é a única forma de saber que terminou de verdade.
+# O lftp sai com 0 mesmo quando o mirror aborta no meio. Conferir a saída é a
+# única forma de saber que terminou de verdade.
 if grep -qiE "^(mirror: )?(fatal|error)|Login failed|No such file|Access failed|interrupt" "$SAIDA"; then
   echo
   echo "❌ O lftp relatou erro. NÃO confie no resultado — releia a saída acima." >&2
@@ -179,9 +160,8 @@ if grep -qiE "^(mirror: )?(fatal|error)|Login failed|No such file|Access failed|
   exit 1
 fi
 
-# Remoção sem nenhum envio é o sintoma exato do mirror que aborta no meio.
-# Deploy sem transferência nenhuma, por outro lado, é normal quando nada mudou —
-# por isso a condição exige as duas coisas juntas.
+# Remoção sem nenhum envio é o sintoma do mirror que aborta no meio; deploy
+# sem transferência é normal quando nada mudou, por isso exige as duas.
 if [[ $MODO_REAL -eq 1 ]] \
    && grep -qi "^Removing" "$SAIDA" \
    && ! grep -q "Transferring file" "$SAIDA"; then

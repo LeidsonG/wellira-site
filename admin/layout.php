@@ -6,7 +6,7 @@
  * público.
  */
 
-/** Abre a página. $titulo aparece na aba; $largo dá mais espaço ao formulário. */
+// Abre a página. $titulo aparece na aba; $largo dá mais espaço ao formulário.
 function painel_topo(string $titulo, bool $logado = true, bool $largo = false, string $classe = ''): void
 {
     ?><!DOCTYPE html>
@@ -17,14 +17,7 @@ function painel_topo(string $titulo, bool $logado = true, bool $largo = false, s
 <meta name="robots" content="noindex, nofollow">
 <title><?= e($titulo) ?> · Painel Wellira</title>
 <link rel="icon" type="image/png" href="/assets/img/favicon.png">
-<?php /* Marca que há JavaScript, para o CSS esconder o que só existe para quem
-         está sem ele, hoje, o campo de nome de arquivo de cada foto, que o
-         botão de envio da própria linha substitui.
-
-         Inline e antes da folha de estilo de propósito: admin.js é defer e roda
-         depois de a página ser desenhada, então uma classe posta por ele
-         chegaria tarde, os campos apareceriam por um instante antes de sumir,
-         a cada carregamento. */ ?>
+<?php // Marca JS antes do CSS, pois admin.js é defer e chegaria tarde. ?>
 <script>document.documentElement.className += ' js';</script>
 <link rel="stylesheet" href="/assets/css/admin.css">
 <script src="/assets/js/admin.js" defer></script>
@@ -38,15 +31,8 @@ function painel_topo(string $titulo, bool $logado = true, bool $largo = false, s
     <a class="marca" href="/admin/"><img class="marca-icone" src="/assets/img/favicon.png"
          alt="" width="26" height="26">Well<span>ira</span> <em>painel</em></a>
       <?php
-      /* Marca o item da página aberta.
-         "Nova oferta" saiu daqui: a tela de Ofertas já tem o botão, e um menu
-         com duas entradas para o mesmo caminho faz a pessoa procurar diferença
-         onde não há.
-         Sem isso o menu é uma fileira de links idênticos, e a única pista de
-         onde a pessoa está é o título da página, que no celular fica abaixo
-         da dobra. */
-      // Compara o caminho inteiro. basename() não serve: em /admin/ ele devolve
-      // "admin", que não é nome de arquivo nenhum, e a lista nunca casava.
+      // Marca o item da página aberta. basename() não serve aqui: em /admin/
+      // ele devolve "admin", e a lista nunca casaria.
       $aqui = (string) parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH);
       $itens = [
           ['/admin/',            'Ofertas',       ['/admin/', '/admin/index.php']],
@@ -68,7 +54,7 @@ function painel_topo(string $titulo, bool $logado = true, bool $largo = false, s
 <?php
 }
 
-/** Fecha a página. */
+// Fecha a página.
 function painel_rodape(bool $logado = true): void
 {
     ?>
@@ -84,10 +70,7 @@ function painel_rodape(bool $logado = true): void
 <?php endif; ?>
 
 <script>
-/* Confirmação de ação destrutiva.
-   O texto vem do atributo data-confirmar e não de JavaScript gerado em PHP:
-   interpolar o título dentro de confirm('...') quebrava a string sempre que ele
-   tinha apóstrofo, e um handler com erro de sintaxe não impede envio nenhum. */
+// Confirmação de ação destrutiva, lida do atributo data-confirmar.
 document.addEventListener('submit', function (evento) {
   var formulario = evento.target;
   var mensagem = formulario.getAttribute && formulario.getAttribute('data-confirmar');
@@ -96,9 +79,7 @@ document.addEventListener('submit', function (evento) {
     evento.preventDefault();
     return;
   }
-  /* Carimba a resposta. O servidor exige este campo para excluir: assim, um
-     pedido que chegue sem passar por aqui (JS desligado, script quebrado)
-     recebe a mesma pergunta numa página, em vez de apagar direto. */
+  // Carimba a resposta que o servidor exige para excluir.
   if (!formulario.querySelector('input[name="confirmado"]')) {
     var marca = document.createElement('input');
     marca.type = 'hidden';
@@ -114,7 +95,7 @@ document.addEventListener('submit', function (evento) {
 <?php
 }
 
-/** Caixa de aviso. $tipo: 'erro', 'ok' ou 'info'. */
+// Caixa de aviso. $tipo: 'erro', 'ok' ou 'info'.
 function painel_aviso(string $tipo, $mensagens): void
 {
     $lista = is_array($mensagens) ? $mensagens : [$mensagens];

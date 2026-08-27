@@ -4,15 +4,11 @@
    Carrossel sem biblioteca, sem requisição externa e sem autoplay.
 
    MELHORIA PROGRESSIVA: o trilho é uma área de rolagem nativa com scroll-snap,
-   feita no CSS. Arrastar com o dedo já funciona com este arquivo ausente ou
-   quebrado — o que se perde são as setas, os pontinhos e o teclado. Por isso o
-   script começa marcando a galeria como "pronta": é essa classe que revela as
-   setas, que nascem escondidas no CSS.
+   feita no CSS. Arrastar com o dedo já funciona sem este script; o que se
+   perde são as setas, os pontinhos e o teclado.
 
    O ÍNDICE ATUAL SAI SEMPRE DA POSIÇÃO DE ROLAGEM, nunca de um contador
-   interno. O visitante também arrasta o trilho com o dedo, e um contador
-   próprio começaria a mentir no primeiro swipe — pontinho aceso na foto errada
-   e seta escondida no meio da galeria.
+   interno, para não mentir quando o visitante arrasta o trilho.
    ========================================================================== */
 
 (function () {
@@ -21,17 +17,13 @@
   var galerias = document.querySelectorAll('[data-galeria]');
   if (!galerias.length) return;
 
-  /* Consultado uma vez só: a preferência do sistema não muda no meio da visita,
-     e ler matchMedia a cada clique não traria nada. */
+  // Consultado uma vez só: a preferência do sistema não muda no meio da visita.
   var SEM_ANIMACAO = !!(window.matchMedia &&
     window.matchMedia('(prefers-reduced-motion: reduce)').matches);
 
   Array.prototype.forEach.call(galerias, iniciar);
 
-  /**
-   * Liga uma galeria. Cada uma vive por si — a página pode ter várias, e
-   * nenhuma sabe da existência da outra.
-   */
+  // Liga uma galeria. Cada uma vive por si, a página pode ter várias.
   function iniciar(galeria) {
     var trilho = galeria.querySelector('[data-trilho]');
     if (!trilho) return;
@@ -47,9 +39,8 @@
     // Pontinhos
     // -------------------------------------------------------------------------
 
-    /* O PHP entrega a caixa vazia (ou pode não entregar caixa nenhuma): quem
-       cria um botão por foto é aqui, porque sem JavaScript eles não navegariam
-       para lugar algum. */
+    // O PHP entrega a caixa vazia; o botão por foto nasce aqui, sem JS eles
+    // não navegariam para lugar algum.
     if (caixaPontos) {
       itens.forEach(function (item, i) {
         var ponto = document.createElement('button');
@@ -86,9 +77,8 @@
       else if (evento.key === 'End')       destino = itens.length - 1;
       else return;
 
-      /* Sem isto o navegador rolaria o container alguns pixels por tecla, e o
-         scroll-snap puxaria de volta: o teclado pareceria travado. Aqui a seta
-         anda uma foto inteira, igual ao clique. */
+      // Sem isto o navegador rolaria alguns pixels e o scroll-snap puxaria de
+      // volta, travando o teclado. Aqui a seta anda uma foto inteira.
       evento.preventDefault();
       irPara(destino);
     });
@@ -100,9 +90,7 @@
     var aguardando = false;
 
     trilho.addEventListener('scroll', function () {
-      /* O evento de scroll dispara dezenas de vezes por gesto. Um quadro de
-         animação por vez basta para os pontinhos acompanharem o dedo sem
-         recalcular posição a cada disparo. */
+      // O evento dispara dezenas de vezes por gesto; um quadro por vez basta.
       if (aguardando) return;
       aguardando = true;
 
@@ -120,20 +108,13 @@
     // Auxiliares
     // -------------------------------------------------------------------------
 
-    /**
-     * Distância que o trilho precisa rolar para o item ficar no começo da área
-     * visível.
-     *
-     * offsetLeft do item e do trilho são medidos a partir do mesmo ancestral
-     * posicionado (.galeria-carrossel), então a subtração dá a posição do item
-     * dentro do conteúdo do trilho — independente de gap, padding ou de quantas
-     * fotos vieram antes.
-     */
+    // Distância que o trilho precisa rolar para o item ficar no começo da
+    // área visível (offsetLeft do item e do trilho, mesmo ancestral posicionado).
     function deslocamento(item) {
       return item.offsetLeft - trilho.offsetLeft;
     }
 
-    /** Índice da foto mais próxima do centro da área visível. */
+    // Índice da foto mais próxima do centro da área visível.
     function indiceVisivel() {
       var centro = trilho.scrollLeft + trilho.clientWidth / 2;
       var melhor = 0;
@@ -146,27 +127,25 @@
       return melhor;
     }
 
-    /** Rola até a foto pedida, ignorando pedidos fora das pontas. */
+    // Rola até a foto pedida, ignorando pedidos fora das pontas.
     function irPara(indice) {
       if (indice < 0) indice = 0;
       if (indice > itens.length - 1) indice = itens.length - 1;
 
       var destino = deslocamento(itens[indice]);
 
-      /* Com "reduzir movimento" ligado a rolagem é seca, e a atribuição direta
-         de scrollLeft também cobre navegador sem scrollTo por opções. */
+      // "Reduzir movimento" ligado, ou sem scrollTo: atribuição direta.
       if (SEM_ANIMACAO || !trilho.scrollTo) {
         trilho.scrollLeft = destino;
       } else {
         trilho.scrollTo({ left: destino, behavior: 'smooth' });
       }
 
-      /* Rolar para onde já se está não dispara evento de scroll — sem esta
-         chamada o estado poderia ficar desatualizado nesse caso. */
+      // Rolar para onde já se está não dispara evento de scroll.
       sincronizar();
     }
 
-    /** Acende o pontinho da foto atual e esconde a seta que não tem para onde ir. */
+    // Acende o pontinho da foto atual e esconde a seta sem para onde ir.
     function sincronizar() {
       var indice = indiceVisivel();
 

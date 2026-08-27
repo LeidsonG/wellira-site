@@ -2,20 +2,13 @@
 # =============================================================================
 # Servidor de desenvolvimento
 # =============================================================================
-# Existe para que o local se comporte como a HostGator em duas coisas que o
-# `php -S` sozinho não faz:
+# Repõe duas coisas que o `php -S` sozinho ignora, mas valem em produção:
 #
-#   1. Roteamento. O servidor embutido não lê .htaccess, então tools/dev-router.php
-#      reproduz a reescrita /<slug> -> oferta.php e os bloqueios de acesso.
+#   1. Roteamento. tools/dev-router.php reproduz o .htaccess: reescrita de
+#      /<slug> para oferta.php e os bloqueios de acesso.
 #
-#   2. Limites de upload. O servidor embutido também não lê .user.ini, e a
-#      instalação padrão do PHP traz upload_max_filesize = 2M. O painel mostra
-#      sempre o limite REAL (o menor entre o teto do código e o do servidor),
-#      então sem estes -d a aba Imagens anuncia "até 2 MB cada" e parece que a
-#      constante de 8 MB não está valendo. Os valores repetem o .user.ini.
-#
-# Era um comando longo demais para digitar de memória, e digitado pela metade
-# reintroduzia justamente o sintoma que ele existe para evitar.
+#   2. Limites de upload. Sem os -d abaixo (que repetem o .user.ini), o PHP
+#      local cai nos 2M padrão e a aba Imagens anuncia "até 2 MB cada".
 
 set -euo pipefail
 

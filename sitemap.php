@@ -2,25 +2,16 @@
 /**
  * Sitemap XML, montado na hora a partir das ofertas em dados/ofertas/.
  *
- * É gerado a cada requisição em vez de ser um arquivo estático porque a cliente
- * cria e despublica ofertas pelo painel, sem passar por deploy. Um sitemap.xml
- * fixo no repositório envelheceria no primeiro produto novo, e mandar o Google
- * a URLs que já viraram 404 custa reputação de rastreamento.
- *
- * O custo é irrelevante para o plano compartilhado: são alguns json_decode de
- * arquivos pequenos, e só o robô do buscador chega aqui.
- *
- * Entram apenas ofertas publicadas e indexáveis — os mesmos critérios que
- * oferta.php aplica na meta robots. Se divergissem, o sitemap estaria
- * anunciando páginas que pedem para não ser indexadas, que é o tipo de sinal
- * contraditório que o Search Console reporta como erro.
+ * Gerado a cada requisição porque a cliente cria e despublica ofertas pelo
+ * painel, sem deploy. Entram só ofertas publicadas e indexáveis, os mesmos
+ * critérios que oferta.php aplica na meta robots.
  */
 
 require_once __DIR__ . '/inc/funcoes.php';
 
 header('Content-Type: application/xml; charset=utf-8');
 
-/** Páginas fixas, com a prioridade relativa que fazem sentido no site. */
+// Páginas fixas, com a prioridade relativa que fazem sentido no site.
 $paginas = [
     ['/',                  '1.0'],
     ['/privacy-policy/',   '0.3'],
