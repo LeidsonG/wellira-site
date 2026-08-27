@@ -23,7 +23,7 @@
   var GA4_ID = IDS.ga4 || '';
 
   // Só rastreia no domínio de produção, para o servidor local não somar às estatísticas.
-  var DOMINIOS = ['wellira.online', 'www.wellira.online'];
+  var DOMINIOS = ['wellira.example', 'www.wellira.example'];
 
   if (DOMINIOS.indexOf(window.location.hostname) === -1) {
     return;

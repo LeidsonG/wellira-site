@@ -95,4 +95,4 @@ const AUTOR_TITULO_PADRAO = "Why I'm sharing this";
 // ---------------------------------------------------------------------------
 
 // Endereço canônico, sem barra final. Usado no <link rel="canonical"> e no sitemap.
-const SITE_URL = 'https://wellira.online';
+const SITE_URL = 'https://wellira.example';

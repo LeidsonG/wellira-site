@@ -268,7 +268,7 @@ if (!empty($_GET['ok'])) {
     <div class="campo">
       <label for="slug">Endereço da página</label>
       <div class="prefixo">
-        <span>wellira.online/</span>
+        <span>wellira.example/</span>
         <input type="text" id="slug" name="slug" value="<?= e($slug) ?>"
                maxlength="64" pattern="[a-z0-9-]+"
                placeholder="se vazio, gera igual ao título">

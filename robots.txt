@@ -25,4 +25,4 @@ User-agent: *
 # a cliente usa para saber qual página converte.
 Disallow: /go/
 
-Sitemap: https://wellira.online/sitemap.xml
+Sitemap: https://wellira.example/sitemap.xml

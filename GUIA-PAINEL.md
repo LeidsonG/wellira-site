@@ -7,7 +7,7 @@ nada de programação.
 
 ## Entrar
 
-1. Acesse **wellira.online/admin**
+1. Acesse **wellira.example/admin**
 2. Digite **usuário e senha** e clique em **Entrar**
 
 Se errar cinco vezes, o painel bloqueia por 15 minutos. É proposital: impede que
@@ -192,7 +192,7 @@ três ficam iguais.
 
 ## O endereço da página
 
-O endereço é a parte final do link: em `wellira.online/vitalane`, o endereço é
+O endereço é a parte final do link: em `wellira.example/vitalane`, o endereço é
 `vitalane`.
 
 - Deixe **em branco** ao criar, que ele é gerado do título automaticamente

@@ -1,7 +1,11 @@
 # Wellira
 
 Site de landing pages de produto para uma cliente real, no ar desde agosto de
-2026 em `wellira.online`, hospedado em plano compartilhado (HostGator).
+2026, hospedado em plano compartilhado (HostGator).
+
+> O domínio real da cliente não aparece neste repositório público. Onde o
+> código precisa de um endereço (canonical, sitemap, JSON-LD), uso
+> `wellira.example`, reservado pela IANA e sem site nenhum por trás.
 
 Cada oferta vira uma página em `/<slug>`: título, vídeo e/ou galeria de fotos,
 texto de venda e botões que levam ao site do fornecedor. A cliente cria,
