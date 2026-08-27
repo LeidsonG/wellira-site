@@ -6,10 +6,10 @@
 #
 # O que NÃO fica aqui, de propósito:
 #
-# - Caminhos internos (/admin, /inc, /dados). robots.txt é público: listar
-#   pasta sensível não protege nada e entrega o mapa a quem varre o site.
-#   Quem protege essas pastas é o "Require all denied" do .htaccess, que é
-#   bloqueio de verdade, no servidor — não pedido de boa vontade ao robô.
+# - Caminhos internos. robots.txt é público: listar pasta sensível não protege
+#   nada e entrega o mapa a quem varre o site. Quem protege essas pastas é o
+#   "Require all denied" do .htaccess, que é bloqueio de verdade, no servidor.
+#   Não é pedido de boa vontade ao robô.
 #
 # - Páginas que devem sair do índice. Disallow impede a LEITURA, e uma página
 #   não lida é uma página cuja meta "noindex" o Google nunca enxerga: ela pode
